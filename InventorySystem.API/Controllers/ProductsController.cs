@@ -1,0 +1,72 @@
+﻿using InventorySystem.Core.DTOs;
+using InventorySystem.Core.Interfaces;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+
+namespace InventorySystem.API.Controllers
+{
+    [ApiController]
+    [Route("api/[controller]")]
+    //[Authorize]
+    public class ProductsController : ControllerBase
+    {
+        private readonly IProductService _service;
+
+        public ProductsController(IProductService service)
+        {
+            _service = service;
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetAll()
+        {
+            var products = await _service.GetAllProductsAsync();
+            return Ok(products);
+        }
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetById(int id)
+        {
+            var product = await _service.GetProductByIdAsync(id);
+            if (product == null)
+            {
+                return NotFound(new { message = "Product not found" });
+            }
+            return Ok(product);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Create(BaseDto dto)
+        {
+            var product = await _service.CreateProductAsync(dto);
+
+            return CreatedAtAction(
+                nameof(GetById),
+                new { id = product.Id },
+                product);
+        }
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Update(int id, BaseDto dto)
+        {
+            var updated = await _service.UpdateProductAsync(id, dto);
+            if (!updated)
+            {
+                return NotFound(new { message = "product not found to update " });
+            }
+
+            return Ok(new {message = "product successfully updated"});
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(int id)
+        {
+            var deleted = await _service.DeleteProductAsync(id);
+
+            if (!deleted)
+                return NotFound(new { message = "Product not found" }); 
+
+            return Ok(new { message = "Product deleted successfully" });
+        }
+    }
+}

@@ -1,0 +1,28 @@
+.product-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+}
+
+    .product-table th,
+    .product-table td {
+        border: 1px solid #ddd;
+        padding: 12px;
+    }
+
+.edit-btn {
+    background: #22c55e;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    margin-right: 10px;
+    cursor: pointer;
+}
+
+.delete-btn {
+    background: #ef4444;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    cursor: pointer;
+}

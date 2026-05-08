@@ -1,0 +1,49 @@
+.register-container {
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #e2e8f0;
+}
+
+.register-box {
+    background: white;
+    padding: 30px;
+    width: 320px;
+    border-radius: 10px;
+}
+
+.register-box input {
+    width: 100%;
+    margin-bottom: 10px;
+    padding: 10px;
+}
+
+.register-box button {
+    width: 100%;
+    padding: 10px;
+    background: #10b981;
+    color: white;
+    border: none;
+}
+
+.link-text {
+    margin-top: 10px;
+    text-align: center;
+}
+
+.link-text a {
+    color: #3b82f6;
+    text-decoration: none;
+    font-weight: bold;
+}
+.error-text {
+    color: red;
+    font-size: 14px;
+    margin: 5px 0 10px;
+}
+
+button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}

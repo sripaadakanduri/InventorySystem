@@ -1,0 +1,57 @@
+.order-form-container {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    margin-bottom: 30px;
+}
+
+    .order-form-container h2 {
+        margin-bottom: 20px;
+    }
+
+.order-item-row {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+    .order-item-row select,
+    .order-item-row input {
+        padding: 10px;
+        flex: 1;
+    }
+
+.add-btn,
+.submit-btn,
+.remove-btn {
+    padding: 10px 15px;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+.add-btn {
+    background: #3498db;
+    color: white;
+    margin-right: 10px;
+}
+
+.submit-btn {
+    background: #2ecc71;
+    color: white;
+}
+
+.remove-btn {
+    background: #e74c3c;
+    color: white;
+}
+
+.error-text {
+    color: red;
+    margin-top: 15px;
+}
+
+.success-text {
+    color: green;
+    margin-top: 15px;
+}

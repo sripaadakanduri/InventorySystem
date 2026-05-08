@@ -1,0 +1,12 @@
+﻿using InventorySystem.Core.DTOs;
+namespace InventorySystem.Core.Interfaces
+{
+    public interface IProductService
+    {
+        Task<IEnumerable<ProductDto>> GetAllProductsAsync();
+        Task<ProductDto?> GetProductByIdAsync(int id);
+        Task<ProductDto> CreateProductAsync(BaseDto dto);
+        Task<bool> UpdateProductAsync(int id, BaseDto dto);
+        Task<bool> DeleteProductAsync(int id);
+    }
+}
