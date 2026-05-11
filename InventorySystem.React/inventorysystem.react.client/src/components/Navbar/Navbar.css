@@ -1,21 +1,78 @@
 .navbar {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    border-bottom: 1px solid var(--border);
+}
+
+.navbar-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 1rem 2rem;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 15px 30px;
-    background: #1f2937;
-    color: white;
+}
+
+.navbar-brand {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    cursor: pointer;
+    transition: opacity 0.2s;
+}
+
+    .navbar-brand:hover {
+        opacity: 0.8;
+    }
+
+    .navbar-brand h2 {
+        margin: 0;
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: var(--text-main);
+    }
+
+.logo-icon {
+    font-size: 1.5rem;
 }
 
 .nav-links {
     display: flex;
-    gap: 10px;
+    gap: 0.5rem;
 }
 
-    .nav-links button {
-        padding: 8px 15px;
-        border: none;
-        cursor: pointer;
-        background: white;
-        border-radius: 5px;
+.nav-btn {
+    background: transparent;
+    color: var(--text-muted);
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    font-weight: 500;
+}
+
+    .nav-btn:hover {
+        color: var(--text-main);
+        background: var(--surface-hover);
+    }
+
+    .nav-btn.active {
+        color: var(--primary);
+        background: var(--primary-hover);
+        color: white;
+    }
+
+.btn-logout {
+    background: transparent;
+    color: var(--danger);
+    border: 1px solid var(--danger);
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    font-weight: 500;
+    transition: all 0.2s;
+}
+
+    .btn-logout:hover {
+        background: var(--danger);
+        color: white;
     }

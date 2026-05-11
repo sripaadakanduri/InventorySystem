@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.VisualStudio.JavaScript.Sdk/1.0.5171056">
+﻿<Project Sdk="Microsoft.VisualStudio.JavaScript.Sdk/1.0.5171056">
   <PropertyGroup>
     <StartupCommand>npm run dev</StartupCommand>
     <JavaScriptTestRoot>src\</JavaScriptTestRoot>
@@ -10,6 +10,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Folder Include="src\components\Navbar\" />
+    <Folder Include="src\components\Layout\" />
     <Folder Include="src\components\OrderForm\" />
     <Folder Include="src\components\OrderList\" />
     <Folder Include="src\components\ProductForm\" />

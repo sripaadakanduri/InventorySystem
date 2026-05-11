@@ -45,9 +45,8 @@ function Orders() {
     };
 
     return (
-        <div className="orders-page">
-
-            <h1>Order Management</h1>
+        <div className="orders-page card">
+            <h1 style={{ marginBottom: "2rem" }}>Order Management</h1>
 
             <OrderForm
                 onOrderCreated={handleOrderCreated}

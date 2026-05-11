@@ -25,8 +25,8 @@ export default function Login() {
     };
 
     return (
-        <div className="login-container">
-            <form onSubmit={submit} className="login-box">
+        <div className="auth-container">
+            <form onSubmit={submit} className="auth-box glass card">
                 <h2>Login</h2>
 
                 {error && <p className="error-text">{error}</p>}
@@ -46,7 +46,7 @@ export default function Login() {
                     }
                 />
 
-                <button type="submit">Login</button>
+                <button type="submit" className="btn-primary">Login</button>
 
                 <p className="link-text">
                     Don't have an account?{" "}

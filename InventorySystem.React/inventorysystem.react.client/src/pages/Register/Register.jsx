@@ -41,8 +41,8 @@ export default function Register() {
     };
 
     return (
-        <div className="register-container">
-            <form onSubmit={submit} className="register-box">
+        <div className="auth-container">
+            <form onSubmit={submit} className="auth-box glass card">
                 <h2>Register</h2>
 
                 {/* General error */}
@@ -88,7 +88,7 @@ export default function Register() {
                 )}
 
                 {/* Submit */}
-                <button type="submit" disabled={loading}>
+                <button type="submit"  className= "btn-primary" disabled={loading}>
                     {loading ? "Registering..." : "Register"}
                 </button>
 

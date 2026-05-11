@@ -1,7 +1,75 @@
 .dashboard {
-    padding: 40px;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    animation: slideUp 0.3s ease-out;
 }
 
-    .dashboard h1 {
-        color: #1e293b;
+.dashboard-header h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    color: var(--text-main);
+}
+
+.dashboard-header p {
+    color: var(--text-muted);
+    font-size: 1.1rem;
+}
+
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+}
+
+.stat-card {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    padding: 1.5rem;
+}
+
+.stat-icon {
+    width: 64px;
+    height: 64px;
+    border-radius: 16px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 2rem;
+}
+
+.stat-info h3 {
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: var(--text-muted);
+    margin: 0 0 0.25rem 0;
+}
+
+.stat-value {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--text-main);
+    margin: 0;
+}
+
+.dashboard-content {
+    min-height: 300px;
+}
+
+    .dashboard-content h2 {
+        font-size: 1.25rem;
+        margin-bottom: 1.5rem;
+        color: var(--text-main);
     }
+
+.empty-state {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 200px;
+    border: 2px dashed var(--border);
+    border-radius: var(--radius);
+    color: var(--text-muted);
+}

@@ -6,33 +6,25 @@ import Products from "./pages/Products/Products";
 import Dashboard from "./pages/Dashboard/Dashboard";
 import Orders from "./pages/Orders/Orders";
 import ProtectedRoute from "./utils/ProtectedRoute";
+import Layout from "./components/Layout/Layout";
+import Transactions from "./pages/Transactions/Transactions";
 
 function App() {
     return (
         <BrowserRouter>
-
-            <h1 style={{ textAlign: "center" }}>Welcome</h1>
-
             <Routes>
-
+                {/* Public Routes */}
                 <Route path="/" element={<Navigate to="/login" />} />
-
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
-                <Route path="/products" element={<Products />} />
-                <Route
-                    path="/orders"
-                    element={<Orders />}
-                />
-                <Route
-                    path="/dashboard"
-                    element={
-                        <ProtectedRoute>
-                            <Dashboard />
-                        </ProtectedRoute>
-                    }
-                />
 
+                {/* Protected Routes inside Layout */}
+                <Route element={<ProtectedRoute><Layout /></ProtectedRoute>}>
+                    <Route path="/dashboard" element={<Dashboard />} />
+                    <Route path="/products" element={<Products />} />
+                    <Route path="/orders" element={<Orders />} />
+                    <Route path="/transactions" element={<Transactions />} />
+                </Route>
             </Routes>
         </BrowserRouter>
     );

@@ -19,6 +19,7 @@ builder.Services.AddScoped<UserRepository>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<JwtServices>();
 builder.Services.AddScoped<IOrderService, OrderServices>();
+builder.Services.AddScoped<IInventoryTransactionService, InventoryTransactionService>();
 
 
 builder.Services.AddAuthentication("Bearer")

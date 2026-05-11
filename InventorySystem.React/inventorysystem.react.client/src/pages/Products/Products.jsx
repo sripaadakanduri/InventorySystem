@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-import Navbar from "../../components/Navbar/Navbar";
+
 import ProductForm from "../../components/ProductForm/ProductForm";
 import ProductTable from "../../components/ProductTable/ProductTable";
 
@@ -35,26 +35,26 @@ function Products() {
     };
 
     // Load products when component mounts
-        useEffect(() => {
+    useEffect(() => {
 
-            let isMounted = true;
+        let isMounted = true;
 
-            (async () => {
-                try {
-                    const data = await getProducts();
-                    if (isMounted) {
-                        setProducts(data);
-                    }
-                } catch (error) {
-                    console.log(error);
+        (async () => {
+            try {
+                const data = await getProducts();
+                if (isMounted) {
+                    setProducts(data);
                 }
-            })();
+            } catch (error) {
+                console.log(error);
+            }
+        })();
 
-            return () => {
-                isMounted = false;
-            };
+        return () => {
+            isMounted = false;
+        };
 
-        }, []);
+    }, []);
 
     // Create or Update Product
     const handleSubmit = async (formData) => {
@@ -102,26 +102,20 @@ function Products() {
     };
 
     return (
-        <div>
+        <div className="products-container card">
+            <h1 style={{ marginBottom: "2rem" }}>Products Management</h1>
 
-            <Navbar />
+            <ProductForm
+                onSubmit={handleSubmit}
+                selectedProduct={selectedProduct}
+            />
 
-            <div className="products-container">
+            <ProductTable
+                products={products}
+                onEdit={handleEdit}
+                onDelete={handleDelete}
+            />
 
-                <h1>Products</h1>
-
-                <ProductForm
-                    onSubmit={handleSubmit}
-                    selectedProduct={selectedProduct}
-                />
-
-                <ProductTable
-                    products={products}
-                    onEdit={handleEdit}
-                    onDelete={handleDelete}
-                />
-
-            </div>
 
         </div>
     );
