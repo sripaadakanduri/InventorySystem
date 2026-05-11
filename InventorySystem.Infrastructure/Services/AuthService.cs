@@ -1,22 +1,26 @@
-﻿using InventorySystem.Core.Interfaces;
-using InventorySystem.Infrastructure.Repositories;
-using InventorySystem.Infrastructure.Auth;
-using InventorySystem.Core.DTOs;
+﻿using InventorySystem.Core.DTOs;
 using InventorySystem.Core.Entities;
-using System.ComponentModel.DataAnnotations;
-using Microsoft.AspNetCore.Identity;
+using InventorySystem.Core.Interfaces;
+using InventorySystem.Infrastructure.Auth;
+using InventorySystem.Infrastructure.Data;
 using InventorySystem.Infrastructure.Helpers;
+using InventorySystem.Infrastructure.Repositories;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
 namespace InventorySystem.Infrastructure.Services
 {
     public class AuthService:IAuthService
     {
         private readonly UserRepository _repo;
         private readonly JwtServices _jwt;
+        private readonly AppDbContext _context;
         
-        public AuthService(UserRepository userRepository, JwtServices jwt)
+        public AuthService(UserRepository userRepository, JwtServices jwt, AppDbContext context)
         {
             _repo = userRepository;
             _jwt = jwt;
+            _context = context;
         }
 
         public async Task<AuthResponseDto> RegisterAsync(RegisterDto dto)
@@ -55,6 +59,8 @@ namespace InventorySystem.Infrastructure.Services
             {
                 throw new InvalidOperationException("Invalid Password");
             }
+            user.LastLoginAt = DateTime.UtcNow;
+            await _context.SaveChangesAsync();
 
             var token = _jwt.GenerateToken(user);
             return new AuthResponseDto

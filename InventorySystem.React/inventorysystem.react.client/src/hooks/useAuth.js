@@ -1,31 +1,66 @@
-import { useNavigate } from "react-router-dom";
-import * as auth from "../services/auth";
+/* eslint-disable no-useless-catch */
 
-export default function useAuth() {
+import { useNavigate } from "react-router-dom";
+
+import {
+    login,
+    register,
+    logout,
+    isAuthenticated,
+    getRole,
+    getUsername
+} from "../services/auth";
+
+const useAuth = () => {
+
     const navigate = useNavigate();
 
     const handleLogin = async (data) => {
+
         try {
-            await auth.login(data);
-            navigate("/dashboard");
+
+            const response = await login(data);
+
+            if (response.role === "Admin") {
+                navigate("/admin/dashboard");
+            }
+            else {
+                navigate("/dashboard");
+            }
+
         } catch (err) {
-            throw err; // ✅ send error back
+            throw err;
         }
     };
 
     const handleRegister = async (data) => {
+
         try {
-            await auth.register(data);
+
+            await register(data);
+
             navigate("/login");
+
         } catch (err) {
             throw err;
         }
     };
 
     const handleLogout = () => {
-        auth.logout();
+
+        logout();
+
         navigate("/login");
     };
 
-    return { handleLogin, handleRegister, handleLogout };
-}
+    return {
+        handleLogin,
+        handleRegister,
+        handleLogout,
+        isAuthenticated: isAuthenticated(),
+        role: getRole(),
+        username: getUsername()
+    };
+};
+
+export default useAuth;

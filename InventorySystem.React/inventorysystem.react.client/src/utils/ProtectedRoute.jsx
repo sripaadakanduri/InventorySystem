@@ -1,10 +1,20 @@
 import { Navigate } from "react-router-dom";
-import { isAuthenticated } from "../services/auth";
+import {
+    isAuthenticated,
+    getRole
+} from "../services/auth";
 
-export default function ProtectedRoute({ children }) {
+const ProtectedRoute = ({ children, role }) => {
+
     if (!isAuthenticated()) {
         return <Navigate to="/login" />;
     }
 
+    if (role && getRole() !== role) {
+        return <Navigate to="/dashboard" />;
+    }
+
     return children;
-}
+};
+
+export default ProtectedRoute;

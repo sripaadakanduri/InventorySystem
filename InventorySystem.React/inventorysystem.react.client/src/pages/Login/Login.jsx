@@ -1,58 +1,99 @@
 import { useState } from "react";
-import useAuth from "../../hooks/useAuth";
 import { Link } from "react-router-dom";
+import useAuth from "../../hooks/useAuth";
 import "./Login.css";
 
-export default function Login() {
+const Login = () => {
+
     const { handleLogin } = useAuth();
 
-    const [form, setForm] = useState({
+    const [formData, setFormData] = useState({
         username: "",
         password: ""
     });
 
-    const [error, setError] = useState(""); // ✅ store error message
+    const [error, setError] = useState("");
 
-    const submit = async (e) => {
+    const handleChange = (e) => {
+
+        setFormData({
+            ...formData,
+            [e.target.name]: e.target.value
+        });
+    };
+
+    const handleSubmit = async (e) => {
+
         e.preventDefault();
-        setError(""); // clear previous error
+
+        setError("");
 
         try {
-            await handleLogin(form);
+
+            await handleLogin(formData);
+
         } catch (err) {
-            setError(err?.response?.data || "Login failed");
+
+            setError(
+                err?.response?.data || "Invalid credentials"
+            );
         }
     };
 
     return (
+
         <div className="auth-container">
-            <form onSubmit={submit} className="auth-box glass card">
+
+            <form
+                onSubmit={handleSubmit}
+                className="auth-box glass card"
+            >
+
                 <h2>Login</h2>
 
-                {error && <p className="error-text">{error}</p>}
+                {
+                    error && (
+                        <p className="error-text">
+                            {error}
+                        </p>
+                    )
+                }
 
                 <input
+                    type="text"
+                    name="username"
                     placeholder="Username"
-                    onChange={(e) =>
-                        setForm({ ...form, username: e.target.value })
-                    }
+                    onChange={handleChange}
                 />
 
                 <input
                     type="password"
+                    name="password"
                     placeholder="Password"
-                    onChange={(e) =>
-                        setForm({ ...form, password: e.target.value })
-                    }
+                    onChange={handleChange}
                 />
 
-                <button type="submit" className="btn-primary">Login</button>
+                <button
+                    type="submit"
+                    className="btn-primary"
+                >
+                    Login
+                </button>
 
                 <p className="link-text">
+
                     Don't have an account?{" "}
-                    <Link to="/register">Register</Link>
+
+                    <Link to="/register">
+                        Register
+                    </Link>
+
                 </p>
+
             </form>
+
         </div>
     );
-}
+};
+
+export default Login;

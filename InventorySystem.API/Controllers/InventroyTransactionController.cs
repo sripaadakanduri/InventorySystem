@@ -1,10 +1,13 @@
-﻿using InventorySystem.Core.Interfaces;
+﻿using InventorySystem.Core.Enums;
+using InventorySystem.Core.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace InventorySystem.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(Roles = UserRoles.Admin)]
     public class InventoryTransactionsController : ControllerBase
     {
         private readonly IInventoryTransactionService _transactionService;

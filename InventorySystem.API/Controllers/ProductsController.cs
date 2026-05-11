@@ -1,6 +1,7 @@
 ﻿using InventorySystem.Core.DTOs;
 using InventorySystem.Core.Interfaces;
 using Microsoft.AspNetCore.Authorization;
+using InventorySystem.Core.Enums;
 using Microsoft.AspNetCore.Mvc;
 
 namespace InventorySystem.API.Controllers
@@ -36,6 +37,7 @@ namespace InventorySystem.API.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = UserRoles.Admin)]
         public async Task<IActionResult> Create(BaseDto dto)
         {
             var product = await _service.CreateProductAsync(dto);
@@ -47,6 +49,7 @@ namespace InventorySystem.API.Controllers
         }
 
         [HttpPut("{id}")]
+        [Authorize(Roles = UserRoles.Admin)]
         public async Task<IActionResult> Update(int id, BaseDto dto)
         {
             var updated = await _service.UpdateProductAsync(id, dto);
@@ -59,6 +62,7 @@ namespace InventorySystem.API.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize(Roles = UserRoles.Admin)]
         public async Task<IActionResult> Delete(int id)
         {
             var deleted = await _service.DeleteProductAsync(id);
