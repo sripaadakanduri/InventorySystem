@@ -24,6 +24,7 @@ builder.Services.AddAuthorization();
 
 builder.Services.AddScoped<IOrderService, OrderServices>();
 builder.Services.AddScoped<IInventoryTransactionService, InventoryTransactionService>();
+builder.Services.AddScoped<IUserService, UserService>();
 
 
 //builder.Services.AddAuthentication("Bearer")

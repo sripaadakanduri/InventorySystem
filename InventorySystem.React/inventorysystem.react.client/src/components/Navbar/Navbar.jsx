@@ -1,54 +1,107 @@
 // Navbar.jsx
-import { Link } from "react-router-dom";
+
+import { Link, useLocation } from "react-router-dom";
 import useAuth from "../../hooks/useAuth";
+import "./Navbar.css";
+import { isAuthenticated } from "../../services/auth";
 
 const Navbar = () => {
-    const { logoutUser, role, username } = useAuth();
+
+    const { handleLogout, role, username } = useAuth();
+
+    const location = useLocation();
+    if (!isAuthenticated()) {
+        return null;
+    }
 
     return (
-        <nav
-            style={{
-                padding: "15px 20px",
-                borderBottom: "1px solid gray",
-                marginBottom: "20px",
-                display: "flex",
-                alignItems: "center",
-                gap: "15px",
-                flexWrap: "wrap",
-                backgroundColor: "#f8f8f8"
-            }}
-        >
-            {/* Common links for all users */}
-            <Link to="/dashboard">Dashboard</Link>
-            <Link to="/orders">Orders</Link>
-            <Link to="/Products">Products</Link>
+        <nav className="navbar">
 
-            {/* Admin-only links */}
-            {role === "Admin" && (
-                <>
-                    <Link to="/admin/users">Users</Link>
-                    <Link to="/transactions">Transactions</Link>
+            <div className="navbar-container">
 
-                </>
-            )}
+                {/* Brand */}
+                <div className="navbar-brand">
+                    <span className="logo-icon">🛒</span>
+                    <h2>Inventory App</h2>
+                </div>
 
-            {/* Spacer pushes username and logout to right */}
-            <div style={{ marginLeft: "auto", display: "flex", gap: "10px", alignItems: "center" }}>
-                <span>Welcome {username}</span>
-                <button
-                    onClick={logoutUser}
+                {/* Navigation Links */}
+                <div className="nav-links">
+
+                    <Link to="/dashboard">
+                        <button
+                            className={`nav-btn ${location.pathname === "/dashboard" ? "active" : ""
+                                }`}
+                        >
+                            Dashboard
+                        </button>
+                    </Link>
+
+                    <Link to="/orders">
+                        <button
+                            className={`nav-btn ${location.pathname === "/orders" ? "active" : ""
+                                }`}
+                        >
+                            Orders
+                        </button>
+                    </Link>
+
+                    <Link to="/products">
+                        <button
+                            className={`nav-btn ${location.pathname === "/products" ? "active" : ""
+                                }`}
+                        >
+                            Products
+                        </button>
+                    </Link>
+
+                    {/* Admin Links */}
+                    {role === "Admin" && (
+                        <>
+                            <Link to="/admin/users">
+                                <button
+                                    className={`nav-btn ${location.pathname === "/admin/users"
+                                        ? "active"
+                                        : ""
+                                        }`}
+                                >
+                                    Users
+                                </button>
+                            </Link>
+
+                            <Link to="/transactions">
+                                <button
+                                    className={`nav-btn ${location.pathname === "/transactions"
+                                        ? "active"
+                                        : ""
+                                        }`}
+                                >
+                                    Transactions
+                                </button>
+                            </Link>
+                        </>
+                    )}
+                </div>
+
+                {/* Right Side */}
+                <div
                     style={{
-                        padding: "5px 10px",
-                        cursor: "pointer",
-                        backgroundColor: "#007bff",
-                        color: "#fff",
-                        border: "none",
-                        borderRadius: "4px"
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "1rem"
                     }}
                 >
-                    Logout
-                </button>
+
+                    <button
+                        onClick={handleLogout}
+                        className="btn-logout"
+                    >
+                        Logout
+                    </button>
+                </div>
+
             </div>
+
         </nav>
     );
 };

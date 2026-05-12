@@ -8,7 +8,7 @@ namespace InventorySystem.API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    //[Authorize]
+    [Authorize]
     public class ProductsController : ControllerBase
     {
         private readonly IProductService _service;
