@@ -107,8 +107,15 @@ namespace InventorySystem.Infrastructure.Services
             }
 
             _repo.Delete(product);
-            await _repo.SaveChangesAsync();
-
+            try
+            {
+                await _repo.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.InnerException?.Message);
+                throw;
+            }
             return true;
         }
     }

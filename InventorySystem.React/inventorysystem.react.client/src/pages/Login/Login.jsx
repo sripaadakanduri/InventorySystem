@@ -14,6 +14,8 @@ const Login = () => {
 
     const [error, setError] = useState("");
 
+    const [showPassword, setShowPassword] = useState(false);
+
     const handleChange = (e) => {
 
         setFormData({
@@ -66,12 +68,36 @@ const Login = () => {
                     onChange={handleChange}
                 />
 
-                <input
-                    type="password"
-                    name="password"
-                    placeholder="Password"
-                    onChange={handleChange}
-                />
+                {/* Password Input */}
+
+                <div className="password-container">
+
+                    <input
+                        type={
+                            showPassword
+                                ? "text"
+                                : "password"
+                        }
+                        name="password"
+                        placeholder="Password"
+                        onChange={handleChange}
+                    />
+
+                    <button
+                        type="button"
+                        className="show-password-btn"
+                        onClick={() =>
+                            setShowPassword(!showPassword)
+                        }
+                    >
+                        {
+                            showPassword
+                                ? "Hide"
+                                : "Show"
+                        }
+                    </button>
+
+                </div>
 
                 <button
                     type="submit"

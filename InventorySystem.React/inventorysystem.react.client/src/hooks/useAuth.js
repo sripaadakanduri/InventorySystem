@@ -22,7 +22,7 @@ const useAuth = () => {
             const response = await login(data);
 
             if (response.role === "Admin") {
-                navigate("/admin/dashboard");
+                navigate("/dashboard");
             }
             else {
                 navigate("/dashboard");
