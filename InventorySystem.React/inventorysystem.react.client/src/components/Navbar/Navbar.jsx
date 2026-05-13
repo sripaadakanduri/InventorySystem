@@ -19,13 +19,11 @@ const Navbar = () => {
 
             <div className="navbar-container">
 
-                {/* Brand */}
                 <div className="navbar-brand">
                     <span className="logo-icon">🛒</span>
                     <h2>Inventory App</h2>
                 </div>
 
-                {/* Navigation Links */}
                 <div className="nav-links">
 
                     <Link to="/dashboard">
@@ -55,7 +53,6 @@ const Navbar = () => {
                         </button>
                     </Link>
 
-                    {/* Admin Links */}
                     {role === "Admin" && (
                         <>
                             <Link to="/admin/users">
@@ -83,7 +80,6 @@ const Navbar = () => {
                     )}
                 </div>
 
-                {/* Right Side */}
                 <div
                     style={{
                         display: "flex",

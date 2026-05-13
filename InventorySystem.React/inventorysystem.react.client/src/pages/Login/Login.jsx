@@ -68,8 +68,6 @@ const Login = () => {
                     onChange={handleChange}
                 />
 
-                {/* Password Input */}
-
                 <div className="password-container">
 
                     <input

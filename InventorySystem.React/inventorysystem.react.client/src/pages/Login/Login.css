@@ -8,7 +8,6 @@
     overflow: hidden;
 }
 
-/* Decorative background shapes */
 .auth-container::before,
 .auth-container::after {
 content: '';

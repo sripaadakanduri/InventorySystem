@@ -13,7 +13,6 @@
     <Folder Include="src\components\Layout\" />
     <Folder Include="src\components\OrderForm\" />
     <Folder Include="src\components\OrderList\" />
-    <Folder Include="src\components\ProductForm\" />
     <Folder Include="src\pages\Products\" />
     <Folder Include="src\validators\" />
     <Folder Include="src\pages\Login\" />

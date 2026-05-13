@@ -1,7 +1,12 @@
 import { useEffect, useState } from "react";
-// import "./ProductForm.css";
 
-function ProductForm({ onSubmit, selectedProduct }) {
+import "./ProductForm.css";
+
+function ProductForm({
+    onSubmit,
+    selectedProduct,
+    onClose
+}) {
 
     const [formData, setFormData] = useState({
         name: "",
@@ -46,59 +51,79 @@ function ProductForm({ onSubmit, selectedProduct }) {
         e.preventDefault();
 
         onSubmit(formData);
-
-        setFormData({
-            name: "",
-            price: "",
-            stockQuantity: "",
-            category: ""
-        });
     };
 
     return (
-        <form className="product-form" onSubmit={handleSubmit}>
+        <div className="product-form-container">
 
-            <input
-                type="text"
-                name="name"
-                placeholder="Product Name"
-                value={formData.name}
-                onChange={handleChange}
-                required
-            />
+            <form
+                className="product-form"
+                onSubmit={handleSubmit}
+            >
 
-            <input
-                type="number"
-                name="price"
-                placeholder="Price"
-                value={formData.price}
-                onChange={handleChange}
-                required
-            />
+                <h2>
+                    {selectedProduct
+                        ? "Update Product"
+                        : "Create Product"}
+                </h2>
 
-            <input
-                type="number"
-                name="stockQuantity"
-                placeholder="Stock Quantity"
-                value={formData.stockQuantity}
-                onChange={handleChange}
-                required
-            />
+                <input
+                    type="text"
+                    name="name"
+                    placeholder="Product Name"
+                    value={formData.name}
+                    onChange={handleChange}
+                    required
+                />
 
-            <input
-                type="text"
-                name="category"
-                placeholder="Category"
-                value={formData.category}
-                onChange={handleChange}
-                required
-            />
+                <input
+                    type="number"
+                    name="price"
+                    placeholder="Price"
+                    value={formData.price}
+                    onChange={handleChange}
+                    required
+                />
 
-            <button type="submit">
-                {selectedProduct ? "Update" : "Add"} Product
-            </button>
+                <input
+                    type="number"
+                    name="stockQuantity"
+                    placeholder="Stock Quantity"
+                    value={formData.stockQuantity}
+                    onChange={handleChange}
+                    required
+                />
 
-        </form>
+                <input
+                    type="text"
+                    name="category"
+                    placeholder="Category"
+                    value={formData.category}
+                    onChange={handleChange}
+                    required
+                />
+
+                <div className="form-buttons">
+
+                    <button type="submit">
+                        {selectedProduct
+                            ? "Update"
+                            : "Create"}
+                    </button>
+
+                    <button
+                        type="button"
+                        className="cancel-btn"
+                        onClick={onClose}
+                    >
+                        Cancel
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
     );
 }
 

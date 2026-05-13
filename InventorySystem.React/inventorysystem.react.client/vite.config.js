@@ -9,7 +9,7 @@ export default defineConfig({
         strictPort:true,
         proxy: {
             "/api": {
-                target: "https://localhost:7236", // ✅ your API port
+                target: "https://localhost:7236", 
                 changeOrigin: true,
                 secure: false
             }

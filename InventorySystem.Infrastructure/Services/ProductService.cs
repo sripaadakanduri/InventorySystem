@@ -101,12 +101,22 @@ namespace InventorySystem.Infrastructure.Services
         public async Task<bool> DeleteProductAsync(int id)
         {
             var product = await _repo.GetByIdAsync(id);
+
             if (product == null)
             {
                 return false;
             }
 
+            // Log transaction BEFORE deletion
+            //await _transactionService.LogTransactionAsync(
+            //    product.Id,
+            //    -product.StockQuantity,
+            //    0,
+            //    "Delete"
+            //);
+
             _repo.Delete(product);
+
             try
             {
                 await _repo.SaveChangesAsync();
@@ -116,6 +126,7 @@ namespace InventorySystem.Infrastructure.Services
                 Console.WriteLine(ex.InnerException?.Message);
                 throw;
             }
+
             return true;
         }
     }

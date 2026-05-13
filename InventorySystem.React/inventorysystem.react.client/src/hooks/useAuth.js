@@ -1,5 +1,3 @@
-/* eslint-disable no-useless-catch */
-
 import { useNavigate } from "react-router-dom";
 
 import {
