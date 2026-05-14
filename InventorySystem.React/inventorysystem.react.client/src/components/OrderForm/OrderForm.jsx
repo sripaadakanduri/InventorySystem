@@ -1,82 +1,65 @@
+// ============================================
+// FILE: OrderForm.js (Updated with available stock display)
+// ============================================
 import { useEffect, useState } from "react";
-import { createOrder } from "../../services/orderService";
+import { createOrder, updateOrder } from "../../services/orderService";
 import api from "../../services/api";
 import "./OrderForm.css";
 
-function OrderForm({ onOrderCreated }) {
-
+function OrderForm({ onOrderCreated, orderToEdit, onOrderUpdated }) {
     const [products, setProducts] = useState([]);
-
-    const [items, setItems] = useState([
-        {
-            productId: "",
-            quantity: 1
-        }
-    ]);
-
+    const [items, setItems] = useState([{ productId: "", quantity: 1 }]);
     const [loading, setLoading] = useState(false);
-
     const [error, setError] = useState("");
-
     const [success, setSuccess] = useState("");
 
+    // Populate form if editing
+    useEffect(() => {
+        if (orderToEdit) {
+            const mappedItems = orderToEdit.items.map(i => ({
+                productId: i.productId,
+                quantity: i.quantity
+            }));
+            setItems(mappedItems);
+        }
+    }, [orderToEdit]);
 
-
+    // Fetch all products
     const fetchProducts = async () => {
         try {
-
             const response = await api.get("/products");
-
             setProducts(response.data);
-
         } catch (err) {
-
             console.error(err);
         }
     };
+
     useEffect(() => {
         fetchProducts();
     }, []);
 
     const handleAddItem = () => {
-
-        setItems([
-            ...items,
-            {
-                productId: "",
-                quantity: 1
-            }
-        ]);
+        setItems([...items, { productId: "", quantity: 1 }]);
     };
 
     const handleRemoveItem = (index) => {
-
         const updatedItems = items.filter((_, i) => i !== index);
-
         setItems(updatedItems);
     };
 
     const handleChange = (index, field, value) => {
-
         const updatedItems = [...items];
-
         updatedItems[index][field] = value;
-
         setItems(updatedItems);
     };
 
     const handleSubmit = async (e) => {
-
         e.preventDefault();
-
         setLoading(true);
-
         setError("");
-
         setSuccess("");
 
         try {
-
             const payload = {
                 items: items.map(item => ({
                     productId: Number(item.productId),
@@ -84,27 +67,20 @@ function OrderForm({ onOrderCreated }) {
                 }))
             };
 
-            const result = await createOrder(payload);
-
-            setSuccess("Order placed successfully");
-
-            setItems([
-                {
-                    productId: "",
-                    quantity: 1
-                }
-            ]);
-
-            if (onOrderCreated) {
-                onOrderCreated(result);
+            if (orderToEdit) {
+                // Edit mode
+                const result = await updateOrder(orderToEdit.id, payload);
+                setSuccess("Order updated successfully");
+                if (onOrderUpdated) onOrderUpdated(result);
+            } else {
+                // Create mode
+                const result = await createOrder(payload);
+                setSuccess("Order placed successfully");
+                setItems([{ productId: "", quantity: 1 }]);
+                if (onOrderCreated) onOrderCreated(result);
             }
-
         } catch (err) {
-
-            setError(
-                err.response?.data?.message ||
-                "Failed to create order"
-            );
+            setError(err.response?.data?.message || "Failed to submit order");
         }
 
         setLoading(false);
@@ -112,122 +88,76 @@ function OrderForm({ onOrderCreated }) {
 
     return (
         <div className="order-form-container">
-
-            <h2>Create Order</h2>
+            <h2>{orderToEdit ? `Edit Order #${orderToEdit.id}` : "Create Order"}</h2>
 
             <form onSubmit={handleSubmit}>
+                {items.map((item, index) => {
+                    const selectedProduct = products.find(
+                        p => p.id === Number(item.productId)
+                    );
+                    const availableQuantity = selectedProduct ? selectedProduct.stockQuantity : null;
 
-                {
-                    items.map((item, index) => (
-
-                        <div
-                            className="order-item-row"
-                            key={index}
-                        >
-
+                    return (
+                        <div className="order-item-row" key={index}>
                             <select
                                 value={item.productId}
                                 onChange={(e) =>
-                                    handleChange(
-                                        index,
-                                        "productId",
-                                        e.target.value
-                                    )
+                                    handleChange(index, "productId", e.target.value)
                                 }
                                 required
                             >
-
-                                <option value="">
-                                    Select Product
-                                </option>
-
-                                {
-                                    products.map(product => (
-
-                                        <option
-                                            key={product.id}
-                                            value={product.id}
-                                        >
-                                            {product.name}
-                                            {" | "}
-                                            Stock: {product.stockQuantity}
-                                            {" | "}
-                                            ${product.price}
-                                        </option>
-                                    ))
-                                }
-
+                                <option value="">Select Product</option>
+                                {products.map(product => (
+                                    <option key={product.id} value={product.id}>
+                                        {product.name}
+                                    </option>
+                                ))}
                             </select>
-
+                            {/* Stock display styled for theme */}
+                            {selectedProduct && (
+                                <span className="stock-badge">
+                                    Available: {availableQuantity}
+                                </span>
+                            )}
                             <input
                                 type="number"
                                 min="1"
+                                max={availableQuantity || 1}
                                 value={item.quantity}
-                                onChange={(e) =>
-                                    handleChange(
-                                        index,
-                                        "quantity",
-                                        e.target.value
-                                    )
-                                }
+                                onChange={(e) => handleChange(index, "quantity", e.target.value)}
                                 required
                             />
 
-                            {
-                                items.length > 1 && (
+                            
 
-                                    <button
-                                        type="button"
-                                        className="remove-btn"
-                                        onClick={() =>
-                                            handleRemoveItem(index)
-                                        }
-                                    >
-                                        Remove
-                                    </button>
-                                )
-                            }
-
+                            {items.length > 1 && (
+                                <button
+                                    type="button"
+                                    className="remove-btn"
+                                    onClick={() => handleRemoveItem(index)}
+                                >
+                                    Remove
+                                </button>
+                            )}
                         </div>
-                    ))
-                }
+                    );
+                })}
 
-                <button
-                    type="button"
-                    className="add-btn"
-                    onClick={handleAddItem}
-                >
+                <button type="button" className="add-btn" onClick={handleAddItem}>
                     Add Product
                 </button>
 
-                <button
-                    type="submit"
-                    className="submit-btn"
-                    disabled={loading}
-                >
-                    {
-                        loading
-                            ? "Processing..."
+                <button type="submit" className="submit-btn" disabled={loading}>
+                    {loading
+                        ? "Processing..."
+                        : orderToEdit
+                            ? "Update Order"
                             : "Place Order"
                     }
                 </button>
 
-                {
-                    error && (
-                        <p className="error-text">
-                            {error}
-                        </p>
-                    )
-                }
-
-                {
-                    success && (
-                        <p className="success-text">
-                            {success}
-                        </p>
-                    )
-                }
-
+                {error && <p className="error-text">{error}</p>}
+                {success && <p className="success-text">{success}</p>}
             </form>
         </div>
     );

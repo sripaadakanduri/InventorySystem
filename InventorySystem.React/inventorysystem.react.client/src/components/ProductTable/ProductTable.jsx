@@ -37,7 +37,68 @@ function ProductTable({
                 </tr>
 
                 {/* Filter Row */}
-                
+                <tr className="filter-row">
+
+                    {selectionMode && (
+                        <th></th>
+                    )}
+
+                    {/* Name Filter */}
+                    <th>
+
+                        <input
+                            type="text"
+                            name="name"
+                            placeholder="Filter Name"
+                            value={filters.name}
+                            onChange={onFilterChange}
+                        />
+
+                    </th>
+
+                    {/* Price Sort */}
+                    <th>
+
+                        <select
+                            name="priceSort"
+                            value={filters.priceSort}
+                            onChange={onFilterChange}
+                        >
+
+                            <option value="">
+                                Sort Price
+                            </option>
+
+                            <option value="lowToHigh">
+                                Low to High
+                            </option>
+
+                            <option value="highToLow">
+                                High to Low
+                            </option>
+
+                        </select>
+
+                    </th>
+
+                    {/* Category Filter */}
+                    <th>
+
+                        <input
+                            type="text"
+                            name="category"
+                            placeholder="Filter Category"
+                            value={filters.category}
+                            onChange={onFilterChange}
+                        />
+
+                    </th>
+
+                    <th>-</th>
+
+                    <th></th>
+
+                </tr>
 
             </thead>
 

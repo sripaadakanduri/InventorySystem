@@ -19,7 +19,7 @@ namespace InventorySystem.Infrastructure.Services
             return await _context.Users
                 .Select(u => new UserDto
                 {
-                    Id = u.id,
+                    Id = u.Id,
                     Username = u.Username,
                     Email = u.Email,
                     Role = u.Role

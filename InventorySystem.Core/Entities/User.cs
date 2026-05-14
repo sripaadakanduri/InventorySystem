@@ -2,14 +2,26 @@
 {
     public class User
     {
-        public int id { get; set;  }
-        public string Username { get; set; }
-        public string Email { get; set; }
+        public int Id { get; set; }
 
-        public string PasswordHash { get; set; }
+        public string Username { get; set; } = string.Empty;
+
+        public string Email { get; set; } = string.Empty;
+
+        public string PasswordHash { get; set; } = string.Empty;
+
         public string Role { get; set; } = "User";
-        public DateTime CreatedAt { get; set; }
+
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+
         public DateTime? LastLoginAt { get; set; }
 
+        // Navigation Properties
+
+        public ICollection<Order> Orders { get; set; }
+            = new List<Order>();
+
+        public ICollection<InventoryTransaction> InventoryTransactions { get; set; }
+            = new List<InventoryTransaction>();
     }
 }

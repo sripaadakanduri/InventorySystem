@@ -1,9 +1,11 @@
-﻿
-using System.IdentityModel.Tokens.Jwt;
-using InventorySystem.Core.Entities;
-using Microsoft.IdentityModel.Tokens;
-using System.Text;
+﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Text;
+
+using InventorySystem.Core.Entities;
+
+using Microsoft.IdentityModel.Tokens;
+
 namespace InventorySystem.Infrastructure.Auth
 {
     public class JwtServices
@@ -14,30 +16,63 @@ namespace InventorySystem.Infrastructure.Auth
         {
             _configuration = configuration;
         }
+
+
         public string GenerateToken(User user)
         {
             var claims = new[]
             {
-                new Claim(ClaimTypes.NameIdentifier, user.id.ToString()),
-                new Claim(ClaimTypes.Name, user.Username),
-                new Claim(ClaimTypes.Email, user.Email),
-                new Claim(ClaimTypes.Role, user.Role)
+                new Claim(
+                    ClaimTypes.NameIdentifier,
+                    user.Id.ToString()
+                ),
+
+                new Claim(
+                    ClaimTypes.Name,
+                    user.Username
+                ),
+
+                new Claim(
+                    ClaimTypes.Email,
+                    user.Email
+                ),
+
+                new Claim(
+                    ClaimTypes.Role,
+                    user.Role
+                )
             };
 
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
 
-            var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+            var key = new SymmetricSecurityKey(
+                Encoding.UTF8.GetBytes(
+                    _configuration["Jwt:Key"]!
+                )
+            );
+
+
+            var credentials =
+                new SigningCredentials(
+                    key,
+                    SecurityAlgorithms.HmacSha256
+                );
+
 
             var token = new JwtSecurityToken(
-                issuer: _configuration["JWT:Issuer"],
-                audience: _configuration["JWT:Audience"],
+                issuer: _configuration["Jwt:Issuer"],
+
+                audience: _configuration["Jwt:Audience"],
+
                 claims: claims,
+
                 expires: DateTime.UtcNow.AddHours(5),
+
                 signingCredentials: credentials
             );
 
-            return new JwtSecurityTokenHandler().WriteToken(token);
-        }
 
+            return new JwtSecurityTokenHandler()
+                .WriteToken(token);
+        }
     }
 }

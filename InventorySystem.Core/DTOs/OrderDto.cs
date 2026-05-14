@@ -1,4 +1,8 @@
-﻿using InventorySystem.Core.Enums;
+﻿// ==========================================
+// FILE: InventorySystem.Core/DTOs/OrderDto.cs
+// ==========================================
+
+using InventorySystem.Core.Enums;
 
 namespace InventorySystem.Core.DTOs
 {
@@ -6,9 +10,13 @@ namespace InventorySystem.Core.DTOs
     {
         public int Id { get; set; }
 
+        public string Username { get; set; } = string.Empty;
+
         public OrderStatus Status { get; set; }
 
         public decimal TotalAmount { get; set; }
+
+        public int TotalQuantity { get; set; }
 
         public DateTime CreatedAt { get; set; }
 

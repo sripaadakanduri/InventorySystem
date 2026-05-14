@@ -1,17 +1,18 @@
-﻿namespace InventorySystem.Core.Entities
+﻿namespace InventorySystem.Core.DTOs
 {
-    public class InventoryTransaction
+    public class InventoryTransactionDto
     {
         public int Id { get; set; }
 
         public int ProductId { get; set; }
 
-        public Product? Product { get; set; }
+        public string ProductName { get; set; }
+            = string.Empty;
 
-        // FK
         public int UserId { get; set; }
 
-        public User? User { get; set; }
+        public string Username { get; set; }
+            = string.Empty;
 
         public int QuantityChanged { get; set; }
 
@@ -21,6 +22,5 @@
             = string.Empty;
 
         public DateTime CreatedAt { get; set; }
-            = DateTime.UtcNow;
     }
 }
