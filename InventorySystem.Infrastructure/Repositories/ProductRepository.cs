@@ -1,7 +1,10 @@
-﻿using InventorySystem.Core.Interfaces;
-using InventorySystem.Core.Entities;
+﻿using InventorySystem.Core.Entities;
+using InventorySystem.Core.Interfaces;
 using InventorySystem.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace InventorySystem.Infrastructure.Repositories
 {
@@ -14,18 +17,27 @@ namespace InventorySystem.Infrastructure.Repositories
             _context = context;
         }
 
+        // Get all active products (optionally filter StockQuantity > 0)
         public async Task<IEnumerable<Product>> GetAllAsync()
         {
-            return await _context.Products.OrderBy(p => p.Id).ToListAsync();
+            return await _context.Products
+                .Where(p => !p.IsDeleted && p.StockQuantity > 0)
+                .OrderBy(p => p.Id)
+                .ToListAsync();
         }
+
+        // Get by ID (non-deleted only)
         public async Task<Product> GetByIdAsync(int id)
         {
-            return await _context.Products.FirstOrDefaultAsync(p => p.Id == id);
+            return await _context.Products
+                .FirstOrDefaultAsync(p => p.Id == id && !p.IsDeleted);
         }
+
         public async Task AddAsync(Product product)
         {
             await _context.Products.AddAsync(product);
         }
+
         public void Update(Product product)
         {
             _context.Products.Update(product);
@@ -33,8 +45,9 @@ namespace InventorySystem.Infrastructure.Repositories
 
         public void Delete(Product product)
         {
-            _context.Products.Remove(product);
+            _context.Products.Remove(product); // Rarely used; soft delete preferred
         }
+
         public async Task SaveChangesAsync()
         {
             await _context.SaveChangesAsync();

@@ -17,3 +17,22 @@
     cursor: pointer;
     min-width: 220px;
 }
+.create-btn {
+    background: #22c55e;
+    color: white;
+    border: none;
+    border-radius: 20px;
+    padding: 8px 16px;
+    margin-right: 10px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 500;
+    font-size: 0.95rem;
+    transition: background 0.3s;
+}
+
+    .create-btn:hover {
+        background: #16a34a;
+    }

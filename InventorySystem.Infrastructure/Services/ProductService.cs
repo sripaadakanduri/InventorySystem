@@ -1,30 +1,28 @@
 ﻿using InventorySystem.Core.DTOs;
 using InventorySystem.Core.Entities;
 using InventorySystem.Core.Interfaces;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace InventorySystem.Infrastructure.Services
 {
     public class ProductService : IProductService
     {
         private readonly IProductRepository _repo;
-
         private readonly IInventoryTransactionService _transactionService;
 
-        public ProductService
-        (
-            IProductRepository repo,
-            IInventoryTransactionService transactionService
-        )
+        public ProductService(IProductRepository repo, IInventoryTransactionService transactionService)
         {
             _repo = repo;
             _transactionService = transactionService;
         }
 
-
+        // Get all active products
         public async Task<IEnumerable<ProductDto>> GetAllProductsAsync()
         {
             var products = await _repo.GetAllAsync();
-
             return products.Select(p => new ProductDto
             {
                 Id = p.Id,
@@ -35,15 +33,10 @@ namespace InventorySystem.Infrastructure.Services
             });
         }
 
-
         public async Task<ProductDto?> GetProductByIdAsync(int id)
         {
             var product = await _repo.GetByIdAsync(id);
-
-            if (product == null)
-            {
-                return null;
-            }
+            if (product == null) return null;
 
             return new ProductDto
             {
@@ -55,12 +48,8 @@ namespace InventorySystem.Infrastructure.Services
             };
         }
 
-
-        public async Task<ProductDto> CreateProductAsync
-        (
-            BaseDto dto,
-            int userId
-        )
+        // Create new product
+        public async Task<ProductDto> CreateProductAsync(BaseDto dto, int userId)
         {
             var product = new Product
             {
@@ -73,11 +62,8 @@ namespace InventorySystem.Infrastructure.Services
             };
 
             await _repo.AddAsync(product);
-
             await _repo.SaveChangesAsync();
 
-
-            // Log initial stock transaction
             if (product.StockQuantity > 0)
             {
                 await _transactionService.LogTransactionAsync(
@@ -89,7 +75,6 @@ namespace InventorySystem.Infrastructure.Services
                 );
             }
 
-
             return new ProductDto
             {
                 Id = product.Id,
@@ -100,20 +85,11 @@ namespace InventorySystem.Infrastructure.Services
             };
         }
 
-
-        public async Task<bool> UpdateProductAsync
-        (
-            int id,
-            BaseDto dto,
-            int userId
-        )
+        // Update product
+        public async Task<bool> UpdateProductAsync(int id, BaseDto dto, int userId)
         {
             var product = await _repo.GetByIdAsync(id);
-
-            if (product == null)
-            {
-                return false;
-            }
+            if (product == null) return false;
 
             var oldStock = product.StockQuantity;
 
@@ -124,19 +100,12 @@ namespace InventorySystem.Infrastructure.Services
             product.UpdatedAt = DateTime.UtcNow;
 
             _repo.Update(product);
-
             await _repo.SaveChangesAsync();
 
-
-            // Log stock change
             if (oldStock != product.StockQuantity)
             {
                 var change = product.StockQuantity - oldStock;
-
-                var actionType =
-                    change > 0
-                    ? "ManualAdd"
-                    : "ManualRemove";
+                var actionType = change > 0 ? "ManualAdd" : "ManualRemove";
 
                 await _transactionService.LogTransactionAsync(
                     product.Id,
@@ -150,18 +119,16 @@ namespace InventorySystem.Infrastructure.Services
             return true;
         }
 
-
+        // Soft delete
         public async Task<bool> DeleteProductAsync(int id)
         {
             var product = await _repo.GetByIdAsync(id);
+            if (product == null) return false;
 
-            if (product == null)
-            {
-                return false;
-            }
+            product.IsDeleted = true;
+            product.UpdatedAt = DateTime.UtcNow;
 
-            _repo.Delete(product);
-
+            _repo.Update(product);
             await _repo.SaveChangesAsync();
 
             return true;

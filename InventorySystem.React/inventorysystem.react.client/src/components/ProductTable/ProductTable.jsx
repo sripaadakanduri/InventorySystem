@@ -1,3 +1,5 @@
+import { useState } from "react";
+import Pagination from "../Pagination/Pagination";
 import "./ProductTable.css";
 
 function ProductTable({
@@ -12,142 +14,212 @@ function ProductTable({
     handleRowSelection
 }) {
 
+    // ============================================
+    // PAGINATION
+    // ============================================
+
+    const [currentPage, setCurrentPage] = useState(1);
+
+    const pageSize = 10;
+
+    // ============================================
+    // FILTERING
+    // ============================================
+
+    let filteredProducts = [...products];
+
+    // Filter Name
+    if (filters.name) {
+
+        filteredProducts = filteredProducts.filter(product =>
+            product.name
+                .toLowerCase()
+                .includes(filters.name.toLowerCase())
+        );
+
+    }
+
+    // Filter Category
+    if (filters.category) {
+
+        filteredProducts = filteredProducts.filter(product =>
+            product.category
+                .toLowerCase()
+                .includes(filters.category.toLowerCase())
+        );
+
+    }
+
+    // ============================================
+    // SORTING
+    // ============================================
+
+    if (filters.priceSort === "lowToHigh") {
+
+        filteredProducts.sort(
+            (a, b) => a.price - b.price
+        );
+
+    }
+
+    if (filters.priceSort === "highToLow") {
+
+        filteredProducts.sort(
+            (a, b) => b.price - a.price
+        );
+
+    }
+
+    // ============================================
+    // PAGINATION LOGIC
+    // ============================================
+
+    const indexOfLastProduct =
+        currentPage * pageSize;
+
+    const indexOfFirstProduct =
+        indexOfLastProduct - pageSize;
+
+    const currentProducts =
+        filteredProducts.slice(
+            indexOfFirstProduct,
+            indexOfLastProduct
+        );
+
     return (
-        <table className="product-table">
 
-            <thead>
+        <div>
 
-                {/* Header Row */}
-                <tr>
+            <table className="product-table">
 
-                    {selectionMode && (
-                        <th>Select</th>
-                    )}
+                <thead>
 
-                    <th>Name</th>
+                    {/* Header Row */}
+                    <tr>
 
-                    <th>Price</th>
+                        {selectionMode && <th>Select</th>}
 
-                    <th>Category</th>
+                        <th>Name</th>
 
-                    <th>Stock Quantity</th>
+                        <th>Price</th>
 
-                    <th>Actions</th>
+                        <th>Category</th>
 
-                </tr>
+                        <th>Stock Quantity</th>
 
-                {/* Filter Row */}
-                <tr className="filter-row">
+                        {role === "ADMIN" && <th>Actions</th>}
 
-                    {selectionMode && (
-                        <th></th>
-                    )}
+                    </tr>
 
-                    {/* Name Filter */}
-                    <th>
+                    {/* Filter Row */}
+                    <tr className="filter-row">
 
-                        <input
-                            type="text"
-                            name="name"
-                            placeholder="Filter Name"
-                            value={filters.name}
-                            onChange={onFilterChange}
-                        />
+                        {selectionMode && <th></th>}
 
-                    </th>
+                        {/* Name Filter */}
+                        <th>
 
-                    {/* Price Sort */}
-                    <th>
+                            <input
+                                type="text"
+                                name="name"
+                                placeholder="Filter Name"
+                                value={filters.name}
+                                onChange={onFilterChange}
+                            />
 
-                        <select
-                            name="priceSort"
-                            value={filters.priceSort}
-                            onChange={onFilterChange}
-                        >
+                        </th>
 
-                            <option value="">
-                                Sort Price
-                            </option>
+                        {/* Price Sort */}
+                        <th>
 
-                            <option value="lowToHigh">
-                                Low to High
-                            </option>
+                            <select
+                                name="priceSort"
+                                value={filters.priceSort}
+                                onChange={onFilterChange}
+                            >
 
-                            <option value="highToLow">
-                                High to Low
-                            </option>
+                                <option value="">
+                                    Sort Price
+                                </option>
 
-                        </select>
+                                <option value="lowToHigh">
+                                    Low to High
+                                </option>
 
-                    </th>
+                                <option value="highToLow">
+                                    High to Low
+                                </option>
 
-                    {/* Category Filter */}
-                    <th>
+                            </select>
 
-                        <input
-                            type="text"
-                            name="category"
-                            placeholder="Filter Category"
-                            value={filters.category}
-                            onChange={onFilterChange}
-                        />
+                        </th>
 
-                    </th>
+                        {/* Category Filter */}
+                        <th>
 
-                    <th>-</th>
+                            <input
+                                type="text"
+                                name="category"
+                                placeholder="Filter Category"
+                                value={filters.category}
+                                onChange={onFilterChange}
+                            />
 
-                    <th></th>
+                        </th>
 
-                </tr>
+                        <th>-</th>
 
-            </thead>
+                        {role === "ADMIN" && <th></th>}
 
-            <tbody>
+                    </tr>
 
-                {products.length > 0 ? (
+                </thead>
 
-                    products.map((product) => (
+                <tbody>
 
-                        <tr
-                            key={product.id}
-                            className={
-                                selectedRowId === product.id
-                                    ? "selected-row"
-                                    : ""
-                            }
-                        >
-                            {selectionMode && (
+                    {currentProducts.length > 0 ? (
 
-                                <td>
+                        currentProducts.map((product) => (
 
-                                    <input
-                                        type="radio"
-                                        name="selectedProduct"
-                                        checked={
-                                            selectedRowId === product.id
-                                        }
-                                        onChange={() =>
-                                            handleRowSelection(product)
-                                        }
-                                    />
+                            <tr
+                                key={product.id}
+                                className={
+                                    selectedRowId === product.id
+                                        ? "selected-row"
+                                        : ""
+                                }
+                            >
 
-                                </td>
+                                {selectionMode && (
 
-                            )}
+                                    <td>
 
-                            <td>{product.name}</td>
+                                        <input
+                                            type="radio"
+                                            name="selectedProduct"
+                                            checked={
+                                                selectedRowId === product.id
+                                            }
+                                            onChange={() =>
+                                                handleRowSelection(product)
+                                            }
+                                        />
 
-                            <td>${product.price}</td>
+                                    </td>
 
-                            <td>{product.category}</td>
+                                )}
 
-                            <td>{product.stockQuantity}</td>
+                                <td>{product.name}</td>
 
-                            <td>
+                                <td>${product.price}</td>
+
+                                <td>{product.category}</td>
+
+                                <td>{product.stockQuantity}</td>
 
                                 {role === "ADMIN" && (
 
-                                    <>
+                                    <td>
 
                                         <button
                                             className="edit-btn"
@@ -165,36 +237,57 @@ function ProductTable({
                                             Delete
                                         </button>
 
-                                    </>
+                                    </td>
 
                                 )}
+
+                            </tr>
+
+                        ))
+
+                    ) : (
+
+                        <tr>
+
+                            <td
+                                colSpan={
+                                    selectionMode
+                                        ? role === "ADMIN"
+                                            ? 7
+                                            : 6
+                                        : role === "ADMIN"
+                                            ? 6
+                                            : 5
+                                }
+                            >
+
+                                No Products Found
 
                             </td>
 
                         </tr>
 
-                    ))
+                    )}
 
-                ) : (
+                </tbody>
 
-                    <tr>
+            </table>
 
-                        <td
-                            colSpan={
-                                selectionMode ? 6 : 5
-                            }
-                        >
-                            No Products Found
-                        </td>
+            {/* ============================================
+                PAGINATION
+            ============================================ */}
 
-                    </tr>
+            <Pagination
+                currentPage={currentPage}
+                totalItems={filteredProducts.length}
+                pageSize={pageSize}
+                onPageChange={setCurrentPage}
+            />
 
-                )}
+        </div>
 
-            </tbody>
-
-        </table>
     );
+
 }
 
 export default ProductTable;

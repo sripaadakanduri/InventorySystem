@@ -15,6 +15,7 @@ namespace InventorySystem.Core.Entities
 
         [Required]
         public string Category { get; set; } = string.Empty;
+        public bool IsDeleted { get; set; } = false;
 
         [Timestamp]
         public byte[]? Version { get; set; }

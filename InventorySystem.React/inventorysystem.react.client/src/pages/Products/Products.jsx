@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { FaPlus } from "react-icons/fa";
 
 import ProductForm from "../../components/ProductForm/ProductForm";
 import ProductTable from "../../components/ProductTable/ProductTable";
@@ -234,29 +235,10 @@ function Products() {
 
                 {role === "ADMIN" && (
 
-                    <select
-                        className="admin-actions-dropdown"
-                        defaultValue=""
-                        onChange={handleAdminAction}
-                    >
-
-                        <option value="">
-                            Admin Actions
-                        </option>
-
-                        <option value="create">
-                            Create Product
-                        </option>
-
-                        <option value="edit">
-                            Edit Selected Product
-                        </option>
-
-                        <option value="delete">
-                            Delete Selected Product
-                        </option>
-
-                    </select>
+                    <button
+                        className="create-btn"
+                        onClick={() => handleCreate()}
+                    ><FaPlus size={14} /> Create Product</button>
 
                 )}
 
