@@ -21,6 +21,7 @@
 
 .delete-btn {
     background: #ef4444;
+    border-radius:15px;
     color: white;
     border: none;
     padding: 8px 12px;

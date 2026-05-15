@@ -15,3 +15,14 @@ export const updateUserRole = async (id, role) => {
 
     return response.data;
 };
+
+export const createUser = async (userData) => {
+
+    const response = await api.post(
+        "/users",
+        userData
+    );
+
+    return response.data;
+
+};

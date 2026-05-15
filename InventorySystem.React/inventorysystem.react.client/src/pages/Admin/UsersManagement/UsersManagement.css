@@ -100,3 +100,48 @@
     color: #6b7280;
     font-size: 16px;
 }
+.users-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.add-user-btn {
+    width: 45px;
+    height: 45px;
+    border: none;
+    border-radius: 50%;
+    font-size: 28px;
+    cursor: pointer;
+    background: #2563eb;
+    color: white;
+    transition: 0.3s;
+}
+
+    .add-user-btn:hover {
+        transform: scale(1.05);
+    }
+
+.add-user-submit-btn {
+    padding: 12px;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    background: #2563eb;
+    color: white;
+    font-weight: 600;
+}
+
+.modal-body {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+    .modal-body input,
+    .modal-body select {
+        padding: 12px;
+        border-radius: 10px;
+        border: 1px solid #ccc;
+    }
