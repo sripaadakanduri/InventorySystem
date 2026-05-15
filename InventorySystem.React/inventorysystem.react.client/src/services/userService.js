@@ -19,7 +19,7 @@ export const updateUserRole = async (id, role) => {
 export const createUser = async (userData) => {
 
     const response = await api.post(
-        "/users",
+        "/auth/register",
         userData
     );
 

@@ -31,17 +31,21 @@
 }
 
 .add-btn {
+    padding : 12px 20px;
+    margin: 12px 0px;
     background: #3498db;
     color: white;
     margin-right: 10px;
 }
 
 .submit-btn {
+    padding: 12px 20px;
     background: #2ecc71;
     color: white;
 }
 
 .remove-btn {
+    padding: 12px 20px;
     background: #e74c3c;
     color: white;
 }

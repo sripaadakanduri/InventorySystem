@@ -7,6 +7,7 @@ import "./Orders.css";
 function Orders() {
     const [orders, setOrders] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [orderToEdit, setOrderToEdit] = useState(null);
 
     // Filters
     const [filterUser, setFilterUser] = useState("");
@@ -40,16 +41,6 @@ function Orders() {
         }
     };
 
-    const handleEditOrder = async (orderId, updatedItems) => {
-        try {
-            const updatedOrder = await updateOrder(orderId, updatedItems);
-            setOrders(prev => prev.map(o => (o.id === orderId ? updatedOrder : o)));
-        } catch (err) {
-            console.error(err);
-            alert("Failed to update order");
-        }
-    };
-
     // Filtered orders
     const filteredOrders = orders.filter(o => {
         let userMatch = filterUser ? o.username.toLowerCase().includes(filterUser.toLowerCase()) : true;
@@ -63,9 +54,17 @@ function Orders() {
         <div className="orders-page card">
             <h1 style={{ marginBottom: "2rem" }}>Order Management</h1>
             <OrderForm
+                orderToEdit={orderToEdit}
                 onOrderCreated={(newOrder) =>
                     setOrders(prev => [newOrder, ...prev])
                 }
+                onOrderUpdated={(updatedOrder) => {
+                    setOrders(prev => prev.map(o => (o.id === updatedOrder.id ? updatedOrder : o)));
+                    setOrderToEdit(null);
+                }}
+                onCancelEdit={() => {
+                    setOrderToEdit(null);
+                }}
             />
 
             {loading ? (
@@ -74,7 +73,10 @@ function Orders() {
                 <OrderList
                     orders={filteredOrders}
                     onCancelOrder={handleCancelOrder}
-                    onEditOrder={handleEditOrder}
+                    onSelectForEdit={(order) => {
+                        setOrderToEdit(order);
+                        window.scrollTo({ top: 0, behavior: "smooth" });
+                    }}
                     filters={{
                         filterUser,
                         setFilterUser,

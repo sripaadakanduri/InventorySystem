@@ -6,6 +6,7 @@ import {
     createUser
 } from "../../../services/userService";
 
+import Pagination from "../../../components/Pagination/Pagination";
 import "./UsersManagement.css";
 
 const UsersManagement = () => {
@@ -21,6 +22,11 @@ const UsersManagement = () => {
         password: "",
         role: "User"
     });
+
+    const [currentPage, setCurrentPage] = useState(1);
+    const pageSize = 6;
+    const [filterUsername, setFilterUsername] = useState("");
+    const [filterRole, setFilterRole] = useState("");
 
     // ============================================
     // FETCH USERS
@@ -102,6 +108,28 @@ const UsersManagement = () => {
 
     };
 
+    // ============================================
+    // FILTER & PAGINATION LOGIC
+    // ============================================
+
+    let filteredUsers = [...users];
+
+    if (filterUsername) {
+        filteredUsers = filteredUsers.filter(user =>
+            user.username.toLowerCase().includes(filterUsername.toLowerCase())
+        );
+    }
+
+    if (filterRole) {
+        filteredUsers = filteredUsers.filter(user =>
+            user.role === filterRole
+        );
+    }
+
+    const indexOfLastUser = currentPage * pageSize;
+    const indexOfFirstUser = indexOfLastUser - pageSize;
+    const currentUsers = filteredUsers.slice(indexOfFirstUser, indexOfLastUser);
+
     return (
 
         <div className="users-management-container">
@@ -139,11 +167,39 @@ const UsersManagement = () => {
 
                         <tr>
 
-                            <th>Username</th>
+                            <th>
+                                Username
+                                <br />
+                                <input
+                                    type="text"
+                                    placeholder="Filter by name..."
+                                    value={filterUsername}
+                                    onChange={(e) => {
+                                        setFilterUsername(e.target.value);
+                                        setCurrentPage(1);
+                                    }}
+                                    style={{ marginTop: '5px', padding: '4px', borderRadius: '4px', border: '1px solid #ccc', width: '90%' }}
+                                />
+                            </th>
 
                             <th>Email</th>
 
-                            <th>Role</th>
+                            <th>
+                                Role
+                                <br />
+                                <select
+                                    value={filterRole}
+                                    onChange={(e) => {
+                                        setFilterRole(e.target.value);
+                                        setCurrentPage(1);
+                                    }}
+                                    style={{ marginTop: '5px', padding: '4px', borderRadius: '4px', border: '1px solid #ccc', width: '90%' }}
+                                >
+                                    <option value="">All Roles</option>
+                                    <option value="Admin">Admin</option>
+                                    <option value="User">User</option>
+                                </select>
+                            </th>
 
                             <th>Action</th>
 
@@ -153,9 +209,9 @@ const UsersManagement = () => {
 
                     <tbody>
 
-                        {users.length > 0 ? (
+                        {currentUsers.length > 0 ? (
 
-                            users.map((user) => (
+                            currentUsers.map((user) => (
 
                                 <tr key={user.id}>
 
@@ -202,13 +258,17 @@ const UsersManagement = () => {
                                         ) : (
 
                                             <button
-                                                className="action-button remove-admin-btn"
-                                                onClick={() =>
-                                                    handleRoleUpdate(
-                                                        user.id,
-                                                        "User"
-                                                    )
-                                                }
+                                                    className="action-button remove-admin-btn"
+                                                    onClick={() =>
+                                                        handleRoleUpdate(
+                                                            user.id,
+                                                            "User"
+                                                        )
+                                                    }
+                                                    disabled={user.username.toLowerCase() === "bunny"}
+                                                    title={user.username.toLowerCase() === "bunny" ? "cannot remove this admin" : ""}
+                                                    style={user.username.toLowerCase() === "bunny" ? { opacity: 0.5, cursor: "not-allowed" } : {}}
+
                                             >
                                                 Remove Admin
                                             </button>
@@ -241,6 +301,17 @@ const UsersManagement = () => {
                 </table>
 
             </div>
+
+            {/* ============================================
+                PAGINATION
+            ============================================ */}
+
+            <Pagination
+                currentPage={currentPage}
+                totalItems={filteredUsers.length}
+                pageSize={pageSize}
+                onPageChange={setCurrentPage}
+            />
 
             {/* ============================================
                 ADD USER MODAL

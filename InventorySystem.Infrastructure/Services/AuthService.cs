@@ -10,12 +10,12 @@ using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
 namespace InventorySystem.Infrastructure.Services
 {
-    public class AuthService:IAuthService
+    public class AuthService : IAuthService
     {
         private readonly UserRepository _repo;
         private readonly JwtServices _jwt;
         private readonly AppDbContext _context;
-        
+
         public AuthService(UserRepository userRepository, JwtServices jwt, AppDbContext context)
         {
             _repo = userRepository;
@@ -35,7 +35,8 @@ namespace InventorySystem.Infrastructure.Services
             {
                 Username = dto.Username,
                 Email = dto.Email,
-                PasswordHash = PasswordHasher.Hash(dto.Password)
+                PasswordHash = PasswordHasher.Hash(dto.Password),
+                Role = string.IsNullOrEmpty(dto.Role) ? "User" : dto.Role
             };
             await _repo.AddAsync(user);
             var token = _jwt.GenerateToken(user);
@@ -69,6 +70,6 @@ namespace InventorySystem.Infrastructure.Services
                 Username = user.Username,
                 Role = user.Role
             };
-        } 
+        }
     }
 }

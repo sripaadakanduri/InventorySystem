@@ -6,7 +6,7 @@ import { createOrder, updateOrder } from "../../services/orderService";
 import api from "../../services/api";
 import "./OrderForm.css";
 
-function OrderForm({ onOrderCreated, orderToEdit, onOrderUpdated }) {
+function OrderForm({ onOrderCreated, orderToEdit, onOrderUpdated, onCancelEdit }) {
     const [products, setProducts] = useState([]);
     const [items, setItems] = useState([{ productId: "", quantity: 1 }]);
     const [loading, setLoading] = useState(false);
@@ -69,7 +69,7 @@ function OrderForm({ onOrderCreated, orderToEdit, onOrderUpdated }) {
 
             if (orderToEdit) {
                 // Edit mode
-                const result = await updateOrder(orderToEdit.id, payload);
+                const result = await updateOrder(orderToEdit.id, payload.items);
                 setSuccess("Order updated successfully");
                 if (onOrderUpdated) onOrderUpdated(result);
             } else {
@@ -128,7 +128,7 @@ function OrderForm({ onOrderCreated, orderToEdit, onOrderUpdated }) {
                                 required
                             />
 
-                            
+
 
                             {items.length > 1 && (
                                 <button
@@ -147,14 +147,30 @@ function OrderForm({ onOrderCreated, orderToEdit, onOrderUpdated }) {
                     Add Product
                 </button>
 
-                <button type="submit" className="submit-btn" disabled={loading}>
-                    {loading
-                        ? "Processing..."
-                        : orderToEdit
-                            ? "Update Order"
-                            : "Place Order"
-                    }
-                </button>
+                <div style={{ display: "flex", gap: "20px" }}>
+                    <button type="submit" className="submit-btn" disabled={loading}>
+                        {loading
+                            ? "Processing..."
+                            : orderToEdit
+                                ? "Update Order"
+                                : "Place Order"
+                        }
+                    </button>
+                    {orderToEdit && (
+                        <button
+                            type="button"
+                            className="cancel-btn"
+                            onClick={() => {
+                                setItems([{ productId: "", quantity: 1 }]);
+                                setError("");
+                                setSuccess("");
+                                if (onCancelEdit) onCancelEdit();
+                            }}
+                        >
+                            Cancel Edit
+                        </button>
+                    )}
+                </div>
 
                 {error && <p className="error-text">{error}</p>}
                 {success && <p className="success-text">{success}</p>}

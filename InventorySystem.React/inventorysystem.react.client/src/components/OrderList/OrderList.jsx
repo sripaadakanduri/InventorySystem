@@ -10,15 +10,13 @@ import "./OrderList.css";
 function OrderList({
     orders,
     onCancelOrder,
-    onEditOrder,
+    onSelectForEdit,
     filters
 }) {
 
     const [selectedOrder, setSelectedOrder] = useState(null);
 
     const [products, setProducts] = useState([]);
-
-    const [editItems, setEditItems] = useState([]);
 
     const [currentPage, setCurrentPage] = useState(1);
 
@@ -192,75 +190,9 @@ function OrderList({
 
 
 
-    const handleChange = (
-        index,
-        field,
-        value
-    ) => {
-
-        const updated = [...editItems];
-
-        updated[index][field] = value;
-
-        setEditItems(updated);
-
-    };
-
-    const handleAddItem = () => {
-
-        setEditItems([
-            ...editItems,
-            {
-                productId: "",
-                quantity: 1
-            }
-        ]);
-
-    };
-
-    const handleRemoveItem = (index) => {
-
-        setEditItems(
-            editItems.filter(
-                (_, i) => i !== index
-            )
-        );
-
-    };
-
-    const handleSubmitEdit = async (e) => {
-
-        e.preventDefault();
-
-        const payload =
-            editItems.map(i => ({
-                productId:
-                    Number(i.productId),
-
-                quantity:
-                    Number(i.quantity)
-            }));
-
-        await onEditOrder(
-            selectedOrder.id,
-            payload
-        );
-
-        setSelectedOrder(null);
-
-    };
-
-    const openEditModal = (order) => {
+    const openViewModal = (order) => {
 
         setSelectedOrder(order);
-
-        const mappedItems =
-            order.items.map(i => ({
-                productId: i.productId,
-                quantity: i.quantity
-            }));
-
-        setEditItems(mappedItems);
 
     };
 
@@ -383,7 +315,7 @@ function OrderList({
                             <tr
                                 key={order.id}
                                 onClick={() =>
-                                    openEditModal(order)
+                                    openViewModal(order)
                                 }
                             >
 
@@ -494,127 +426,52 @@ function OrderList({
 
                         </div>
 
-                        <form
-                            className="modal-body"
-                            onSubmit={handleSubmitEdit}
-                        >
+                        <div className="modal-body">
+                            <table className="orders-table" style={{ marginBottom: "1.5rem" }}>
+                                <thead>
+                                    <tr>
+                                        <th style={{ padding: "10px", textAlign: "left", borderBottom: "1px solid var(--border-color)" }}>Product</th>
+                                        <th style={{ padding: "10px", textAlign: "left", borderBottom: "1px solid var(--border-color)" }}>Quantity</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {selectedOrder.items.map((item, idx) => {
+                                        const prod = products.find((p) => p.id === item.productId);
+                                        return (
+                                            <tr key={idx}>
+                                                <td style={{ padding: "10px", borderBottom: "1px solid var(--border-color)" }}>{prod ? prod.name : `Product #${item.productId}`}</td>
+                                                <td style={{ padding: "10px", borderBottom: "1px solid var(--border-color)" }}>{item.quantity}</td>
+                                            </tr>
+                                        );
+                                    })}
+                                </tbody>
+                            </table>
 
-                            {editItems.map(
-                                (item, idx) => (
-
-                                    <div
-                                        key={idx}
-                                        className="order-item-row"
-                                    >
-
-                                        <select
-                                            value={item.productId}
-                                            onChange={(e) =>
-                                                handleChange(
-                                                    idx,
-                                                    "productId",
-                                                    e.target.value
-                                                )
-                                            }
-                                            required
-                                        >
-
-                                            <option value="">
-                                                Select Product
-                                            </option>
-
-                                            {products.map(p => (
-
-                                                <option
-                                                    key={p.id}
-                                                    value={p.id}
-                                                >
-
-                                                    {p.name}
-                                                    {" | "}
-                                                    Stock:
-                                                    {" "}
-                                                    {p.stockQuantity}
-                                                    {" | "}
-                                                    ${p.price}
-
-                                                </option>
-
-                                            ))}
-
-                                        </select>
-
-                                        <input
-                                            type="number"
-                                            min="1"
-                                            value={item.quantity}
-                                            onChange={(e) =>
-                                                handleChange(
-                                                    idx,
-                                                    "quantity",
-                                                    e.target.value
-                                                )
-                                            }
-                                            required
-                                        />
-
-                                        {editItems.length > 1 && (
-
-                                            <button
-                                                type="button"
-                                                onClick={() =>
-                                                    handleRemoveItem(idx)
-                                                }
-                                            >
-                                                Remove
-                                            </button>
-
-                                        )}
-
-                                    </div>
-
-                                )
-                            )}
-
-                            <button
-                                type="button"
-                                onClick={handleAddItem}
-                            >
-                                Add Product
-                            </button>
-
-                            <div className="modal-actions">
-
+                            <div className="modal-actions" style={{ display: "flex", gap: "10px", justifyContent: "flex-end" }}>
                                 <button
-                                    type="submit"
+                                    type="button"
                                     className="edit-btn"
+                                    onClick={() => {
+                                        onSelectForEdit(selectedOrder);
+                                        setSelectedOrder(null);
+                                    }}
                                 >
                                     Update Order
                                 </button>
-
                                 {selectedOrder.status !== 4 && (
-
                                     <button
                                         type="button"
                                         className="cancel-btn"
                                         onClick={() => {
-
-                                            onCancelOrder(
-                                                selectedOrder.id
-                                            );
-
+                                            onCancelOrder(selectedOrder.id);
                                             setSelectedOrder(null);
-
                                         }}
                                     >
                                         Cancel Order
                                     </button>
-
                                 )}
-
                             </div>
-
-                        </form>
+                        </div>
 
                     </div>
 
