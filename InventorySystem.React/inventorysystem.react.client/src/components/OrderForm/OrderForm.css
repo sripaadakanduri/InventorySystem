@@ -64,10 +64,10 @@
     display: flex;
     align-items: center;
     padding: 10px;
-    background: #ecf0f1; /* light gray */
+    background: #ecf0f1; 
     border-radius: 5px;
     font-size: 0.9rem;
-    color: #2c3e50; /* dark text */
+    color: #2c3e50; 
     min-width: 120px;
     text-align: center;
 }

@@ -24,13 +24,10 @@ const UsersManagement = () => {
     });
 
     const [currentPage, setCurrentPage] = useState(1);
-    const pageSize = 6;
+    const [pageSize, setPageSize] =
+        useState(10);
     const [filterUsername, setFilterUsername] = useState("");
     const [filterRole, setFilterRole] = useState("");
-
-    // ============================================
-    // FETCH USERS
-    // ============================================
 
     const fetchUsers = async () => {
 
@@ -54,10 +51,6 @@ const UsersManagement = () => {
 
     }, []);
 
-    // ============================================
-    // UPDATE ROLE
-    // ============================================
-
     const handleRoleUpdate = async (
         id,
         role
@@ -76,10 +69,6 @@ const UsersManagement = () => {
         }
 
     };
-
-    // ============================================
-    // ADD USER
-    // ============================================
 
     const handleAddUser = async (e) => {
 
@@ -108,10 +97,6 @@ const UsersManagement = () => {
 
     };
 
-    // ============================================
-    // FILTER & PAGINATION LOGIC
-    // ============================================
-
     let filteredUsers = [...users];
 
     if (filterUsername) {
@@ -134,10 +119,6 @@ const UsersManagement = () => {
 
         <div className="users-management-container">
 
-            {/* ============================================
-                HEADER
-            ============================================ */}
-
             <div className="users-header">
 
                 <h2 className="users-management-title">
@@ -155,9 +136,7 @@ const UsersManagement = () => {
 
             </div>
 
-            {/* ============================================
-                USERS TABLE
-            ============================================ */}
+
 
             <div className="users-table-wrapper">
 
@@ -167,42 +146,7 @@ const UsersManagement = () => {
 
                         <tr>
 
-                            <th>
-                                Username
-                                <br />
-                                <input
-                                    type="text"
-                                    placeholder="Filter by name..."
-                                    value={filterUsername}
-                                    onChange={(e) => {
-                                        setFilterUsername(e.target.value);
-                                        setCurrentPage(1);
-                                    }}
-                                    style={{ marginTop: '5px', padding: '4px', borderRadius: '4px', border: '1px solid #ccc', width: '90%' }}
-                                />
-                            </th>
-
-                            <th>Email</th>
-
-                            <th>
-                                Role
-                                <br />
-                                <select
-                                    value={filterRole}
-                                    onChange={(e) => {
-                                        setFilterRole(e.target.value);
-                                        setCurrentPage(1);
-                                    }}
-                                    style={{ marginTop: '5px', padding: '4px', borderRadius: '4px', border: '1px solid #ccc', width: '90%' }}
-                                >
-                                    <option value="">All Roles</option>
-                                    <option value="Admin">Admin</option>
-                                    <option value="User">User</option>
-                                </select>
-                            </th>
-
-                            <th>Action</th>
-
+                           
                         </tr>
 
                     </thead>
@@ -302,20 +246,16 @@ const UsersManagement = () => {
 
             </div>
 
-            {/* ============================================
-                PAGINATION
-            ============================================ */}
+        
 
             <Pagination
                 currentPage={currentPage}
                 totalItems={filteredUsers.length}
                 pageSize={pageSize}
                 onPageChange={setCurrentPage}
+                onPageSizeChange={setPageSize}
             />
 
-            {/* ============================================
-                ADD USER MODAL
-            ============================================ */}
 
             {showAddModal && (
 

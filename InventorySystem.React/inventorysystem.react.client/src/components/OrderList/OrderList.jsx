@@ -18,8 +18,8 @@ function OrderList({
 
     const [currentPage, setCurrentPage] = useState(1);
 
-    const pageSize = 10;
-
+    const [pageSize, setPageSize] =
+        useState(10);
     const {
         filterUser,
         setFilterUser,
@@ -58,7 +58,6 @@ function OrderList({
 
     let filteredOrders = [...orders];
 
-    // Filter User
     if (filterUser) {
 
         filteredOrders =
@@ -72,7 +71,6 @@ function OrderList({
 
     }
 
-    // Filter Status
     if (filterStatus) {
 
         filteredOrders =
@@ -82,7 +80,6 @@ function OrderList({
 
     }
 
-    // Filter Start Date
     if (filterStartDate) {
 
         filteredOrders =
@@ -100,7 +97,6 @@ function OrderList({
 
     }
 
-    // Filter End Date
     if (filterEndDate) {
 
         filteredOrders =
@@ -112,7 +108,6 @@ function OrderList({
                 const endDate =
                     new Date(filterEndDate);
 
-                // Include full end day
                 endDate.setHours(
                     23,
                     59,
@@ -155,6 +150,8 @@ function OrderList({
 
             case 4:
                 return "cancelled";
+            case 5:
+                return "Updated";
 
             default:
                 return "";
@@ -178,6 +175,8 @@ function OrderList({
 
             case 4:
                 return "Cancelled";
+            case 5:
+                return "Updated..";
 
             default:
                 return "Unknown";
@@ -264,6 +263,9 @@ function OrderList({
 
                                 <option value="4">
                                     Cancelled
+                                </option>
+                                <option value="5">
+                                    Updated
                                 </option>
 
                             </select>
@@ -371,22 +373,16 @@ function OrderList({
 
             </table>
 
-            {/* ============================================
-                PAGINATION
-            ============================================ */}
+            
 
             <Pagination
                 currentPage={currentPage}
-                totalItems={
-                    filteredOrders.length
-                }
+                totalItems={orders.length}
                 pageSize={pageSize}
                 onPageChange={setCurrentPage}
+                onPageSizeChange={setPageSize}
             />
 
-            {/* ============================================
-                EDIT MODAL
-            ============================================ */}
 
             {selectedOrder && (
 
@@ -446,16 +442,20 @@ function OrderList({
                             </table>
 
                             <div className="modal-actions" style={{ display: "flex", gap: "10px", justifyContent: "flex-end" }}>
-                                <button
-                                    type="button"
-                                    className="edit-btn"
-                                    onClick={() => {
-                                        onSelectForEdit(selectedOrder);
-                                        setSelectedOrder(null);
-                                    }}
-                                >
-                                    Update Order
-                                </button>
+                                {selectedOrder.status !== 4 && (
+
+                                    <button
+                                        type="button"
+                                        className="edit-btn"
+                                        onClick={() => {
+                                            onSelectForEdit(selectedOrder);
+                                            setSelectedOrder(null);
+                                        }}
+                                    >
+                                        Update Order
+                                    </button>
+
+                                )}
                                 {selectedOrder.status !== 4 && (
                                     <button
                                         type="button"

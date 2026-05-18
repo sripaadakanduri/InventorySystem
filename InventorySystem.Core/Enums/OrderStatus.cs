@@ -5,6 +5,8 @@
         Pending = 1,
         Confirmed = 2,
         Failed = 3,
-        Cancelled = 4
+        Cancelled = 4,
+        Updated = 5
+
     }
 }

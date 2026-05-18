@@ -1,6 +1,4 @@
-// ============================================
-// FILE: OrderForm.js (Updated with available stock display)
-// ============================================
+
 import { useEffect, useState } from "react";
 import { createOrder, updateOrder } from "../../services/orderService";
 import api from "../../services/api";
@@ -13,7 +11,6 @@ function OrderForm({ onOrderCreated, orderToEdit, onOrderUpdated, onCancelEdit }
     const [error, setError] = useState("");
     const [success, setSuccess] = useState("");
 
-    // Populate form if editing
     useEffect(() => {
         if (orderToEdit) {
             const mappedItems = orderToEdit.items.map(i => ({
@@ -24,7 +21,6 @@ function OrderForm({ onOrderCreated, orderToEdit, onOrderUpdated, onCancelEdit }
         }
     }, [orderToEdit]);
 
-    // Fetch all products
     const fetchProducts = async () => {
         try {
             const response = await api.get("/products");
@@ -113,7 +109,6 @@ function OrderForm({ onOrderCreated, orderToEdit, onOrderUpdated, onCancelEdit }
                                     </option>
                                 ))}
                             </select>
-                            {/* Stock display styled for theme */}
                             {selectedProduct && (
                                 <span className="stock-badge">
                                     Available: {availableQuantity}

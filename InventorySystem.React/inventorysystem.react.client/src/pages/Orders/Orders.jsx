@@ -9,7 +9,6 @@ function Orders() {
     const [loading, setLoading] = useState(true);
     const [orderToEdit, setOrderToEdit] = useState(null);
 
-    // Filters
     const [filterUser, setFilterUser] = useState("");
     const [filterStatus, setFilterStatus] = useState("");
     const [filterStartDate, setFilterStartDate] = useState("");
@@ -41,7 +40,6 @@ function Orders() {
         }
     };
 
-    // Filtered orders
     const filteredOrders = orders.filter(o => {
         let userMatch = filterUser ? o.username.toLowerCase().includes(filterUser.toLowerCase()) : true;
         let statusMatch = filterStatus ? o.status.toString() === filterStatus : true;
@@ -61,6 +59,7 @@ function Orders() {
                 onOrderUpdated={(updatedOrder) => {
                     setOrders(prev => prev.map(o => (o.id === updatedOrder.id ? updatedOrder : o)));
                     setOrderToEdit(null);
+
                 }}
                 onCancelEdit={() => {
                     setOrderToEdit(null);
