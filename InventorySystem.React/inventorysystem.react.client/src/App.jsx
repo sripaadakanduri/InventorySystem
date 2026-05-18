@@ -27,9 +27,6 @@ function App() {
             <Navbar />
 
             <Routes>
-
-                {/* Public Routes */}
-
                 <Route
                     path="/"
                     element={<Navigate to="/login" />}
