@@ -146,7 +146,43 @@ const UsersManagement = () => {
 
                         <tr>
 
-                           
+
+                            <th>
+                                Username
+                                <br />
+                                <input
+                                    type="text"
+                                    placeholder="Filter by name..."
+                                    value={filterUsername}
+                                    onChange={(e) => {
+                                        setFilterUsername(e.target.value);
+                                        setCurrentPage(1);
+                                    }}
+                                    style={{ marginTop: '5px', padding: '4px', borderRadius: '4px', border: '1px solid #ccc', width: '90%' }}
+                                />
+                            </th>
+
+                            <th>Email</th>
+
+                            <th>
+                                Role
+                                <br />
+                                <select
+                                    value={filterRole}
+                                    onChange={(e) => {
+                                        setFilterRole(e.target.value);
+                                        setCurrentPage(1);
+                                    }}
+                                    style={{ marginTop: '5px', padding: '4px', borderRadius: '4px', border: '1px solid #ccc', width: '90%' }}
+                                >
+                                    <option value="">All Roles</option>
+                                    <option value="Admin">Admin</option>
+                                    <option value="User">User</option>
+                                </select>
+                            </th>
+
+                            <th>Action</th>
+
                         </tr>
 
                     </thead>

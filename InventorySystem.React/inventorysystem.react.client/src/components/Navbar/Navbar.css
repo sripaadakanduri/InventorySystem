@@ -127,7 +127,8 @@
     transform: translateY(6px) scale(0.98);
     pointer-events: none;
     position: absolute;
-    top: calc(100% + 10px);
+    top: calc(100% + 1px);
+
     right: 0;
     min-width: 220px;
     background: var(--white);
