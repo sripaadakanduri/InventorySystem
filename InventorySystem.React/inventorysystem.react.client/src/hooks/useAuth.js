@@ -20,10 +20,9 @@ const useAuth = () => {
             const response = await login(data);
 
             if (response.role === "Admin") {
-                navigate("/dashboard");
-            }
-            else {
-                navigate("/dashboard");
+                navigate("/dashboard", { replace: true });
+            } else {
+                navigate("/dashboard", { replace: true });
             }
 
         } catch (err) {
@@ -37,7 +36,7 @@ const useAuth = () => {
 
             await register(data);
 
-            navigate("/login");
+            navigate("/login", { replace: true });
 
         } catch (err) {
             throw err;
@@ -48,14 +47,14 @@ const useAuth = () => {
 
         logout();
 
-        navigate("/login");
+        navigate("/login", { replace: true });
     };
 
     return {
         handleLogin,
         handleRegister,
         handleLogout,
-        isAuthenticated: isAuthenticated(),
+        authenticated: isAuthenticated(),
         role: getRole(),
         username: getUsername()
     };

@@ -148,6 +148,7 @@ export default function Dashboard() {
 
             <footer className="dashboard-footer">
                 <p>© 2026 Inventory System</p>
+                <div className="bg-red-500 rounded-2xl">completed</div>
             </footer>
         </div>
     );
