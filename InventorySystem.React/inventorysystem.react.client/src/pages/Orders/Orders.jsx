@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import OrderList from "../../components/OrderList/OrderList";
 import OrderForm from "../../components/OrderForm/OrderForm";
 import { getAllOrders, cancelOrder, updateOrder } from "../../services/orderService";
-import "./Orders.css";
+// import "./Orders.css";
 
 function Orders() {
     const [orders, setOrders] = useState([]);
@@ -50,7 +50,7 @@ function Orders() {
 
     return (
         <div className="orders-page card">
-            <h1 style={{ marginBottom: "2rem" }}>Order Management</h1>
+            <h1 class="folt-bold text-3xl flex justify-center p-8">Order Management</h1>
             <OrderForm
                 orderToEdit={orderToEdit}
                 onOrderCreated={(newOrder) =>

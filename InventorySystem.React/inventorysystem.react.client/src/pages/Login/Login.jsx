@@ -69,6 +69,7 @@ const Login = () => {
                     name="username"
                     placeholder="Username"
                     onChange={handleChange}
+                    class="py-1 px-2 foucs:bg-blue-500 transition duration-300"
                 />
 
                 <div className="password-container">
@@ -82,6 +83,7 @@ const Login = () => {
                         name="password"
                         placeholder="Password"
                         onChange={handleChange}
+                        class="px-2 py-1 foucs:bg-blue-500 transition duration-300"
                     />
 
                     <button
@@ -100,13 +102,15 @@ const Login = () => {
 
                 </div>
 
-                <button
-                    type="submit"
-                    className="btn-primary"
-                    disabled={loading}
-                >
-                    {loading ?" LogingIn...." :"Login"}
-                </button>
+                <div className="flex justify-center">
+                    <button
+                        type="submit"
+                        classN="bg-blue-500 border border-gray-200 shadow-xl rounded-xl px-3 py-2 text-sm disabled:opacity-50 w-40 flex justify-center"
+                        disabled={loading}
+                    >
+                        {loading ? "Logging In..." : "Login"}
+                    </button>
+                </div>
 
                 <p className="link-text">
 

@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import api from "../../services/api";
 import Pagination from "../Pagination/Pagination";
-import "./OrderList.css";
+// import "./OrderList.css";
 
 function OrderList({
     orders,
@@ -197,106 +197,129 @@ function OrderList({
 
     return (
 
-        <div className="order-list-container">
+        <div className="w-full overflow-x-auto rounded-3xl border border-gray-200 shadow-lg bg-white">
 
-            <table className="orders-table">
+            <table className="w-full border-collapse">
 
-                <thead>
+                {/* Table Header */}
+                <thead className="bg-blue-50 text-gray-700">
 
-                    <tr>
+                    <tr class="border border-gray-200">
 
-                        <th>
+                        {/* User */}
+                        <th className="p-4 ">
 
-                            User
+                            <div className="flex flex-col gap-2">
 
-                            <input
-                                type="text"
-                                placeholder="Filter"
-                                value={filterUser}
-                                onChange={(e) =>
-                                    setFilterUser(
-                                        e.target.value
-                                    )
-                                }
-                                className="table-filter-input"
-                            />
+                                <span className="font-semibold">
+                                    User
+                                </span>
+
+                                <input
+                                    type="text"
+                                    placeholder="Filter"
+                                    value={filterUser}
+                                    onChange={(e) =>
+                                        setFilterUser(e.target.value)
+                                    }
+                                    className="border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                                />
+
+                            </div>
 
                         </th>
 
-                        <th>
+                        {/* Total */}
+                        <th className="p-4 font-semibold">
                             Total
                         </th>
 
-                        <th>
+                        {/* Quantity */}
+                        <th className="p-4 font-semibold">
                             Quantity
                         </th>
 
-                        <th>
+                        {/* Status */}
+                        <th className="p-4">
 
-                            Status
+                            <div className="flex flex-col gap-2">
 
-                            <select
-                                value={filterStatus}
-                                onChange={(e) =>
-                                    setFilterStatus(
-                                        e.target.value
-                                    )
-                                }
-                                className="table-filter-select"
-                            >
+                                <span className="font-semibold">
+                                    Status
+                                </span>
 
-                                <option value="">
-                                    All
-                                </option>
+                                <select
+                                    value={filterStatus}
+                                    onChange={(e) =>
+                                        setFilterStatus(e.target.value)
+                                    }
+                                    className="border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                                >
 
-                                <option value="1">
-                                    Pending
-                                </option>
+                                    <option value="">
+                                        All
+                                    </option>
 
-                                <option value="2">
-                                    Confirmed
-                                </option>
+                                    <option value="1">
+                                        Pending
+                                    </option>
 
-                                <option value="3">
-                                    Failed
-                                </option>
+                                    <option value="2">
+                                        Confirmed
+                                    </option>
 
-                                <option value="4">
-                                    Cancelled
-                                </option>
-                                <option value="5">
-                                    Updated
-                                </option>
+                                    <option value="3">
+                                        Failed
+                                    </option>
 
-                            </select>
+                                    <option value="4">
+                                        Cancelled
+                                    </option>
+
+                                    <option value="5">
+                                        Updated
+                                    </option>
+
+                                </select>
+
+                            </div>
 
                         </th>
 
-                        <th>
+                        {/* Created */}
+                        <th className="p-4">
 
-                            Created
+                            <div className="flex flex-col gap-2">
 
-                            <div className="date-filters">
+                                <span className="font-semibold">
+                                    Created
+                                </span>
 
-                                <input
-                                    type="date"
-                                    value={filterStartDate}
-                                    onChange={(e) =>
-                                        setFilterStartDate(
-                                            e.target.value
-                                        )
-                                    }
-                                />
+                                <div className="flex gap-2">
 
-                                <input
-                                    type="date"
-                                    value={filterEndDate}
-                                    onChange={(e) =>
-                                        setFilterEndDate(
-                                            e.target.value
-                                        )
-                                    }
-                                />
+                                    <input
+                                        type="date"
+                                        value={filterStartDate}
+                                        onChange={(e) =>
+                                            setFilterStartDate(
+                                                e.target.value
+                                            )
+                                        }
+                                        className="border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                                    />
+
+                                    <input
+                                        type="date"
+                                        value={filterEndDate}
+                                        onChange={(e) =>
+                                            setFilterEndDate(
+                                                e.target.value
+                                            )
+                                        }
+                                        className="border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                                    />
+
+                                </div>
 
                             </div>
 
@@ -306,49 +329,57 @@ function OrderList({
 
                 </thead>
 
+                {/* Table Body */}
                 <tbody>
 
                     {currentOrders.length > 0 ? (
 
-                        currentOrders.map(order => (
+                        currentOrders.map((order) => (
 
                             <tr
                                 key={order.id}
                                 onClick={() =>
                                     openViewModal(order)
                                 }
+                                className="hover:bg-gray-50 hover:translate-0.5 cursor-pointer transition transform duration-150 border border-gray-200 items-center  justify-center"
                             >
 
-                                <td>
+                                <td className="p-4 text-center">
                                     {order.username}
                                 </td>
 
-                                <td>
+                                <td className="p-4 font-medium text-black-600 text-center">
                                     ${order.totalAmount}
                                 </td>
 
-                                <td>
+                                <td className="p-4 text-center">
                                     {order.totalQuantity}
                                 </td>
 
-                                <td>
+                                <td className="p-4 text-center">
 
                                     <span
-                                        className={`status-badge ${getStatusClass(order.status)}`}
+                                        className={`px-3 py-1 rounded-full text-sm font-medium
+                ${order.status === 1
+                                                ? "bg-yellow-100 text-yellow-700"
+                                                : order.status === 2
+                                                    ? "bg-green-50 text-green-700"
+                                                    : order.status === 3
+                                                        ? "bg-red-100 text-red-700"
+                                                        : order.status === 4
+                                                            ? "bg-gray-200 text-gray-700"
+                                                            : "bg-blue-50 text-blue-700"
+                                            }`}
                                     >
-
                                         {getStatusText(order.status)}
-
                                     </span>
 
                                 </td>
 
-                                <td>
-
+                                <td className="p-4 text-gray-600 text-center">
                                     {new Date(
                                         order.createdAt
                                     ).toLocaleString()}
-
                                 </td>
 
                             </tr>
@@ -359,10 +390,11 @@ function OrderList({
 
                         <tr>
 
-                            <td colSpan="5">
-
+                            <td
+                                colSpan="5"
+                                className="text-center py-8 text-gray-500"
+                            >
                                 No Orders Found
-
                             </td>
 
                         </tr>
@@ -373,44 +405,46 @@ function OrderList({
 
             </table>
 
-            
+            {/* Pagination */}
+            <div className="p-4">
 
-            <Pagination
-                currentPage={currentPage}
-                totalItems={orders.length}
-                pageSize={pageSize}
-                onPageChange={setCurrentPage}
-                onPageSizeChange={setPageSize}
-            />
+                <Pagination
+                    currentPage={currentPage}
+                    totalItems={orders.length}
+                    pageSize={pageSize}
+                    onPageChange={setCurrentPage}
+                    onPageSizeChange={setPageSize}
+                />
+
+            </div>
 
 
+            {/* Modal */}
             {selectedOrder && (
 
                 <div
-                    className="modal-overlay"
-                    onClick={() =>
-                        setSelectedOrder(null)
-                    }
+                    className="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
+                    onClick={() => setSelectedOrder(null)}
                 >
 
                     <div
-                        className="modal-content"
+                        className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl p-6 relative"
                         onClick={(e) =>
                             e.stopPropagation()
                         }
                     >
 
-                        <div className="modal-header">
+                        {/* Header */}
+                        <div className="flex items-center justify-between border-b pb-4 mb-6">
 
-                            <h3>
+                            <h3 className="text-2xl font-bold text-gray-800">
 
-                                Order #
-                                {selectedOrder.id}
+                                Order #{selectedOrder.id}
 
                             </h3>
 
                             <button
-                                className="close-btn"
+                                className="text-gray-500 hover:text-red-500 text-2xl font-bold"
                                 onClick={() =>
                                     setSelectedOrder(null)
                                 }
@@ -420,55 +454,111 @@ function OrderList({
 
                         </div>
 
-                        <div className="modal-body">
-                            <table className="orders-table" style={{ marginBottom: "1.5rem" }}>
-                                <thead>
+                        {/* Product Table */}
+                        <div className="overflow-x-auto">
+
+                            <table className="w-full border border-gray-200 rounded-xl overflow-hidden">
+
+                                <thead className="bg-blue-50">
+
                                     <tr>
-                                        <th style={{ padding: "10px", textAlign: "left", borderBottom: "1px solid var(--border-color)" }}>Product</th>
-                                        <th style={{ padding: "10px", textAlign: "left", borderBottom: "1px solid var(--border-color)" }}>Quantity</th>
+
+                                        <th className="text-left p-4 border-b">
+                                            Product
+                                        </th>
+
+                                        <th className="text-left p-4 border-b">
+                                            Quantity
+                                        </th>
+
                                     </tr>
+
                                 </thead>
+
                                 <tbody>
+
                                     {selectedOrder.items.map((item, idx) => {
-                                        const prod = products.find((p) => p.id === item.productId);
+
+                                        const prod =
+                                            products.find(
+                                                (p) =>
+                                                    p.id === item.productId
+                                            );
+
                                         return (
-                                            <tr key={idx}>
-                                                <td style={{ padding: "10px", borderBottom: "1px solid var(--border-color)" }}>{prod ? prod.name : `Product #${item.productId}`}</td>
-                                                <td style={{ padding: "10px", borderBottom: "1px solid var(--border-color)" }}>{item.quantity}</td>
+
+                                            <tr
+                                                key={idx}
+                                                className="border-b hover:bg-gray-50"
+                                            >
+
+                                                <td className="p-4">
+
+                                                    {prod
+                                                        ? prod.name
+                                                        : `Product #${item.productId}`}
+
+                                                </td>
+
+                                                <td className="p-4">
+                                                    {item.quantity}
+                                                </td>
+
                                             </tr>
+
                                         );
+
                                     })}
+
                                 </tbody>
+
                             </table>
 
-                            <div className="modal-actions" style={{ display: "flex", gap: "10px", justifyContent: "flex-end" }}>
-                                {selectedOrder.status !== 4 && (
+                        </div>
 
-                                    <button
-                                        type="button"
-                                        className="edit-btn"
-                                        onClick={() => {
-                                            onSelectForEdit(selectedOrder);
-                                            setSelectedOrder(null);
-                                        }}
-                                    >
-                                        Update Order
-                                    </button>
+                        {/* Actions */}
+                        <div className="flex justify-end gap-4 mt-6">
 
-                                )}
-                                {selectedOrder.status !== 4 && (
-                                    <button
-                                        type="button"
-                                        className="cancel-btn"
-                                        onClick={() => {
-                                            onCancelOrder(selectedOrder.id);
-                                            setSelectedOrder(null);
-                                        }}
-                                    >
-                                        Cancel Order
-                                    </button>
-                                )}
-                            </div>
+                            {selectedOrder.status !== 4 && (
+
+                                <button
+                                    type="button"
+                                    className="bg-blue-500 hover:bg-blue-600 shadow-xl px-6 py-3 rounded-xl shadow transition"
+                                    onClick={() => {
+
+                                        onSelectForEdit(
+                                            selectedOrder
+                                        );
+
+                                        setSelectedOrder(null);
+
+                                    }}
+                                >
+                                    Update Order
+                                </button>
+
+                            )}
+
+                            {selectedOrder.status !== 4 && (
+
+                                <button
+                                    type="button"
+                                    className="bg-red-500 hover:bg-red-600 shadow-xl  px-6 py-3 rounded-xl shadow transition"
+                                    onClick={() => {
+
+                                        onCancelOrder(
+                                            selectedOrder.id
+                                        );
+
+                                        setSelectedOrder(null);
+
+                                    }}
+                                >
+                                    Cancel Order
+                                </button>
+
+                            )}
+
                         </div>
 
                     </div>
@@ -478,6 +568,7 @@ function OrderList({
             )}
 
         </div>
+
 
     );
 

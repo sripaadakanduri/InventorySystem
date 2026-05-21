@@ -1,18 +1,20 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+
+/* =========================
+   CSS Variables
+========================= */
 
 :root {
-    --primary: #6366f1; /* Indigo 500 */
-    --primary-hover: #4f46e5; /* Indigo 600 */
-    --bg: #f8fafc; /* Slate 50 */
+    --primary: #6366f1;
+    --primary-hover: #4f46e5;
+    --bg: #f8fafc;
     --surface: #ffffff;
     --surface-hover: #f1f5f9;
-    --text-main: #0f172a; /* Slate 900 */
-    --text-muted: #64748b; /* Slate 500 */
-    --border: #e2e8f0; /* Slate 200 */
+    --text-main: #0f172a;
+    --text-muted: #64748b;
+    --border: #e2e8f0;
     --danger: #ef4444;
     --radius: 12px;
     --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
@@ -20,89 +22,107 @@
     --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
 }
 
+/* =========================
+   Dark Mode
+========================= */
+
 @media (prefers-color-scheme: dark) {
+
     :root {
-        --bg: #0f172a; /* Slate 900 */
-        --surface: #1e293b; /* Slate 800 */
+        --bg: #0f172a;
+        --surface: #1e293b;
         --surface-hover: #334155;
-        --text-main: #f8fafc; /* Slate 50 */
-        --text-muted: #94a3b8; /* Slate 400 */
-        --border: #334155; /* Slate 700 */
+        --text-main: #f8fafc;
+        --text-muted: #94a3b8;
+        --border: #334155;
     }
 }
 
+/* =========================
+   Base Styles
+========================= */
+
 * {
     box-sizing: border-box;
-    margin: 0;
-    padding: 0;
+}
+
+html {
+    scroll-behavior: smooth;
 }
 
 body {
-    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    margin: 0;
+    font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     background-color: var(--bg);
     color: var(--text-main);
     line-height: 1.5;
     -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
 }
 
-/* Base Form Elements */
-input, select, textarea {
+/* =========================
+   Typography
+========================= */
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    font-weight: 600;
+}
+
+p {
+    color: var(--text-muted);
+}
+
+/* =========================
+   Form Elements
+========================= */
+
+input,
+select,
+textarea {
     width: 100%;
-    padding: 0.75rem 1rem;
     border: 1px solid var(--border);
-    border-radius: 8px;
+    border-radius: 10px;
     background: var(--surface);
     color: var(--text-main);
     font-family: inherit;
-    font-size: 0.95rem;
-    transition: all 0.2s ease;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
 }
 
-    input:focus, select:focus {
+    input:focus,
+    select:focus,
+    textarea:focus {
         outline: none;
         border-color: var(--primary);
-        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
     }
+
+/* =========================
+   Buttons
+========================= */
 
 button {
-    cursor: pointer;
     font-family: inherit;
-    font-weight: 500;
-    transition: all 0.2s ease;
-}
-
-.btn-primary {
-    background-color: var(--primary);
-    color: white;
     border: none;
-    padding: 0.75rem 1.5rem;
-    border-radius: 8px;
-    font-size: 0.95rem;
-    box-shadow: var(--shadow-sm);
-    display: inline-flex;
-    justify-content: center;
-    align-items: center;
+    background: none;
+    cursor: pointer;
 }
 
-    .btn-primary:hover {
-        background-color: var(--primary-hover);
-        transform: translateY(-1px);
-        box-shadow: var(--shadow-md);
-    }
-
-    .btn-primary:active {
-        transform: translateY(0);
-    }
+/* =========================
+   Utilities
+========================= */
 
 .card {
     background: var(--surface);
+    border: 1px solid var(--border);
     border-radius: var(--radius);
     box-shadow: var(--shadow-md);
-    padding: 2rem;
-    border: 1px solid var(--border);
 }
 
-/* Glassmorphism utility */
 .glass {
     background: rgba(255, 255, 255, 0.7);
     backdrop-filter: blur(10px);
@@ -111,8 +131,30 @@ button {
 }
 
 @media (prefers-color-scheme: dark) {
+
     .glass {
         background: rgba(30, 41, 59, 0.7);
-        border: 1px solid rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.08);
     }
 }
+
+/* =========================
+   Scrollbar
+========================= */
+
+::-webkit-scrollbar {
+    width: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 999px;
+}
+
+    ::-webkit-scrollbar-thumb:hover {
+        background: #94a3b8;
+    }

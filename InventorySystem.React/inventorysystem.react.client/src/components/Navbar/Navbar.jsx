@@ -1,97 +1,332 @@
 ﻿import { Link, useLocation, useNavigate } from "react-router-dom";
 import useAuth from "../../hooks/useAuth";
-import "./Navbar.css";
-import { isAuthenticated } from "../../services/auth";
 
-import { Home, ShoppingCart, Package, Users, CreditCard, LogOut } from "lucide-react";
+import {
+    Home,
+    ShoppingCart,
+    Package,
+    Users,
+    CreditCard,
+    LogOut
+} from "lucide-react";
 
 const Navbar = () => {
-    const { handleLogout, role, username } = useAuth();
+
+    const {
+        handleLogout,
+        role,
+        username,
+        authenticated
+    } = useAuth();
+
     const location = useLocation();
+
     const navigate = useNavigate();
 
-    if (!isAuthenticated()) return null;
+    if (!authenticated) return null;
 
     return (
-        <nav className="navbar">
-            <div className="navbar-container">
+
+        <nav className="border-b border-gray-200 bg-white shadow-sm">
+
+            <div className="sticky top-0 z-50 flex items-center justify-between bg-white/80 backdrop-blur px-6 py-4">
+
+                {/* Brand */}
                 <div
-                    className="navbar-brand cursor-pointer"
+                    className="flex cursor-pointer items-center gap-3"
                     onClick={() => navigate("/dashboard")}
                 >
-                    <span className="logo-icon">🛒</span>
-                    <span className="brand-name">Inventory System</span>
-                </div>
 
-                <div className="menu-container">
-                    <div className="menu-trigger">
-                        <span className="menu-trigger-avatar">
-                            {username ? username[0].toUpperCase() : "U"}
-                        </span>
-                        <span className="menu-trigger-name">{username}</span>
-                        <span className="menu-trigger-chevron">
-                            <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-                                <path d="M2 4L6 8L10 4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-                            </svg>
-                        </span>
+                    <div
+                        className="
+                            flex h-12 w-12 items-center justify-center
+                            rounded-2xl bg-blue-50
+                            text-xl font-bold text-white
+                        "
+                    >
+                        🛒
                     </div>
 
-                    <div className="dropdown-menu">
-                        <div className="dropdown-header">
-                            <div className="dropdown-avatar">
-                                {username ? username[0].toUpperCase() : "U"}
-                            </div>
-                            <div className="dropdown-user-info">
-                                <span className="dropdown-username">{username}</span>
-                                <span className="dropdown-role">{role}</span>
-                            </div>
+                    <div>
+
+                        <h1 className="text-xl font-bold">
+                            Inventory System
+                        </h1>
+
+                        <p className="text-sm text-gray-400">
+                            Admin Dashboard
+                        </p>
+
+                    </div>
+
+                </div>
+
+                {/* Right Side */}
+                <div className="relative group">
+
+                    {/* Trigger */}
+                    <div
+                        className="
+                            flex items-center gap-2
+                            rounded-3xl px-3 py-2
+                            transition duration-300
+                            hover:bg-gray-100 hover:shadow-2xl
+                        "
+                    >
+
+                        {/* Avatar */}
+                        <span
+                            className="
+                                flex h-12 w-12 items-center justify-center
+                                rounded-full bg-blue-500
+                                text-lg font-bold text-white
+                            "
+                        >
+                            {username
+                                ? username[0].toUpperCase()
+                                : "U"}
+                        </span>
+
+                        {/* Name */}
+                        <div className="text-left">
+
+                            <span className="font-semibold">
+                                {username}
+                            </span>
+
+                            <p className="text-sm text-gray-400">
+                                {role}
+                            </p>
+
                         </div>
 
-                        <div className="dropdown-divider" />
+                        {/* Chevron */}
+                        <span
+                            className="
+                                text-gray-400 transition duration-300
+                                group-hover:rotate-180
+                            "
+                        >
 
-                        <Link to="/dashboard" className={`dropdown-item ${location.pathname === "/dashboard" ? "active" : ""}`}>
-                            <Home size={16} className="item-icon" />
+                            <svg
+                                width="12"
+                                height="12"
+                                viewBox="0 0 12 12"
+                                fill="none"
+                            >
+                                <path
+                                    d="M2 4L6 8L10 4"
+                                    stroke="currentColor"
+                                    strokeWidth="1.8"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                />
+                            </svg>
+
+                        </span>
+
+                    </div>
+
+                    {/* Dropdown */}
+                    <div
+                        className="
+                            invisible absolute right-0 top-full
+                            mt-2 w-80 origin-top-right
+                            rounded-2xl border border-gray-200
+                            bg-white p-6 shadow-2xl
+                            opacity-0 scale-95
+                            transition-all duration-300
+                            group-hover:visible
+                            group-hover:opacity-100
+                            group-hover:scale-100
+                        "
+                    >
+
+                        {/* Header */}
+                        <div className="grid grid-cols-2 justify-center items-center">
+
+                            <div
+                                className="
+                                    mt-2 flex h-12 w-12 items-center justify-center
+                                    rounded-full bg-purple-500
+                                    text-lg font-bold text-white ml-15
+                                "
+                            >
+                                {username
+                                    ? username[0].toUpperCase()
+                                    : "U"}
+                            </div>
+
+                            <div class="">
+
+                                <h1 className="text-lg font-semibold">
+                                    {username}
+                                </h1>
+
+                                <h2 className="text-sm text-gray-400">
+                                    {role}
+                                </h2>
+
+                            </div>
+
+                        </div>
+
+                        {/* Divider */}
+                        <div className="my-3 border border-gray-200"></div>
+
+                        <div classNma="flex flex-col gap-y-3">
+                        {/* Dashboard */}
+                        <Link
+                            to="/dashboard"
+                            className={`
+                                flex w-full items-center gap-3
+                                rounded-2xl px-3 py-2
+                                transition duration-300
+                                hover:bg-blue-50
+                                mb-2
+                                ${location.pathname === "/dashboard"
+                                    ? "bg-blue-50 text-blue-600"
+                                    : ""
+                                }
+                            `}
+                        >
+
+                            <Home size={16} />
+
                             <span>Dashboard</span>
-                            {location.pathname === "/dashboard" && <span className="active-dot" />}
+
                         </Link>
 
-                        <Link to="/orders" className={`dropdown-item ${location.pathname === "/orders" ? "active" : ""}`}>
-                            <ShoppingCart size={16} className="item-icon" />
+                        {/* Orders */}
+                        <Link
+                            to="/orders"
+                            className={`
+                                flex w-full items-center gap-3
+                                rounded-2xl px-3 py-2
+                                transition duration-300
+                                hover:bg-blue-50
+                                mb-2
+                                ${location.pathname === "/orders"
+                                    ? "bg-blue-50 text-blue-600"
+                                    : ""
+                                }
+                            `}
+                        >
+
+                            <ShoppingCart size={16} />
+
                             <span>Orders</span>
-                            {location.pathname === "/orders" && <span className="active-dot" />}
+
                         </Link>
 
-                        <Link to="/products" className={`dropdown-item ${location.pathname === "/products" ? "active" : ""}`}>
-                            <Package size={16} className="item-icon" />
+                        {/* Products */}
+                        <Link
+                            to="/products"
+                            className={`
+                                flex w-full items-center gap-3
+                                rounded-2xl px-3 py-2
+                                transition duration-300
+                                hover:bg-blue-50 mb-2
+                                ${location.pathname === "/products"
+                                    ? "bg-blue-50 text-blue-600"
+                                    : ""
+                                }
+                            `}
+                        >
+
+                            <Package size={16} />
+
                             <span>Products</span>
-                            {location.pathname === "/products" && <span className="active-dot" />}
+
                         </Link>
 
+                        {/* Admin Section */}
                         {role === "Admin" && (
                             <>
-                                <div className="dropdown-divider" />
-                                <p className="dropdown-section-label">Admin</p>
-                                <Link to="/admin/users" className={`dropdown-item ${location.pathname === "/admin/users" ? "active" : ""}`}>
-                                    <Users size={16} className="item-icon" />
+
+                                <div className="my-3 border border-gray-200"></div>
+
+                                <p
+                                    className="
+                                        mb-2 ml-2 text-xs
+                                        font-semibold uppercase
+                                        tracking-wider text-gray-400 mb-2
+                                    "
+                                >
+                                    Admin
+                                </p>
+
+                                <Link
+                                    to="/admin/users"
+                                    className={`
+                                        flex w-full items-center gap-3
+                                        rounded-2xl px-3 py-2
+                                        transition duration-300
+                                        hover:bg-blue-50 mb-2
+                                        ${location.pathname === "/admin/users"
+                                            ? "bg-blue-50 text-blue-600"
+                                            : ""
+                                        }
+                                    `}
+                                >
+
+                                    <Users size={16} />
+
                                     <span>Users</span>
-                                    {location.pathname === "/admin/users" && <span className="active-dot" />}
+
                                 </Link>
-                                <Link to="/transactions" className={`dropdown-item ${location.pathname === "/transactions" ? "active" : ""}`}>
-                                    <CreditCard size={16} className="item-icon" />
+
+                                <Link
+                                    to="/transactions"
+                                    className={`
+                                        flex w-full items-center gap-3
+                                        rounded-2xl px-3 py-2
+                                        transition duration-300
+                                        hover:bg-blue-50 mb-2
+                                        ${location.pathname === "/transactions"
+                                            ? "bg-blue-50 text-blue-600"
+                                            : ""
+                                        }
+                                    `}
+                                >
+
+                                    <CreditCard size={16} />
+
                                     <span>Audit Trail</span>
-                                    {location.pathname === "/transactions" && <span className="active-dot" />}
+
                                 </Link>
+
                             </>
                         )}
+                        </div>
 
-                        <div className="dropdown-divider" />
-                        <button className="btn-logout" onClick={handleLogout}>
-                            <LogOut size={16} className="item-icon" />
+
+                        {/* Divider */}
+                        <div className="my-3 border border-gray-200"></div>
+
+                        {/* Logout */}
+                        <button
+                            className="
+                                ml-2 flex w-full items-center gap-3
+                                rounded-2xl px-3 py-2
+                                text-red-500 transition duration-300
+                                hover:bg-red-50
+                            "
+                            onClick={handleLogout}
+                        >
+
+                            <LogOut size={16} />
+
                             <span>Logout</span>
+
                         </button>
+
                     </div>
+
                 </div>
+
             </div>
+
         </nav>
     );
 };
