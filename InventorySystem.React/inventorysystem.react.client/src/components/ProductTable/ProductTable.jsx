@@ -1,7 +1,11 @@
 import { useState } from "react";
 import Pagination from "../Pagination/Pagination";
 import "./ProductTable.css";
-
+import { FaEdit, FaTrash } from "react-icons/fa"
+import {
+    Pencil,
+    Trash2
+} from "lucide-react";
 function ProductTable({
     products,
     role,
@@ -139,7 +143,7 @@ function ProductTable({
                                                 onEdit(product)
                                             }
                                         >
-                                            Edit
+                                            <Pencil/>
                                         </button>
 
                                         <button
@@ -148,7 +152,7 @@ function ProductTable({
                                                 onDelete(product.id)
                                             }
                                         >
-                                            Delete
+                                            <Trash2/>
                                         </button>
 
                                     </td>

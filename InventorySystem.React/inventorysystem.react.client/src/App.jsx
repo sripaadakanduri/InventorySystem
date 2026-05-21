@@ -9,6 +9,8 @@ import Navbar from "./components/Navbar/Navbar";
 
 import ProtectedRoute from "./utils/ProtectedRoute";
 
+import { isAuthenticated } from "./services/auth";
+
 import Login from "./pages/Login/Login";
 import Register from "./pages/Register/Register";
 import Dashboard from "./pages/Dashboard/Dashboard";
@@ -27,19 +29,36 @@ function App() {
             <Navbar />
 
             <Routes>
+
+                {/* Root Route */}
+
                 <Route
                     path="/"
-                    element={<Navigate to="/login" />}
+                    element={
+                        isAuthenticated()
+                            ? <Navigate to="/dashboard" />
+                            : <Navigate to="/login" />
+                    }
                 />
+
+                {/* Auth Routes */}
 
                 <Route
                     path="/login"
-                    element={<Login />}
+                    element={
+                        isAuthenticated()
+                            ? <Navigate to="/dashboard" />
+                            : <Login />
+                    }
                 />
 
                 <Route
                     path="/register"
-                    element={<Register />}
+                    element={
+                        isAuthenticated()
+                            ? <Navigate to="/dashboard" />
+                            : <Register />
+                    }
                 />
 
                 {/* Protected Routes */}
@@ -91,11 +110,15 @@ function App() {
                     }
                 />
 
-                {/* Catch-all */}
+                {/* Catch-all Route */}
 
                 <Route
                     path="*"
-                    element={<Navigate to="/" />}
+                    element={
+                        isAuthenticated()
+                            ? <Navigate to="/dashboard" />
+                            : <Navigate to="/login" />
+                    }
                 />
 
             </Routes>

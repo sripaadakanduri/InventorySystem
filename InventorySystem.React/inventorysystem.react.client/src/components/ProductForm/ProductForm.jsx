@@ -1,13 +1,7 @@
 import { useEffect, useState } from "react";
-
 import "./ProductForm.css";
 
-function ProductForm({
-    onSubmit,
-    selectedProduct,
-    onClose
-}) {
-
+function ProductForm({ onSubmit, selectedProduct, onClose }) {
     const [formData, setFormData] = useState({
         name: "",
         price: "",
@@ -16,18 +10,14 @@ function ProductForm({
     });
 
     useEffect(() => {
-
         if (selectedProduct) {
-
             setFormData({
                 name: selectedProduct.name || "",
                 price: selectedProduct.price || "",
                 stockQuantity: selectedProduct.stockQuantity || "",
                 category: selectedProduct.category || ""
             });
-
         } else {
-
             setFormData({
                 name: "",
                 price: "",
@@ -35,11 +25,9 @@ function ProductForm({
                 category: ""
             });
         }
-
     }, [selectedProduct]);
 
     const handleChange = (e) => {
-
         setFormData({
             ...formData,
             [e.target.name]: e.target.value
@@ -47,32 +35,31 @@ function ProductForm({
     };
 
     const handleSubmit = (e) => {
-
         e.preventDefault();
-
         onSubmit(formData);
     };
 
     return (
-        <div className="product-form-container">
+        <div className="flex-col space-y-4 justify-center items-center min-h-1000 bg-gray-100 p-6">
 
             <form
-                className="product-form"
                 onSubmit={handleSubmit}
+                className="bg-white w-full max-w-md p-6 rounded-xl shadow-lg"
             >
 
-                <h2>
-                    {selectedProduct
-                        ? "Update Product"
-                        : "Create Product"}
+                {/* Title */}
+                <h2 className="text-xl font-bold text-center mb-6">
+                    {selectedProduct ? "Update Product" : "Create Product"}
                 </h2>
 
+                {/* Inputs */}
                 <input
                     type="text"
                     name="name"
                     placeholder="Product Name"
                     value={formData.name}
                     onChange={handleChange}
+                    className="w-full border border-gray-300 rounded-lg p-3 mb-3 focus:outline-none focus:ring-2 focus:ring-blue-400"
                     required
                 />
 
@@ -82,6 +69,7 @@ function ProductForm({
                     placeholder="Price"
                     value={formData.price}
                     onChange={handleChange}
+                    className="w-full border border-gray-300 rounded-lg p-3 mb-3 focus:outline-none focus:ring-2 focus:ring-blue-400"
                     required
                 />
 
@@ -91,6 +79,7 @@ function ProductForm({
                     placeholder="Stock Quantity"
                     value={formData.stockQuantity}
                     onChange={handleChange}
+                    className="w-full border border-gray-300 rounded-lg p-3 mb-3 focus:outline-none focus:ring-2 focus:ring-blue-400"
                     required
                 />
 
@@ -100,21 +89,24 @@ function ProductForm({
                     placeholder="Category"
                     value={formData.category}
                     onChange={handleChange}
+                    className="w-full border border-gray-300 rounded-lg p-3 mb-3 focus:outline-none focus:ring-2 focus:ring-blue-400"
                     required
                 />
 
-                <div className="form-buttons">
+                {/* Buttons */}
+                <div className="">
 
-                    <button type="submit">
-                        {selectedProduct
-                            ? "Update"
-                            : "Create"}
+                    <button
+                        type="submit"
+                        className="submit-btn bg-blue-500 hover:bg-blue-600 text-white py-3 rounded-xl font-medium"
+                    >
+                        {selectedProduct ? "Update" : "Create"}
                     </button>
 
                     <button
                         type="button"
-                        className="cancel-btn"
                         onClick={onClose}
+                        className="cancel-btn bg-red-500 hover:bg-red-600 text-white py-3 rounded-xl font-medium"
                     >
                         Cancel
                     </button>

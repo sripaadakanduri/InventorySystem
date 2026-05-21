@@ -13,7 +13,7 @@ const Login = () => {
     });
 
     const [error, setError] = useState("");
-
+    const [loading, setLoading] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
 
     const handleChange = (e) => {
@@ -27,7 +27,7 @@ const Login = () => {
     const handleSubmit = async (e) => {
 
         e.preventDefault();
-
+        setLoading(true);
         setError("");
 
         try {
@@ -39,6 +39,9 @@ const Login = () => {
             setError(
                 err?.response?.data || "Invalid credentials"
             );
+        }
+        finally {
+            setLoading(false);
         }
     };
 
@@ -100,8 +103,9 @@ const Login = () => {
                 <button
                     type="submit"
                     className="btn-primary"
+                    disabled={loading}
                 >
-                    Login
+                    {loading ?" LogingIn...." :"Login"}
                 </button>
 
                 <p className="link-text">

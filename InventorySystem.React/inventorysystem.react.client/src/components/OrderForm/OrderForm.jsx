@@ -3,7 +3,14 @@ import { useEffect, useState } from "react";
 import { createOrder, updateOrder } from "../../services/orderService";
 import api from "../../services/api";
 import "./OrderForm.css";
-
+import {
+    Plus,
+    Minus,
+    Pencil,
+    X,
+    Save,
+    PackagePlus
+} from "lucide-react";
 function OrderForm({ onOrderCreated, orderToEdit, onOrderUpdated, onCancelEdit }) {
     const [products, setProducts] = useState([]);
     const [items, setItems] = useState([{ productId: "", quantity: 1 }]);
@@ -131,7 +138,7 @@ function OrderForm({ onOrderCreated, orderToEdit, onOrderUpdated, onCancelEdit }
                                     className="remove-btn"
                                     onClick={() => handleRemoveItem(index)}
                                 >
-                                    Remove
+                                    <Minus/>
                                 </button>
                             )}
                         </div>
@@ -139,7 +146,7 @@ function OrderForm({ onOrderCreated, orderToEdit, onOrderUpdated, onCancelEdit }
                 })}
 
                 <button type="button" className="add-btn" onClick={handleAddItem}>
-                    Add Product
+                        <Plus />
                 </button>
 
                 <div style={{ display: "flex", gap: "20px" }}>

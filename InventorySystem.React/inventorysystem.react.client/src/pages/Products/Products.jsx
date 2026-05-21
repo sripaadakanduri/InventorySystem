@@ -172,7 +172,7 @@ function Products() {
 
             <div className="products-header">
 
-                <h1>
+                <h1 className="text-gray-800 font-bold text-lg">
                     Products Management
                 </h1>
 
