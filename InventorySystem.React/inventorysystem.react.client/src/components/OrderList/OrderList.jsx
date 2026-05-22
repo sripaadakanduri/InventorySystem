@@ -197,16 +197,15 @@ function OrderList({
 
     return (
 
-        <div className="w-full overflow-x-auto rounded-3xl border border-gray-200 shadow-lg bg-white">
+        <div className=" overflow-x-auto rounded-3xl border border-gray-200 shadow-lg bg-white m-8">
 
-            <table className="w-full border-collapse">
-
+            <table className="w-full border-separate border-spacing-0 rounded-3xl">
+    
                 {/* Table Header */}
                 <thead className="bg-blue-50 text-gray-700">
 
-                    <tr class="border border-gray-200">
+                    <tr className="border border-gray-200">
 
-                        {/* User */}
                         <th className="p-4 ">
 
                             <div className="flex flex-col gap-2">
@@ -229,17 +228,14 @@ function OrderList({
 
                         </th>
 
-                        {/* Total */}
                         <th className="p-4 font-semibold">
                             Total
                         </th>
 
-                        {/* Quantity */}
                         <th className="p-4 font-semibold">
                             Quantity
                         </th>
 
-                        {/* Status */}
                         <th className="p-4">
 
                             <div className="flex flex-col gap-2">
@@ -286,7 +282,6 @@ function OrderList({
 
                         </th>
 
-                        {/* Created */}
                         <th className="p-4">
 
                             <div className="flex flex-col gap-2">
@@ -329,7 +324,6 @@ function OrderList({
 
                 </thead>
 
-                {/* Table Body */}
                 <tbody>
 
                     {currentOrders.length > 0 ? (
@@ -405,7 +399,6 @@ function OrderList({
 
             </table>
 
-            {/* Pagination */}
             <div className="p-4">
 
                 <Pagination
@@ -419,7 +412,6 @@ function OrderList({
             </div>
 
 
-            {/* Modal */}
             {selectedOrder && (
 
                 <div
@@ -463,11 +455,11 @@ function OrderList({
 
                                     <tr>
 
-                                        <th className="text-left p-4 border-b">
+                                        <th className="text-left p-4 border-gray-200">
                                             Product
                                         </th>
 
-                                        <th className="text-left p-4 border-b">
+                                        <th className="text-left p-4 border-gray-200">
                                             Quantity
                                         </th>
 
@@ -489,7 +481,7 @@ function OrderList({
 
                                             <tr
                                                 key={idx}
-                                                className="border-b hover:bg-gray-50"
+                                                className="border-b border-gray-200 hover:bg-gray-100 transition transform duration-300"
                                             >
 
                                                 <td className="p-4">
@@ -516,14 +508,13 @@ function OrderList({
 
                         </div>
 
-                        {/* Actions */}
                         <div className="flex justify-end gap-4 mt-6">
 
                             {selectedOrder.status !== 4 && (
 
                                 <button
                                     type="button"
-                                    className="bg-blue-500 hover:bg-blue-600 shadow-xl px-6 py-3 rounded-xl shadow transition"
+                                    className="bg-blue-500 hover:bg-blue-600 text-white shadow-xl px-6 py-3 rounded-xl transition"
                                     onClick={() => {
 
                                         onSelectForEdit(
@@ -543,7 +534,7 @@ function OrderList({
 
                                 <button
                                     type="button"
-                                    className="bg-red-500 hover:bg-red-600 shadow-xl  px-6 py-3 rounded-xl shadow transition"
+                                    className="bg-red-500 hover:bg-red-600 text-white shadow-xl px-6 py-3 rounded-xl transition"
                                     onClick={() => {
 
                                         onCancelOrder(

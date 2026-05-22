@@ -1,15 +1,7 @@
-import {
-    BrowserRouter,
-    Routes,
-    Route,
-    Navigate
-} from "react-router-dom";
-
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Navbar from "./components/Navbar/Navbar";
-
 import ProtectedRoute from "./utils/ProtectedRoute";
-
-import { isAuthenticated } from "./services/auth";
+import PublicRoute from "./utils/PublicRoute";
 
 import Login from "./pages/Login/Login";
 import Register from "./pages/Register/Register";
@@ -17,51 +9,31 @@ import Dashboard from "./pages/Dashboard/Dashboard";
 import Products from "./pages/Products/Products";
 import Orders from "./pages/Orders/Orders";
 import Transactions from "./pages/Transactions/Transactions";
-
 import UsersManagement from "./pages/Admin/UsersManagement/UsersManagement";
 
 function App() {
-
     return (
-
         <BrowserRouter>
-
             <Navbar />
-
             <Routes>
-
-                {/* Root Route */}
-
-                <Route
-                    path="/"
-                    element={
-                        isAuthenticated()
-                            ? <Navigate to="/dashboard" />
-                            : <Navigate to="/login" />
-                    }
-                />
-
-                {/* Auth Routes */}
+                <Route path="/" element={<Navigate to="/dashboard" replace />} />
 
                 <Route
                     path="/login"
                     element={
-                        isAuthenticated()
-                            ? <Navigate to="/dashboard" />
-                            : <Login />
+                        <PublicRoute>
+                            <Login />
+                        </PublicRoute>
                     }
                 />
-
                 <Route
                     path="/register"
                     element={
-                        isAuthenticated()
-                            ? <Navigate to="/dashboard" />
-                            : <Register />
+                        <PublicRoute>
+                            <Register />
+                        </PublicRoute>
                     }
                 />
-
-                {/* Protected Routes */}
 
                 <Route
                     path="/dashboard"
@@ -71,7 +43,6 @@ function App() {
                         </ProtectedRoute>
                     }
                 />
-
                 <Route
                     path="/products"
                     element={
@@ -80,7 +51,6 @@ function App() {
                         </ProtectedRoute>
                     }
                 />
-
                 <Route
                     path="/orders"
                     element={
@@ -89,7 +59,6 @@ function App() {
                         </ProtectedRoute>
                     }
                 />
-
                 <Route
                     path="/transactions"
                     element={
@@ -98,8 +67,6 @@ function App() {
                         </ProtectedRoute>
                     }
                 />
-
-                {/* Admin Route */}
 
                 <Route
                     path="/admin/users"
@@ -110,19 +77,8 @@ function App() {
                     }
                 />
 
-                {/* Catch-all Route */}
-
-                <Route
-                    path="*"
-                    element={
-                        isAuthenticated()
-                            ? <Navigate to="/dashboard" />
-                            : <Navigate to="/login" />
-                    }
-                />
-
+                <Route path="*" element={<Navigate to="/dashboard" replace />} />
             </Routes>
-
         </BrowserRouter>
     );
 }

@@ -27,9 +27,17 @@ const Navbar = () => {
 
     return (
 
-        <nav className="border-b border-gray-200 bg-white shadow-sm">
+        <nav className="sticky top-4 z-50 flex justify-center">
 
-            <div className="sticky top-0 z-50 flex items-center justify-between bg-white/80 backdrop-blur px-6 py-4">
+            <div
+                className="
+                    flex w-full max-w-6xl
+                    items-center justify-between
+                    rounded-full border border-gray-200
+                    bg-white/80 px-4 py-2
+                    shadow-lg backdrop-blur
+                "
+            >
 
                 {/* Brand */}
                 <div
@@ -127,7 +135,6 @@ const Navbar = () => {
 
                     </div>
 
-                    {/* Dropdown */}
                     <div
                         className="
                             invisible absolute right-0 top-full
@@ -142,7 +149,6 @@ const Navbar = () => {
                         "
                     >
 
-                        {/* Header */}
                         <div className="grid grid-cols-2 justify-center items-center">
 
                             <div
@@ -175,7 +181,6 @@ const Navbar = () => {
                         <div className="my-3 border border-gray-200"></div>
 
                         <div classNma="flex flex-col gap-y-3">
-                        {/* Dashboard */}
                         <Link
                             to="/dashboard"
                             className={`
@@ -197,7 +202,6 @@ const Navbar = () => {
 
                         </Link>
 
-                        {/* Orders */}
                         <Link
                             to="/orders"
                             className={`
@@ -219,7 +223,6 @@ const Navbar = () => {
 
                         </Link>
 
-                        {/* Products */}
                         <Link
                             to="/products"
                             className={`
@@ -304,7 +307,7 @@ const Navbar = () => {
                         {/* Divider */}
                         <div className="my-3 border border-gray-200"></div>
 
-                        {/* Logout */}
+                  
                         <button
                             className="
                                 ml-2 flex w-full items-center gap-3

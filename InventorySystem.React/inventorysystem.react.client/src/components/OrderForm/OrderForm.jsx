@@ -23,7 +23,6 @@ function OrderForm({
     const [error, setError] = useState("");
     const [success, setSuccess] = useState("");
 
-    // Load edit order data
     useEffect(() => {
         if (orderToEdit) {
             const mappedItems = orderToEdit.items.map((i) => ({
@@ -35,7 +34,6 @@ function OrderForm({
         }
     }, [orderToEdit]);
 
-    // Fetch products
     const fetchProducts = async () => {
         try {
             const response = await api.get("/products");
@@ -49,7 +47,6 @@ function OrderForm({
         fetchProducts();
     }, []);
 
-    // Add item
     const handleAddItem = () => {
         setItems([
             ...items,
@@ -60,7 +57,6 @@ function OrderForm({
         ]);
     };
 
-    // Remove item
     const handleRemoveItem = (index) => {
         const updatedItems = items.filter(
             (_, i) => i !== index
@@ -69,14 +65,12 @@ function OrderForm({
         setItems(updatedItems);
     };
 
-    // Handle input change
     const handleChange = (index, field, value) => {
         const updatedItems = [...items];
         updatedItems[index][field] = value;
         setItems(updatedItems);
     };
 
-    // Submit form
     const handleSubmit = async (e) => {
         e.preventDefault();
 
@@ -132,9 +126,8 @@ function OrderForm({
     };
 
     return (
-        <div className="max-w-7xl mx-auto bg-white shadow-xl rounded-2xl p-8 border border-gray-200 mb-10">
+        <div className="max-w-5xl mx-auto bg-white shadow-xl rounded-2xl p-8 border border-gray-200 mb-10">
 
-            {/* Heading */}
             <div className="flex items-center gap-3 mb-8">
                 <PackagePlus className="w-8 h-8 text-blue-500" />
 
@@ -145,13 +138,11 @@ function OrderForm({
                 </h2>
             </div>
 
-            {/* Form */}
             <form
                 onSubmit={handleSubmit}
                 className="space-y-2"
             >
 
-                {/* Items */}
                 {items.map((item, index) => {
                     const selectedProduct = products.find(
                         (p) => p.id === Number(item.productId)
@@ -168,7 +159,6 @@ function OrderForm({
                             className="rounded-xl  flex flex-col md:flex-row gap-4 items-center"
                         >
 
-                            {/* Product Select */}
                             <select
                                 value={item.productId}
                                 onChange={(e) =>
@@ -179,7 +169,7 @@ function OrderForm({
                                     )
                                 }
                                 required
-                                className="w-full md:w-1/2 border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                                className="w-full md:w-1/2 border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-100"
                             >
                                 <option value="">
                                     Select Product
@@ -195,14 +185,12 @@ function OrderForm({
                                 ))}
                             </select>
 
-                            {/* Stock */}
                             {selectedProduct && (
-                                <span className="bg-green-50 text-green-700 text-sm px-4 py-2 rounded-full whitespace-nowrap">
+                                <span className="bg-blue-50 text-blue-500 text-sm px-6 py-4 rounded-2xl whitespace-nowrap">
                                     Available: {availableQuantity}
                                 </span>
                             )}
 
-                            {/* Quantity */}
                             <input
                                 type="number"
                                 min="1"
@@ -216,17 +204,16 @@ function OrderForm({
                                     )
                                 }
                                 required
-                                className="w-28 border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                                className="w-28 border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-100"
                             />
 
-                            {/* Remove Button */}
                             {items.length > 1 && (
                                 <button
                                     type="button"
                                     onClick={() =>
                                         handleRemoveItem(index)
                                     }
-                                    className="bg-red-500 hover:bg-red-600 text-whit p-3 rounded-lg transition duration-200 shadow"
+                                    className="bg-red-500 hover:bg-red-500 text-white p-3 rounded-lg transition duration-200 shadow"
                                 >
                                     <Minus className="w-5 h-5" />
                                 </button>
@@ -235,25 +222,22 @@ function OrderForm({
                     );
                 })}
 
-                {/* Add Item Button */}
                 <div class="inline-flex border border-gray-200 rounded-xl">
                     <button
                         type="button"
                         onClick={handleAddItem}
-                        className="flex border border-gray-200 items-center gap-2 bg-blue-500 hover:bg-blue-600 text-balck px-6 py-3 rounded-xl shadow-lg transition duration-200"
+                        className="flex border border-gray-200 items-center text-white gap-2 bg-blue-500 hover:bg-blue-600 text-balck px-6 py-3 rounded-xl shadow-lg transition duration-200"
                     >
                         <Plus className="w-5 h-5" />
                     </button>
                 </div>
 
-                {/* Action Buttons */}
                 <div className="flex flex-wrap gap-4">
 
-                    {/* Submit */}
                     <button
                         type="submit"
                         disabled={loading}
-                        className="bg-green-500 hover:bg-green-600 text-black px-8 py-3 rounded-xl font-semibold shadow-lg transition duration-200"
+                        className="bg-green-500 hover:bg-green-600 text-white px-8 py-3 rounded-xl font-semibold shadow-lg transition duration-200"
                     >
                         {loading
                             ? "Processing..."
@@ -262,7 +246,6 @@ function OrderForm({
                                 : "Place Order"}
                     </button>
 
-                    {/* Cancel */}
                     {orderToEdit && (
                         <button
                             type="button"
@@ -288,14 +271,12 @@ function OrderForm({
                     )}
                 </div>
 
-                {/* Error */}
                 {error && (
                     <div className="bg-red-100 text-red-700 px-4 py-3 rounded-lg border border-red-300">
                         {error}
                     </div>
                 )}
 
-                {/* Success */}
                 {success && (
                     <div className="bg-green-100 text-green-700 px-4 py-3 rounded-lg border border-green-300">
                         {success}

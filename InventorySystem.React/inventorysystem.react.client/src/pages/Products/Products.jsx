@@ -11,7 +11,7 @@ import {
     deleteProduct
 } from "../../services/ProductService";
 
-import "./Products.css";
+
 
 function Products() {
 
@@ -167,42 +167,38 @@ function Products() {
     }, [products, filters]);
 
     return (
+        <div className="w-full max-w-7xl mx-auto flex flex-col gap-6">
 
-        <div className="products-container card">
-
-            <div className="products-header">
-
-                <h1 className="text-gray-800 font-bold text-lg">
-                    Products Management
-                </h1>
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 rounded-3xl mt-8 border border-gray-200 shadow-sm">
+                <div>
+                    <h1 className="text-2xl font-bold text-gray-900">
+                        Products Management
+                    </h1>
+                    <p className="text-sm text-gray-500 mt-1">Manage your inventory, prices, and stock levels</p>
+                </div>
 
                 {role === "ADMIN" && (
-
                     <button
-                        className="create-btn"
+                        className="flex items-center justify-center gap-2 bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-xl font-medium transition duration-200 shadow-md w-full sm:w-auto"
                         onClick={handleCreate}
                     >
                         <FaPlus size={14} />
                         Create Product
                     </button>
-
                 )}
-
             </div>
 
             {showForm && role === "ADMIN" && (
-
-                <ProductForm
-                    onSubmit={handleSubmit}
-                    selectedProduct={selectedProduct}
-                    onClose={() => {
-
-                        setShowForm(false);
-
-                        setSelectedProduct(null);
-                    }}
-                />
-
+                <div className="bg-white p-6 rounded-3xl border border-gray-200 shadow-sm">
+                    <ProductForm
+                        onSubmit={handleSubmit}
+                        selectedProduct={selectedProduct}
+                        onClose={() => {
+                            setShowForm(false);
+                            setSelectedProduct(null);
+                        }}
+                    />
+                </div>
             )}
 
             <ProductTable

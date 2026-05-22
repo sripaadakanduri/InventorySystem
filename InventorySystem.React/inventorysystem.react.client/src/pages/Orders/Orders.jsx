@@ -49,8 +49,8 @@ function Orders() {
     });
 
     return (
-        <div className="orders-page card">
-            <h1 class="folt-bold text-3xl flex justify-center p-8">Order Management</h1>
+        <div className="orders-page card mt-8 mx-4">
+            <h1 class="folt-bold text-3xl flex justify-center p-5">Order Management</h1>
             <OrderForm
                 orderToEdit={orderToEdit}
                 onOrderCreated={(newOrder) =>

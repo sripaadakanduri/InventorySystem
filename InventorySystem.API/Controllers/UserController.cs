@@ -39,5 +39,7 @@ namespace InventorySystem.API.Controllers
 
             return Ok("Role updated successfully");
         }
+
+
     }
 }

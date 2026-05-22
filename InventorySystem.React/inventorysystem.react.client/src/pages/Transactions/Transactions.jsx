@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import transactionService from '../../services/transactionService';
 import Pagination from '../../components/Pagination/Pagination';
-import './Transactions.css';
 import { toast } from 'react-toastify';
+import { Activity } from 'lucide-react';
 
 const Transactions = () => {
     const [transactions, setTransactions] = useState([]);
@@ -12,7 +12,6 @@ const Transactions = () => {
     const [filterActionType, setFilterActionType] = useState("");
     const [filterStartDate, setFilterStartDate] = useState("");
     const [filterEndDate, setFilterEndDate] = useState("");
-    const [products, setProducts] = useState([]);
 
     const [currentPage, setCurrentPage] = useState(1);
     const pageSize = 10;
@@ -70,114 +69,141 @@ const Transactions = () => {
         fetchTransactions();
     }, []);
 
-    const getBadgeClass = (actionType) => {
-        if (actionType === "StockIn" || actionType === "ManualAdd") return "badge-success";
-        if (actionType === "StockOut" || actionType === "ManualRemove") return "badge-danger";
-        if (actionType === "OrderPlaced") return "badge-warning";
-        return "badge-primary";
+    const getBadgeStyle = (actionType) => {
+        if (actionType === "StockIn" || actionType === "ManualAdd") return "bg-green-50 text-green-700 border-green-200";
+        if (actionType === "StockOut" || actionType === "ManualRemove") return "bg-red-50 text-red-700 border-red-200";
+        if (actionType === "OrderPlaced") return "bg-amber-50 text-amber-700 border-amber-200";
+        if (actionType === "OrderCancelled") return "bg-gray-100 text-gray-700 border-gray-200";
+        return "bg-blue-50 text-blue-700 border-blue-200";
     };
 
-    if (loading) return <div className="loading">Loading transaction history...</div>;
+    if (loading) return (
+        <div className="flex justify-center items-center min-h-[50vh]">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
+        </div>
+    );
 
     return (
-        <div className="transactions-container">
-            <div className="transactions-header">
-                <h2>Audit Trail </h2>
-                <p>Track every stock change across the system.</p>
+        <div className="max-w-7xl mx-auto p-6">
+            <div className="flex items-center gap-3 mb-8">
+                <Activity className="w-8 h-8 text-indigo-600" />
+                <div>
+                    <h2 className="text-3xl font-bold text-gray-800">Audit Trail</h2>
+                    <p className="text-gray-500 mt-1">Track every stock change across the system.</p>
+                </div>
             </div>
 
-            <div className="transactions-list">
-                <table className="transactions-table">
-                    <thead>
+            <div className="w-full overflow-x-auto rounded-3xl border border-gray-200 shadow-lg bg-white mt-6">
+                <table className="w-full border-collapse">
+                    <thead className="bg-blue-50 text-gray-700 border-b border-gray-200">
                         <tr>
-                            <th>
-                                UserName
-                                <br />
-                                <input
-                                    type="text"
-                                    placeholder="Filter user..."
-                                    value={filterUsername}
-                                    onChange={(e) => { setFilterUsername(e.target.value); setCurrentPage(1); }}
-                                    className="table-filter-input"
-                                />
-                            </th>
-                            <th>
-                                Product Name
-                                <br />
-                                <input
-                                    type="text"
-                                    placeholder="Filter product..."
-                                    value={filterProduct}
-                                    onChange={(e) => { setFilterProduct(e.target.value); setCurrentPage(1); }}
-                                    className="table-filter-input"
-                                />
-                            </th>
-                            <th>Change</th>
-                            <th>Remaining Stock</th>
-                            <th>
-                                Action Type
-                                <br />
-                                <select
-                                    value={filterActionType}
-                                    onChange={(e) => { setFilterActionType(e.target.value); setCurrentPage(1); }}
-                                    className="table-filter-select"
-                                >
-                                    <option value="">All</option>
-                                    <option value="ManualAdd">ManualAdd</option>
-                                    <option value="ManualRemove">ManualRemove</option>
-                                    <option value="OrderPlaced">OrderPlaced</option>
-                                    <option value="OrderCancelled">OrderCancelled</option>
-                                </select>
-                            </th>
-                            <th>
-                                Date & Time
-                                <div className="date-filters-container">
+                            <th className="p-4 text-left font-semibold">
+                                <div className="flex flex-col gap-2">
+                                    <span>Username</span>
                                     <input
-                                        type="date"
-                                        value={filterStartDate}
-                                        onChange={(e) => { setFilterStartDate(e.target.value); setCurrentPage(1); }}
-                                        className="date-filter-input"
-                                        title="Start Date"
+                                        type="text"
+                                        placeholder="Filter user..."
+                                        value={filterUsername}
+                                        onChange={(e) => { setFilterUsername(e.target.value); setCurrentPage(1); }}
+                                        className="border border-gray-300 rounded-lg px-3 py-2 text-sm font-normal focus:outline-none focus:ring-2 focus:ring-blue-400 w-full"
                                     />
+                                </div>
+                            </th>
+                            <th className="p-4 text-left font-semibold">
+                                <div className="flex flex-col gap-2">
+                                    <span>Product Name</span>
                                     <input
-                                        type="date"
-                                        value={filterEndDate}
-                                        onChange={(e) => { setFilterEndDate(e.target.value); setCurrentPage(1); }}
-                                        className="date-filter-input"
-                                        title="End Date"
+                                        type="text"
+                                        placeholder="Filter product..."
+                                        value={filterProduct}
+                                        onChange={(e) => { setFilterProduct(e.target.value); setCurrentPage(1); }}
+                                        className="border border-gray-300 rounded-lg px-3 py-2 text-sm font-normal focus:outline-none focus:ring-2 focus:ring-blue-400 w-full"
                                     />
+                                </div>
+                            </th>
+                            <th className="p-4 text-center font-semibold align-top">
+                                <span className="block mt-2">Change</span>
+                            </th>
+                            <th className="p-4 text-center font-semibold align-top">
+                                <span className="block mt-2">Stock</span>
+                            </th>
+                            <th className="p-4 text-left font-semibold">
+                                <div className="flex flex-col gap-2">
+                                    <span>Action Type</span>
+                                    <select
+                                        value={filterActionType}
+                                        onChange={(e) => { setFilterActionType(e.target.value); setCurrentPage(1); }}
+                                        className="border border-gray-300 rounded-lg px-3 py-2 text-sm font-normal focus:outline-none focus:ring-2 focus:ring-blue-400 w-full"
+                                    >
+                                        <option value="">All</option>
+                                        <option value="ManualAdd">ManualAdd</option>
+                                        <option value="ManualRemove">ManualRemove</option>
+                                        <option value="OrderPlaced">OrderPlaced</option>
+                                        <option value="OrderCancelled">OrderCancelled</option>
+                                    </select>
+                                </div>
+                            </th>
+                            <th className="p-4 text-left font-semibold">
+                                <div className="flex flex-col gap-2">
+                                    <span>Date & Time</span>
+                                    <div className="flex gap-2">
+                                        <input
+                                            type="date"
+                                            value={filterStartDate}
+                                            onChange={(e) => { setFilterStartDate(e.target.value); setCurrentPage(1); }}
+                                            className="border border-gray-300 rounded-lg px-2 py-1.5 text-xs font-normal focus:outline-none focus:ring-2 focus:ring-blue-400 w-1/2"
+                                            title="Start Date"
+                                        />
+                                        <input
+                                            type="date"
+                                            value={filterEndDate}
+                                            onChange={(e) => { setFilterEndDate(e.target.value); setCurrentPage(1); }}
+                                            className="border border-gray-300 rounded-lg px-2 py-1.5 text-xs font-normal focus:outline-none focus:ring-2 focus:ring-blue-400 w-1/2"
+                                            title="End Date"
+                                        />
+                                    </div>
                                 </div>
                             </th>
                         </tr>
                     </thead>
                     <tbody>
-                        {currentTransactions.map(t => (
-                            <tr key={t.id}>
-                                <td>{t.user?.username || `User ${t.userId}`}</td>
-                                <td>{t.product?.name || `Product ${t.productId}`}</td>
-                                <td className={t.quantityChanged > 0 ? 'text-success' : 'text-danger'}>
-                                    {t.quantityChanged > 0 ? `+${t.quantityChanged}` : t.quantityChanged}
-                                </td>
-                                <td>{t.remainingStock}</td>
-                                <td><span className={`badge ${getBadgeClass(t.actionType)}`}>{t.actionType}</span></td>
-                                <td>{new Date(t.createdAt).toLocaleString()}</td>
-                            </tr>
-                        ))}
-                        {currentTransactions.length === 0 && (
+                        {currentTransactions.length > 0 ? (
+                            currentTransactions.map(t => (
+                                <tr key={t.id} className="border-b border-gray-200 hover:bg-gray-50 transition duration-150">
+                                    <td className="p-4 font-medium text-gray-900">{t.user?.username || `User ${t.userId}`}</td>
+                                    <td className="p-4 text-gray-700">{t.product?.name || `Product ${t.productId}`}</td>
+                                    <td className="p-4 text-center font-bold">
+                                        <span className={t.quantityChanged > 0 ? 'text-green-600' : 'text-red-600'}>
+                                            {t.quantityChanged > 0 ? `+${t.quantityChanged}` : t.quantityChanged}
+                                        </span>
+                                    </td>
+                                    <td className="p-4 text-center text-gray-600 font-medium">{t.remainingStock}</td>
+                                    <td className="p-4">
+                                        <span className={`px-3 py-1 rounded-full text-sm font-medium border ${getBadgeStyle(t.actionType)}`}>
+                                            {t.actionType}
+                                        </span>
+                                    </td>
+                                    <td className="p-4 text-gray-500 text-sm">{new Date(t.createdAt).toLocaleString()}</td>
+                                </tr>
+                            ))
+                        ) : (
                             <tr>
-                                <td colSpan="6" className="no-data">No transactions found.</td>
+                                <td colSpan="6" className="p-8 text-center text-gray-500 text-lg">
+                                    No transactions found.
+                                </td>
                             </tr>
                         )}
                     </tbody>
                 </table>
+                <div className="p-4 bg-white rounded-b-3xl">
+                    <Pagination
+                        currentPage={currentPage}
+                        totalItems={filteredTransactions.length}
+                        pageSize={pageSize}
+                        onPageChange={setCurrentPage}
+                    />
+                </div>
             </div>
-
-            <Pagination
-                currentPage={currentPage}
-                totalItems={filteredTransactions.length}
-                pageSize={pageSize}
-                onPageChange={setCurrentPage}
-            />
         </div>
     );
 };

@@ -103,7 +103,7 @@ export default function Dashboard() {
             title: "Audit Trail",
             description: "Monitor activity logs",
             icon: <ClipboardList size={22} />,
-            path: "/admin/audit",
+            path: "/transactions", // Corrected path to match routing
             iconBg: "#fff7ed",
             iconColor: "#ea580c",
         },
@@ -116,44 +116,43 @@ export default function Dashboard() {
 
     return (
 
-        <div className="dashboard-container">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
             {/* HERO SECTION */}
-            <section className="hero-section">
+            <section className="mb-12">
 
                 <div
                     className="
-                        hero-card m-8 rounded-3xl
-                        border border-gray-200
-                        p-8 shadow-lg
+                        rounded-3xl border border-gray-200
+                        bg-white p-8 md:p-12 shadow-lg
                     "
                 >
 
                     <div
                         className="
-                            hero-grid grid grid-cols-1
-                            gap-10 lg:grid-cols-2
+                            grid grid-cols-1
+                            gap-12 lg:gap-16 lg:grid-cols-2
                         "
                     >
 
                         {/* LEFT */}
-                        <div className="hero-left">
+                        <div className="flex flex-col justify-center space-y-6">
 
-                            <span
-                                className="
-                                    hero-tag mb-3 inline-flex
-                                    rounded-full bg-blue-50
-                                    px-3 py-1 text-sm
-                                    text-blue-400
-                                "
-                            >
-                                Inventory Management Platform
-                            </span>
+                            <div>
+                                <span
+                                    className="
+                                        inline-flex rounded-full bg-blue-50
+                                        px-4 py-1.5 text-sm font-medium
+                                        text-blue-600
+                                    "
+                                >
+                                    Inventory Management Platform
+                                </span>
+                            </div>
 
                             <h1
                                 className="
-                                    hero-title mb-4
-                                    text-4xl font-bold
+                                    text-4xl md:text-5xl font-extrabold tracking-tight text-gray-900 leading-tight
                                 "
                             >
                                 Manage inventory
@@ -163,8 +162,7 @@ export default function Dashboard() {
 
                             <p
                                 className="
-                                    hero-desc mb-6
-                                    text-gray-400
+                                    text-lg text-gray-500 leading-relaxed max-w-lg
                                 "
                             >
                                 A clean and modern platform
@@ -173,16 +171,16 @@ export default function Dashboard() {
                                 — all in one place.
                             </p>
 
-                            <div className="hero-buttons">
+                            <div className="flex flex-wrap gap-4 pt-2">
 
                                 <Link
                                     to="/products"
                                     className="
-                                        btn-primary mr-5
-                                        rounded-2xl bg-black
-                                        px-4 py-3 text-white
+                                        rounded-xl bg-black
+                                        px-6 py-3.5 font-semibold text-white
                                         transition duration-300
-                                        hover:bg-gray-800
+                                        hover:bg-gray-900 shadow-md
+                                        hover:-translate-y-0.5 transform
                                     "
                                 >
                                     Explore Products
@@ -191,11 +189,10 @@ export default function Dashboard() {
                                 <Link
                                     to="/orders"
                                     className="
-                                        btn-secondary rounded-2xl
-                                        border border-gray-200
-                                        px-4 py-3
-                                        transition duration-300
-                                        hover:bg-black hover:text-white transition duration-300
+                                        rounded-xl border border-gray-300
+                                        px-6 py-3.5 font-semibold text-black
+                                        transition duration-300 bg-white shadow-sm
+                                        hover:bg-black hover:text-white
                                     "
                                 >
                                     View Orders
@@ -206,31 +203,28 @@ export default function Dashboard() {
                         </div>
 
                         {/* RIGHT */}
-                        <div className="hero-right flex flex-col">
+                        <div className="flex flex-col gap-6">
 
                             <div
                                 className="
                                     grid grid-cols-1
-                                    gap-4 md:grid-cols-2
+                                    gap-6 sm:grid-cols-2
                                 "
                             >
 
                                 {/* TOTAL PRODUCTS */}
                                 <div
                                     className="
-                                        stat-card rounded-2xl
-                                        border border-gray-200
-                                        bg px-6 py-5
+                                        flex flex-col justify-center rounded-2xl border border-gray-100
+                                        bg-gray-50 p-6 shadow-sm
                                         transition duration-300
-                                        hover:-translate-y-0.5
-                                        hover:shadow-2xl
+                                        hover:-translate-y-1 hover:shadow-md
                                     "
                                 >
 
                                     <p
                                         className="
-                                            stat-label mb-5
-                                            text-sm text-gray-400
+                                            mb-3 text-sm font-medium text-gray-500
                                         "
                                     >
                                         Total Products
@@ -238,8 +232,7 @@ export default function Dashboard() {
 
                                     <h1
                                         className="
-                                            stat-value text-4xl
-                                            font-bold text-black
+                                            text-4xl font-bold text-gray-900
                                         "
                                     >
                                         {stats.totalProducts}
@@ -250,19 +243,16 @@ export default function Dashboard() {
                                 {/* ORDERS TODAY */}
                                 <div
                                     className="
-                                        stat-card rounded-2xl
-                                        border border-gray-200
-                                        bg px-6 py-5
+                                        flex flex-col justify-center rounded-2xl border border-gray-100
+                                        bg-gray-50 p-6 shadow-sm
                                         transition duration-300
-                                        hover:-translate-y-0.5
-                                        hover:shadow-2xl
+                                        hover:-translate-y-1 hover:shadow-md
                                     "
                                 >
 
                                     <p
                                         className="
-                                            stat-label mb-5
-                                            text-sm text-gray-400
+                                            mb-3 text-sm font-medium text-gray-500
                                         "
                                     >
                                         Orders Today
@@ -270,8 +260,7 @@ export default function Dashboard() {
 
                                     <h1
                                         className="
-                                            stat-value text-4xl
-                                            font-bold text-black
+                                            text-4xl font-bold text-gray-900
                                         "
                                     >
                                         {stats.ordersToday}
@@ -284,19 +273,16 @@ export default function Dashboard() {
                             {/* LOW STOCK */}
                             <div
                                 className="
-                                    stat-card mt-4 rounded-2xl
-                                    border border-gray-200
-                                    bg px-6 py-5
+                                    flex flex-col justify-center rounded-2xl border border-red-100
+                                    bg-red-50 p-6 shadow-sm
                                     transition duration-300
-                                    hover:-translate-y-0.5
-                                    hover:shadow-2xl
+                                    hover:-translate-y-1 hover:shadow-md
                                 "
                             >
 
                                 <p
                                     className="
-                                        stat-label mb-5
-                                        text-sm text-gray-400
+                                        mb-3 text-sm font-medium text-red-600
                                     "
                                 >
                                     Low Stock Alerts
@@ -304,11 +290,10 @@ export default function Dashboard() {
 
                                 <h1
                                     className="
-                                        stat-value text-4xl
-                                        font-bold text-black
+                                        text-4xl font-bold text-gray-900
                                     "
                                 >
-                                    {stats.lowStock} Items
+                                    {stats.lowStock} <span className="text-xl font-medium text-gray-500">Items</span>
                                 </h1>
 
                             </div>
@@ -322,22 +307,22 @@ export default function Dashboard() {
             </section>
 
             {/* QUICK ACCESS */}
-            <section className="quick-access-section p-8">
+            <section className="mb-12">
 
-                <div className="quick-access-header mb-6">
+                <div className="mb-8 flex flex-col gap-1">
 
-                    <h1 className="mb-2 text-2xl font-bold">
+                    <h1 className="text-2xl font-bold text-gray-900">
                         Quick Access
                     </h1>
 
-                    <h3 className="text-sm text-gray-400">
+                    <h3 className="text-sm text-gray-500">
                         Navigate through your workspace
                     </h3>
 
                 </div>
 
                 {/* CARDS */}
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
 
                     {allCards.map((card, index) => (
 
@@ -345,54 +330,55 @@ export default function Dashboard() {
                             key={index}
                             to={card.path}
                             className="
-                                w-72 rounded-3xl
-                                border border-gray-200
-                                bg-white p-6 shadow-md
-                                transition duration-300
-                                hover:-translate-y-1
-                                hover:shadow-xl
+                                group flex flex-col justify-between rounded-3xl
+                                border border-gray-200 bg-white p-6 shadow-sm
+                                transition duration-300 hover:-translate-y-1 hover:shadow-xl
                             "
                         >
+                            <div>
+                                {/* TOP */}
+                                <div className="mb-6 flex items-start gap-4">
 
-                            {/* TOP */}
-                            <div className="flex items-center gap-4">
-
-                                {/* ICON */}
-                                <div
-                                    className="
-                                        flex h-14 w-14
-                                        items-center justify-center
-                                        rounded-2xl
-                                    "
-                                    style={{
-                                        backgroundColor: card.iconBg,
-                                        color: card.iconColor
-                                    }}
-                                >
-                                    {card.icon}
-                                </div>
-
-                                {/* TEXT */}
-                                <div class="space-y-2">
-
-                                    <h2
+                                    {/* ICON */}
+                                    <div
                                         className="
-                                            text-lg font-bold
-                                            text-gray-900
+                                            flex h-14 w-14 shrink-0
+                                            items-center justify-center
+                                            rounded-2xl transition-transform duration-300
+                                            group-hover:scale-110
                                         "
+                                        style={{
+                                            backgroundColor: card.iconBg,
+                                            color: card.iconColor
+                                        }}
                                     >
-                                        {card.title}
-                                    </h2>
+                                        {card.icon}
+                                    </div>
 
-                                    <p className="text-sm text-gray-400">
-                                        {card.description}
-                                    </p>
+                                    {/* TEXT */}
+                                    <div className="space-y-1.5">
+
+                                        <h2
+                                            className="
+                                                text-lg font-bold text-gray-900
+                                            "
+                                        >
+                                            {card.title}
+                                        </h2>
+
+                                        <p className="text-sm text-gray-500 leading-snug">
+                                            {card.description}
+                                        </p>
+
+                                    </div>
 
                                 </div>
-
                             </div>
 
-                            <h2 class="flex items-center gap-2 mt-10"> Open <ArrowRight size={18} /></h2>
+                            <div className="flex items-center text-sm font-semibold text-gray-700 transition-colors group-hover:text-gray-900">
+                                Open Module
+                                <ArrowRight size={16} className="ml-2 transform transition-transform duration-300 group-hover:translate-x-1" />
+                            </div>
 
                         </Link>
 
@@ -405,14 +391,12 @@ export default function Dashboard() {
             {/* FOOTER */}
             <footer
                 className="
-                    dashboard-footer mt-10
-                    flex items-center justify-between
-                    border-t border-gray-200
-                    px-8 py-6
+                    mt-auto flex items-center justify-between
+                    border-t border-gray-200 py-6
                 "
             >
 
-                <p className="text-sm text-gray-400">
+                <p className="text-sm text-gray-500">
                     © 2026 Inventory System
                 </p>
 
