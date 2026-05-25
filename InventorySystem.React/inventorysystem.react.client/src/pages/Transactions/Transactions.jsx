@@ -127,8 +127,8 @@ const Transactions = () => {
                                     />
                                 </div>
                             </th>
-                            <th className="p-2 px-4">--</th>
-                            <th className="p-2 px-4">--</th>
+                            <th className="p-2 px-4"></th>
+                            <th className="p-2 px-4"></th>
                             <th className="p-2 px-4">
                                 <div className="flex justify-center">
                                     <select

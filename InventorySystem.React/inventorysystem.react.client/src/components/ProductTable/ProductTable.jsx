@@ -69,8 +69,8 @@ function ProductTable({
                                 />
                             </div>
                         </th>
-                        <th className="p-2 px-4">--</th>
-                        {role === "ADMIN" && <th className="p-2 px-4">--</th>}
+                        <th className="p-2 px-4"></th>
+                        {role === "ADMIN" && <th className="p-2 px-4"></th>}
                     </tr>
                 </thead>
                 <tbody>

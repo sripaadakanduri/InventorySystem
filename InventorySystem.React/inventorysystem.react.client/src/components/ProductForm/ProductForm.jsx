@@ -101,20 +101,21 @@ function ProductForm({ onSubmit, selectedProduct, onClose }) {
                     </div>
                 </div>
 
-                <div className="flex flex-wrap gap-4 pt-4">
-                    <button
-                        type="submit"
-                        className="bg-green-500 hover:bg-green-600 text-white px-8 py-3 rounded-xl font-semibold shadow-lg transition duration-200"
-                    >
-                        {selectedProduct ? "Update Product" : "Save Product"}
-                    </button>
-                    <button
+                <div className="flex flex-wrap gap-4 pt-4 justify-end">
+                 <button
                         type="button"
                         onClick={onClose}
                         className="bg-red-500 hover:bg-red-600 text-white px-8 py-3 rounded-xl font-semibold shadow-lg transition duration-200"
                     >
                         Cancel
                     </button>
+                    <button
+                        type="submit"
+                        className="bg-green-500 hover:bg-green-600 text-white px-8 py-3 rounded-xl font-semibold shadow-lg transition duration-200"
+                    >
+                        {selectedProduct ? "Update Product" : "Save Product"}
+                    </button>
+                   
                 </div>
             </form>
         </div>

@@ -117,7 +117,7 @@
                                         />
                                     </div>
                                 </th>
-                                <th className="p-2 px-4 text-black">--</th>
+                                <th className="p-2 px-4 text-black"></th>
                                 <th className="p-2 px-4">
                                     <div className="flex justify-center">
                                         <select
@@ -134,7 +134,7 @@
                                         </select>
                                     </div>
                                 </th>
-                                <th className="p-2 text-black px-4">--</th>
+                                <th className="p-2 text-black px-4"></th>
                             </tr>
                         </thead>
                         <tbody>
