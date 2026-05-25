@@ -167,9 +167,9 @@ function Products() {
     }, [products, filters]);
 
     return (
-        <div className="w-full max-w-7xl mx-auto flex flex-col gap-6">
+        <div className="w-full max-w-7xl mx-auto flex flex-col gap-6 p-4 sm:p-6">
 
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 rounded-3xl mt-8 border border-gray-200 shadow-sm">
+            <div className="flex flex-col sm:flex-row sm:items-center shadow-lg justify-between gap-4 bg-white p-6 rounded-3xl mt-8 border border-gray-200">
                 <div>
                     <h1 className="text-2xl font-bold text-gray-900">
                         Products Management
@@ -179,7 +179,7 @@ function Products() {
 
                 {role === "ADMIN" && (
                     <button
-                        className="flex items-center justify-center gap-2 bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-xl font-medium transition duration-200 shadow-md w-full sm:w-auto"
+                        className="flex items-center justify-center gap-2 bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-xl font-medium transition duration-200 shadow-md w-full sm:w-auto"
                         onClick={handleCreate}
                     >
                         <FaPlus size={14} />
@@ -189,7 +189,7 @@ function Products() {
             </div>
 
             {showForm && role === "ADMIN" && (
-                <div className="bg-white p-6 rounded-3xl border border-gray-200 shadow-sm">
+                <div className="bg-white p-6 rounded-3xl border border-gray-200 shadow-xl">
                     <ProductForm
                         onSubmit={handleSubmit}
                         selectedProduct={selectedProduct}

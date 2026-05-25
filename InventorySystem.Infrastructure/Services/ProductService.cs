@@ -74,7 +74,6 @@ namespace InventorySystem.Infrastructure.Services
                     "StockIn"
                 );
             }
-
             return new ProductDto
             {
                 Id = product.Id,

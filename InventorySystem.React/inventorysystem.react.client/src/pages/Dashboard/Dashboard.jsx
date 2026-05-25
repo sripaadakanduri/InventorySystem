@@ -139,15 +139,16 @@ export default function Dashboard() {
                         <div className="flex flex-col justify-center space-y-6">
 
                             <div>
-                                <span
+                                <div
                                     className="
                                         inline-flex rounded-full bg-blue-50
                                         px-4 py-1.5 text-sm font-medium
-                                        text-blue-600
+                                        text-blue-600 justify-center items-center gap-x-2
                                     "
                                 >
+                                <div class="w-2 h-2 rounded-full bg-blue-600"></div>
                                     Inventory Management Platform
-                                </span>
+                                </div>
                             </div>
 
                             <h1
@@ -215,7 +216,7 @@ export default function Dashboard() {
                                 {/* TOTAL PRODUCTS */}
                                 <div
                                     className="
-                                        flex flex-col justify-center rounded-2xl border border-gray-100
+                                        group flex flex-col justify-center rounded-2xl border border-gray-100
                                         bg-gray-50 p-6 shadow-sm
                                         transition duration-300
                                         hover:-translate-y-1 hover:shadow-md
@@ -224,7 +225,7 @@ export default function Dashboard() {
 
                                     <p
                                         className="
-                                            mb-3 text-sm font-medium text-gray-500
+                                            mb-3 text-sm font-medium text-gray-500 group-hover:text-black transition duration-300
                                         "
                                     >
                                         Total Products
@@ -232,7 +233,7 @@ export default function Dashboard() {
 
                                     <h1
                                         className="
-                                            text-4xl font-bold text-gray-900
+                                            text-4xl font-bold text-gray-900 group-hover:text-5xl duration-300
                                         "
                                     >
                                         {stats.totalProducts}
@@ -243,7 +244,7 @@ export default function Dashboard() {
                                 {/* ORDERS TODAY */}
                                 <div
                                     className="
-                                        flex flex-col justify-center rounded-2xl border border-gray-100
+                                       group flex flex-col justify-center rounded-2xl border border-gray-100
                                         bg-gray-50 p-6 shadow-sm
                                         transition duration-300
                                         hover:-translate-y-1 hover:shadow-md
@@ -252,7 +253,7 @@ export default function Dashboard() {
 
                                     <p
                                         className="
-                                            mb-3 text-sm font-medium text-gray-500
+                                            mb-3 text-sm font-medium text-gray-500  group-hover:text-black transition duration-300
                                         "
                                     >
                                         Orders Today
@@ -260,7 +261,7 @@ export default function Dashboard() {
 
                                     <h1
                                         className="
-                                            text-4xl font-bold text-gray-900
+                                            text-4xl font-bold text-gray-900  group-hover:text-5xl duration-300
                                         "
                                     >
                                         {stats.ordersToday}
@@ -273,7 +274,7 @@ export default function Dashboard() {
                             {/* LOW STOCK */}
                             <div
                                 className="
-                                    flex flex-col justify-center rounded-2xl border border-red-100
+                                    group flex flex-col justify-center rounded-2xl border border-red-100
                                     bg-red-50 p-6 shadow-sm
                                     transition duration-300
                                     hover:-translate-y-1 hover:shadow-md
@@ -290,7 +291,7 @@ export default function Dashboard() {
 
                                 <h1
                                     className="
-                                        text-4xl font-bold text-gray-900
+                                        text-4xl font-bold text-gray-900 group-hover:text-5xl duration-300
                                     "
                                 >
                                     {stats.lowStock} <span className="text-xl font-medium text-gray-500">Items</span>

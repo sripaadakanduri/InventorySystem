@@ -40,7 +40,7 @@ function ProductForm({ onSubmit, selectedProduct, onClose }) {
     };
 
     return (
-        <div className="max-w-3xl mx-auto bg-white shadow-xl rounded-2xl p-8 border border-gray-200 mb-10">
+        <div className="w-full">
             <div className="flex items-center gap-3 mb-8">
                 <Package className="w-8 h-8 text-blue-500" />
                 <h2 className="text-3xl font-bold text-gray-800">
@@ -106,12 +106,12 @@ function ProductForm({ onSubmit, selectedProduct, onClose }) {
                         type="submit"
                         className="bg-green-500 hover:bg-green-600 text-white px-8 py-3 rounded-xl font-semibold shadow-lg transition duration-200"
                     >
-                        {selectedProduct ? "Update Product" : "Create Product"}
+                        {selectedProduct ? "Update Product" : "Save Product"}
                     </button>
                     <button
                         type="button"
                         onClick={onClose}
-                        className="bg-gray-500 hover:bg-gray-600 text-white px-8 py-3 rounded-xl font-semibold shadow-lg transition duration-200"
+                        className="bg-red-500 hover:bg-red-600 text-white px-8 py-3 rounded-xl font-semibold shadow-lg transition duration-200"
                     >
                         Cancel
                     </button>

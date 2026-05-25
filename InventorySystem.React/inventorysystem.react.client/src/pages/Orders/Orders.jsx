@@ -49,22 +49,28 @@ function Orders() {
     });
 
     return (
-        <div className="orders-page card mt-8 mx-4">
-            <h1 class="folt-bold text-3xl flex justify-center p-5">Order Management</h1>
-            <OrderForm
-                orderToEdit={orderToEdit}
-                onOrderCreated={(newOrder) =>
-                    setOrders(prev => [newOrder, ...prev])
-                }
-                onOrderUpdated={(updatedOrder) => {
-                    setOrders(prev => prev.map(o => (o.id === updatedOrder.id ? updatedOrder : o)));
-                    setOrderToEdit(null);
+        <div className="w-full max-w-7xl mx-auto flex flex-col gap-6 p-4 sm:p-6">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-center gap-4 bg-white p-6 rounded-3xl mt-8 border border-gray-200 shadow-lg">
+                <h1 className="text-2xl font-bold text-gray-900">
+                    Order Management
+                </h1>
+            </div>
 
-                }}
-                onCancelEdit={() => {
-                    setOrderToEdit(null);
-                }}
-            />
+            <div className="bg-white p-6 rounded-3xl border border-gray-200 shadow-lg">
+                <OrderForm
+                    orderToEdit={orderToEdit}
+                    onOrderCreated={(newOrder) =>
+                        setOrders(prev => [newOrder, ...prev])
+                    }
+                    onOrderUpdated={(updatedOrder) => {
+                        setOrders(prev => prev.map(o => (o.id === updatedOrder.id ? updatedOrder : o)));
+                        setOrderToEdit(null);
+                    }}
+                    onCancelEdit={() => {
+                        setOrderToEdit(null);
+                    }}
+                />
+            </div>
 
             {loading ? (
                 <p>Loading orders...</p>

@@ -27,7 +27,8 @@ const Login = () => {
         try {
             await handleLogin(formData);
         } catch (err) {
-            setError(err?.response?.data || "Invalid credentials");
+            const data = err?.response?.data;
+            setError(data?.message || (typeof data === 'string' ? data : "Invalid username or password."));
         } finally {
             setLoading(false);
         }
@@ -95,7 +96,7 @@ const Login = () => {
                     <button
                         type="submit"
                         disabled={loading}
-                        className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 px-4 rounded-xl shadow-lg transition-all transform active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed flex justify-center items-center"
+                        className="w-full bg-blue-500 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-xl shadow-lg transition-all transform active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed flex justify-center items-center"
                     >
                         {loading ? (
                             <span className="flex items-center gap-2">
@@ -107,7 +108,7 @@ const Login = () => {
 
                     <p className="text-center text-gray-600 text-sm mt-6">
                         Don't have an account?{" "}
-                        <Link to="/register" className="text-indigo-600 font-semibold hover:text-indigo-800 transition-colors">
+                        <Link to="/register" className="text-blue-500 font-semibold hover:text-blue-700 transition-colors">
                             Create an account
                         </Link>
                     </p>

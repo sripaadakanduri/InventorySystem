@@ -197,131 +197,74 @@ function OrderList({
 
     return (
 
-        <div className=" overflow-x-auto rounded-3xl border border-gray-200 shadow-lg bg-white m-8">
+        <div className="w-full overflow-x-auto rounded-3xl border border-gray-200 shadow-lg bg-white">
 
             <table className="w-full border-separate border-spacing-0 rounded-3xl">
-    
+
                 {/* Table Header */}
                 <thead className="bg-blue-50 text-gray-700">
-
-                    <tr className="border border-gray-200">
-
-                        <th className="p-4 ">
-
-                            <div className="flex flex-col gap-2">
-
-                                <span className="font-semibold">
-                                    User
-                                </span>
-
+                    <tr className="border-b border-gray-200">
+                        <th className="p-4 text-center font-semibold border-b border-gray-200">User</th>
+                        <th className="p-4 text-center font-semibold border-b border-gray-200">Total</th>
+                        <th className="p-4 text-center font-semibold border-b border-gray-200">Quantity</th>
+                        <th className="p-4 text-center font-semibold border-b border-gray-200">Status</th>
+                        <th className="p-4 text-center font-semibold border-b border-gray-200">Created</th>
+                    </tr>
+                    <tr>
+                        <th className="p-2 px-4">
+                            <div className="flex justify-center">
                                 <input
                                     type="text"
-                                    placeholder="Filter"
+                                    placeholder="Filter User..."
                                     value={filterUser}
                                     onChange={(e) =>
                                         setFilterUser(e.target.value)
                                     }
-                                    className="border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                                    className="border border-gray-300 rounded-lg px-3 py-2 text-sm font-normal focus:outline-none focus:ring-2 focus:ring-blue-400 w-32"
                                 />
-
                             </div>
-
                         </th>
-
-                        <th className="p-4 font-semibold">
-                            Total
-                        </th>
-
-                        <th className="p-4 font-semibold">
-                            Quantity
-                        </th>
-
-                        <th className="p-4">
-
-                            <div className="flex flex-col gap-2">
-
-                                <span className="font-semibold">
-                                    Status
-                                </span>
-
+                        <th className="p-2 px-4">--</th>
+                        <th className="p-2 px-4">--</th>
+                        <th className="p-2 px-4">
+                            <div className="flex justify-center">
                                 <select
                                     value={filterStatus}
                                     onChange={(e) =>
                                         setFilterStatus(e.target.value)
                                     }
-                                    className="border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                                    className="border border-gray-300 rounded-lg px-3 py-2 text-sm font-normal focus:outline-none focus:ring-2 focus:ring-blue-400 w-32"
                                 >
-
-                                    <option value="">
-                                        All
-                                    </option>
-
-                                    <option value="1">
-                                        Pending
-                                    </option>
-
-                                    <option value="2">
-                                        Confirmed
-                                    </option>
-
-                                    <option value="3">
-                                        Failed
-                                    </option>
-
-                                    <option value="4">
-                                        Cancelled
-                                    </option>
-
-                                    <option value="5">
-                                        Updated
-                                    </option>
-
+                                    <option value="">All Statuses</option>
+                                    <option value="1">Pending</option>
+                                    <option value="2">Confirmed</option>
+                                    <option value="3">Failed</option>
+                                    <option value="4">Cancelled</option>
+                                    <option value="5">Updated</option>
                                 </select>
-
                             </div>
-
                         </th>
-
-                        <th className="p-4">
-
-                            <div className="flex flex-col gap-2">
-
-                                <span className="font-semibold">
-                                    Created
-                                </span>
-
-                                <div className="flex gap-2">
-
-                                    <input
-                                        type="date"
-                                        value={filterStartDate}
-                                        onChange={(e) =>
-                                            setFilterStartDate(
-                                                e.target.value
-                                            )
-                                        }
-                                        className="border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
-                                    />
-
-                                    <input
-                                        type="date"
-                                        value={filterEndDate}
-                                        onChange={(e) =>
-                                            setFilterEndDate(
-                                                e.target.value
-                                            )
-                                        }
-                                        className="border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
-                                    />
-
-                                </div>
-
+                        <th className="p-2 px-4">
+                            <div className="flex flex-col gap-2 justify-center items-center">
+                                <input
+                                    type="date"
+                                    value={filterStartDate}
+                                    onChange={(e) =>
+                                        setFilterStartDate(e.target.value)
+                                    }
+                                    className="border border-gray-300 rounded-lg px-2 py-1 text-sm font-normal focus:outline-none focus:ring-2 focus:ring-blue-400 w-full max-w-[140px]"
+                                />
+                                <input
+                                    type="date"
+                                    value={filterEndDate}
+                                    onChange={(e) =>
+                                        setFilterEndDate(e.target.value)
+                                    }
+                                    className="border border-gray-300 rounded-lg px-2 py-1 text-sm font-normal focus:outline-none focus:ring-2 focus:ring-blue-400 w-full max-w-[140px]"
+                                />
                             </div>
-
                         </th>
-
                     </tr>
-
                 </thead>
 
                 <tbody>
@@ -339,7 +282,7 @@ function OrderList({
                             >
 
                                 <td className="p-4 text-center">
-                                    {order.username}
+                                    {order.username.charAt(0).toUpperCase() + order.username.slice(1)}
                                 </td>
 
                                 <td className="p-4 font-medium text-black-600 text-center">

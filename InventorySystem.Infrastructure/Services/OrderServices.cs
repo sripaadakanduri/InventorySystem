@@ -284,7 +284,7 @@ namespace InventorySystem.Infrastructure.Services
                 await _context.OrderItems.AddRangeAsync(newOrderItems);
 
                 order.TotalAmount = totalAmount;
-                order.Status = OrderStatus.Confirmed;
+                order.Status = OrderStatus.Updated;
                 order.UpdatedAt = DateTime.UtcNow;
 
                 await _context.SaveChangesAsync();

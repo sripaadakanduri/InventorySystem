@@ -21,28 +21,35 @@ function ProductTable({
         <div className="w-full overflow-x-auto rounded-3xl border border-gray-200 shadow-lg bg-white mt-6">
             <table className="w-full border-collapse">
                 <thead className="bg-blue-50 text-gray-700 border-b border-gray-200">
-                    <tr class="">
-                        <th className="p-4 text-left font-semibold">
-                            <div className="flex flex-col gap-2">
-                                <span class="text-center">Name</span>
+                    <tr>
+                        <th className="p-4 text-center font-semibold border-b border-gray-200">Name</th>
+                        <th className="p-4 text-center font-semibold border-b border-gray-200">Price</th>
+                        <th className="p-4 text-center font-semibold border-b border-gray-200">Category</th>
+                        <th className="p-4 text-center font-semibold border-b border-gray-200">Stock Quantity</th>
+                        {role === "ADMIN" && (
+                            <th className="p-4 text-center font-semibold border-b border-gray-200">Actions</th>
+                        )}
+                    </tr>
+                    <tr>
+                        <th className="p-2 px-4">
+                            <div className="flex justify-center">
                                 <input
                                     type="text"
                                     name="name"
                                     placeholder="Filter Name..."
                                     value={filters.name}
                                     onChange={onFilterChange}
-                                    className="border border-gray-300 rounded-lg px-3 py-2 text-sm font-normal focus:outline-none focus:ring-2 focus:ring-blue-400 w-full"
+                                    className="border border-gray-300 rounded-lg px-3 py-2 text-sm font-normal focus:outline-none focus:ring-2 focus:ring-blue-400 w-32"
                                 />
                             </div>
                         </th>
-                        <th className="p-4 text-left font-semibold">
-                            <div className="flex flex-col gap-2">
-                                <span class="text-center">Price</span>
+                        <th className="p-2 px-4">
+                            <div className="flex justify-center">
                                 <select
                                     name="priceSort"
                                     value={filters.priceSort}
                                     onChange={onFilterChange}
-                                    className="border border-gray-300 rounded-lg px-3 py-2 text-sm font-normal focus:outline-none focus:ring-2 focus:ring-blue-400 w-full"
+                                    className="border border-gray-300 rounded-lg px-3 py-2 text-sm font-normal focus:outline-none focus:ring-2 focus:ring-blue-400 w-32"
                                 >
                                     <option value="">Sort Price</option>
                                     <option value="lowToHigh">Low to High</option>
@@ -50,27 +57,20 @@ function ProductTable({
                                 </select>
                             </div>
                         </th>
-                        <th className="p-4 text-left font-semibold">
-                            <div className="flex flex-col gap-2">
-                                <span class="text-center">Category</span>
+                        <th className="p-2 px-4">
+                            <div className="flex justify-center">
                                 <input
                                     type="text"
                                     name="category"
                                     placeholder="Filter Category..."
                                     value={filters.category}
                                     onChange={onFilterChange}
-                                    className="border border-gray-300 rounded-lg px-3 py-2 text-sm font-normal focus:outline-none focus:ring-2 focus:ring-blue-400 w-full"
+                                    className="border border-gray-300 rounded-lg px-3 py-2 text-sm font-normal focus:outline-none focus:ring-2 focus:ring-blue-400 w-32"
                                 />
                             </div>
                         </th>
-                        <th className="p-4 text-center font-semibold align-top">
-                            <span className="block mt-2 text-center">Stock Quantity</span>
-                        </th>
-                        {role === "ADMIN" && (
-                            <th className="p-4 text-center font-semibold align-top">
-                                <span className="block mt-2 text-center">Actions</span>
-                            </th>
-                        )}
+                        <th className="p-2 px-4">--</th>
+                        {role === "ADMIN" && <th className="p-2 px-4">--</th>}
                     </tr>
                 </thead>
                 <tbody>

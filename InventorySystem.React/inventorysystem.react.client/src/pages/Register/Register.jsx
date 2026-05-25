@@ -2,7 +2,7 @@ import { useState } from "react";
 import useAuth from "../../hooks/useAuth";
 import { Link } from "react-router-dom";
 import { validateRegister } from "../../validators/authValidator";
-import { Eye, EyeOff, UserPlus, User, Mail, Lock } from "lucide-react";
+import { Eye, EyeOff, UserPlus, User, Mail, Lock, Check, X, ChevronDown } from "lucide-react";
 
 export default function Register() {
     const { handleRegister } = useAuth();
@@ -14,6 +14,15 @@ export default function Register() {
     const [errors, setErrors] = useState({});
     const [loading, setLoading] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
+    const [showReqs, setShowReqs] = useState(false);
+
+    const passwordReqs = [
+        { label: "At least 8 characters", met: form.password.length >= 8 },
+        { label: "One uppercase letter", met: /(?=.*[A-Z])/.test(form.password) },
+        { label: "One lowercase letter", met: /(?=.*[a-z])/.test(form.password) },
+        { label: "One number", met: /(?=.*\d)/.test(form.password) },
+        { label: "One special character", met: /(?=.*[!@#$%^&*.,<>?|])/.test(form.password) }
+    ];
 
     const submit = async (e) => {
         e.preventDefault();
@@ -27,9 +36,16 @@ export default function Register() {
         try {
             await handleRegister(form);
         } catch (err) {
-            setErrors({
-                general: err?.response?.data || "Registration failed"
-            });
+            const data = err?.response?.data;
+            const message = data?.message || (typeof data === 'string' ? data : "Registration failed");
+            
+            if (message.toLowerCase().includes("email")) {
+                setErrors({ email: message });
+            } else if (message.toLowerCase().includes("username")) {
+                setErrors({ username: message });
+            } else {
+                setErrors({ general: message });
+            }
         } finally {
             setLoading(false);
         }
@@ -46,7 +62,7 @@ export default function Register() {
                     <p className="text-gray-500 mt-2">Join us and manage your inventory seamlessly.</p>
                 </div>
 
-                <form onSubmit={submit} className="space-y-5">
+                <form onSubmit={submit} className="space-y-5" noValidate>
                     {errors.general && (
                         <div className="bg-red-50 text-red-600 p-4 rounded-xl text-sm font-medium border border-red-100 text-center">
                             {errors.general}
@@ -111,13 +127,32 @@ export default function Register() {
                                 {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                             </button>
                         </div>
-                        {errors.password && <p className="text-red-500 text-xs mt-1 ml-1 font-medium">{errors.password}</p>}
+                        <div className="mt-3 ml-1 border border-gray-100 rounded-lg overflow-hidden bg-gray-50/50">
+                            <button
+                                type="button"
+                                onClick={() => setShowReqs(!showReqs)}
+                                className={`w-full flex items-center justify-between px-3 py-2 text-xs font-semibold transition-colors hover:bg-gray-100 ${passwordReqs.every(req => req.met) ? 'text-green-600' : 'text-red-500 hover:text-red-600'}`}
+                            >
+                                <span>Password Requirements</span>
+                                <ChevronDown className={`w-4 h-4 transform transition-transform duration-200 ${showReqs ? 'rotate-180' : ''}`} />
+                            </button>
+                            <div className={`transition-all duration-300 ease-in-out ${showReqs ? 'max-h-48 opacity-100 pb-3' : 'max-h-0 opacity-0'} overflow-hidden`}>
+                                <div className="space-y-1.5 px-3">
+                                    {passwordReqs.map((req, index) => (
+                                        <div key={index} className={`flex items-center text-xs font-medium transition-colors ${req.met ? 'text-green-600' : 'text-red-500'}`}>
+                                            {req.met ? <Check className="w-3.5 h-3.5 mr-1.5" /> : <X className="w-3.5 h-3.5 mr-1.5" />}
+                                            {req.label}
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
                     <button
                         type="submit"
                         disabled={loading}
-                        className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 px-4 rounded-xl shadow-lg transition-all transform active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed flex justify-center items-center mt-2"
+                        className="w-full bg-blue-500 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-xl shadow-lg transition-all transform active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed flex justify-center items-center mt-2"
                     >
                         {loading ? (
                             <span className="flex items-center gap-2">
@@ -129,7 +164,7 @@ export default function Register() {
 
                     <p className="text-center text-gray-600 text-sm mt-6">
                         Already have an account?{" "}
-                        <Link to="/login" className="text-indigo-600 font-semibold hover:text-indigo-800 transition-colors">
+                        <Link to="/login" className="text-blue-500 font-semibold hover:text-blue-800 transition-colors">
                             Sign in instead
                         </Link>
                     </p>

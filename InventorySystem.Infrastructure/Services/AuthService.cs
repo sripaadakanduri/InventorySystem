@@ -25,10 +25,16 @@ namespace InventorySystem.Infrastructure.Services
 
         public async Task<AuthResponseDto> RegisterAsync(RegisterDto dto)
         {
-            var existinguser = await _repo.GetByUsernameAsync(dto.Username);
-            if (existinguser != null)
+            var existingUsername = await _repo.GetByUsernameAsync(dto.Username);
+            if (existingUsername != null)
             {
-                throw new InvalidOperationException("User already exists");
+                throw new InvalidOperationException("Username is already taken. Please choose another.");
+            }
+
+            var existingEmail = await _repo.GetByEmailAsync(dto.Email);
+            if (existingEmail != null)
+            {
+                throw new InvalidOperationException("An account with this email address already exists.");
             }
 
             var user = new User
@@ -53,12 +59,12 @@ namespace InventorySystem.Infrastructure.Services
             var user = await _repo.GetByUsernameAsync(dto.Username);
             if (user == null)
             {
-                throw new InvalidOperationException("User not Found");
+                throw new InvalidOperationException("Invalid username or password.");
             }
 
             if (!PasswordHasher.Verify(dto.Password, user.PasswordHash))
             {
-                throw new InvalidOperationException("Invalid Password");
+                throw new InvalidOperationException("Invalid username or password.");
             }
             user.LastLoginAt = DateTime.UtcNow;
             await _context.SaveChangesAsync();

@@ -27,7 +27,7 @@ const Navbar = () => {
 
     return (
 
-        <nav className="sticky top-4 z-50 flex justify-center">
+        <nav className="sticky top-4 z-50 flex justify-center mx-6">
 
             <div
                 className="
@@ -49,7 +49,7 @@ const Navbar = () => {
                         className="
                             flex h-12 w-12 items-center justify-center
                             rounded-2xl bg-blue-50
-                            text-xl font-bold text-white
+                            text-xl font-bold text-black
                         "
                     >
                         🛒
@@ -57,13 +57,9 @@ const Navbar = () => {
 
                     <div>
 
-                        <h1 className="text-xl font-bold">
-                            Inventory System
+                        <h1 className="text-2xl font-black tracking-[0.1 em] uppercase">
+                            Inventory<span className="text-primary ml-3">System</span>
                         </h1>
-
-                        <p className="text-sm text-gray-400">
-                            Admin Dashboard
-                        </p>
 
                     </div>
 
@@ -99,7 +95,7 @@ const Navbar = () => {
                         <div className="text-left">
 
                             <span className="font-semibold">
-                                {username}
+                                {username.charAt(0).toUpperCase() + username.slice(1) }
                             </span>
 
                             <p className="text-sm text-gray-400">
@@ -166,7 +162,7 @@ const Navbar = () => {
                             <div class="">
 
                                 <h1 className="text-lg font-semibold">
-                                    {username}
+                                    {username.charAt(0).toUpperCase() + username.slice(1)}
                                 </h1>
 
                                 <h2 className="text-sm text-gray-400">
