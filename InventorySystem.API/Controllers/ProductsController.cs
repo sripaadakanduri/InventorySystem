@@ -1,8 +1,8 @@
 ﻿using System.Security.Claims;
 
 using InventorySystem.Core.DTOs;
-using InventorySystem.Core.Interfaces;
-using InventorySystem.Core.Enums;
+using InventorySystem.Common.Enums;
+using InventorySystem.Service.Interfaces;
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -11,6 +11,7 @@ namespace InventorySystem.API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize]
     public class ProductsController : ControllerBase
     {
         private readonly IProductService _service;

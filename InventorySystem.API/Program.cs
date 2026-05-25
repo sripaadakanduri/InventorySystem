@@ -1,13 +1,11 @@
 using InventorySystem.API.Extensions;
-using InventorySystem.Core.Interfaces;
-using InventorySystem.Infrastructure.Auth;
-using InventorySystem.Infrastructure.Data;
-using InventorySystem.Infrastructure.Repositories;
-using InventorySystem.Infrastructure.Services;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
+using InventorySystem.Service.Interfaces;
+using InventorySystem.Service.Auth;
+using InventorySystem.Service.Data;
+using InventorySystem.Service.Repositories;
+using InventorySystem.Service.Services;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
-using System.Text;
+
 
 var builder = WebApplication.CreateBuilder(args);
 

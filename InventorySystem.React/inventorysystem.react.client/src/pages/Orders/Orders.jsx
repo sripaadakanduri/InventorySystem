@@ -1,7 +1,8 @@
+/* eslint-disable no-unused-vars */
 import { useEffect, useState } from "react";
 import OrderList from "../../components/OrderList/OrderList";
 import OrderForm from "../../components/OrderForm/OrderForm";
-import { getAllOrders, cancelOrder, updateOrder } from "../../services/orderService";
+import { getAllOrders, cancelOrder, updateOrder } from "../../services/ordersService";
 // import "./Orders.css";
 
 function Orders() {

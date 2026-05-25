@@ -10,7 +10,7 @@ import {
 } from "lucide-react";
 
 import { getProducts } from "../../services/ProductService";
-import { getAllOrders } from "../../services/OrderService";
+import { getAllOrders } from "../../services/ordersService";
 
 export default function Dashboard() {
 

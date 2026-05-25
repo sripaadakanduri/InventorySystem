@@ -1,9 +1,9 @@
 ﻿using InventorySystem.Core.DTOs.Users;
-using InventorySystem.Core.Interfaces;
-using InventorySystem.Infrastructure.Data;
+using InventorySystem.Service.Interfaces;
+using InventorySystem.Service.Data;
 using Microsoft.EntityFrameworkCore;
 
-namespace InventorySystem.Infrastructure.Services
+namespace InventorySystem.Service.Services
 {
     public class UserService : IUserService
     {

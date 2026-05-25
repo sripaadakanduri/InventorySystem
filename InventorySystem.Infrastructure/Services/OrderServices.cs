@@ -1,11 +1,11 @@
 ﻿using InventorySystem.Core.DTOs;
 using InventorySystem.Core.Entities;
 using InventorySystem.Common.Enums;
-using InventorySystem.Core.Interfaces;
-using InventorySystem.Infrastructure.Data;
+using InventorySystem.Service.Interfaces;
+using InventorySystem.Service.Data;
 using Microsoft.EntityFrameworkCore;
 
-namespace InventorySystem.Infrastructure.Services
+namespace InventorySystem.Service.Services
 {
     public class OrderServices : IOrderService
     {

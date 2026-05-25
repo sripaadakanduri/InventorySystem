@@ -1,5 +1,5 @@
 ﻿using InventorySystem.Core.DTOs;
-namespace InventorySystem.Core.Interfaces
+namespace InventorySystem.Service.Interfaces
 {
     public interface IAuthService
     {

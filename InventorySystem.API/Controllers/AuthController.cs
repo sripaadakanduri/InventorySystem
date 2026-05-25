@@ -1,5 +1,5 @@
 ﻿using InventorySystem.Core.DTOs;
-using InventorySystem.Core.Interfaces;
+using InventorySystem.Service.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 namespace InventorySystem.API.Controllers

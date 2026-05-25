@@ -1,14 +1,12 @@
 ﻿using InventorySystem.Core.DTOs;
 using InventorySystem.Core.Entities;
-using InventorySystem.Core.Interfaces;
-using InventorySystem.Infrastructure.Auth;
-using InventorySystem.Infrastructure.Data;
-using InventorySystem.Infrastructure.Helpers;
-using InventorySystem.Infrastructure.Repositories;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
-using System.ComponentModel.DataAnnotations;
-namespace InventorySystem.Infrastructure.Services
+using InventorySystem.Service.Auth;
+using InventorySystem.Service.Data;
+using InventorySystem.Service.Helpers;
+using InventorySystem.Service.Interfaces;
+using InventorySystem.Service.Repositories;
+
+namespace InventorySystem.Service.Services
 {
     public class AuthService : IAuthService
     {

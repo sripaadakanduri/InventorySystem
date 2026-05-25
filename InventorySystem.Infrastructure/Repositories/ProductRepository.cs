@@ -1,13 +1,10 @@
 ﻿using InventorySystem.Core.Entities;
-using InventorySystem.Core.Interfaces;
-using InventorySystem.Infrastructure.Data;
+using InventorySystem.Service.Interfaces;
+using InventorySystem.Service.Data;
 using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+ namespace InventorySystem.Service.Repositories
+{ 
 
-namespace InventorySystem.Infrastructure.Repositories
-{
     public class ProductRepository : IProductRepository
     {
         private readonly AppDbContext _context;

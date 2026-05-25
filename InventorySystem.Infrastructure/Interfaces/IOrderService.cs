@@ -1,10 +1,7 @@
-﻿// ==========================================
-// FILE: InventorySystem.Core/Interfaces/IOrderService.cs
-// ==========================================
-
+﻿
 using InventorySystem.Core.DTOs;
 
-namespace InventorySystem.Core.Interfaces
+namespace InventorySystem.Service.Interfaces
 {
     public interface IOrderService
     {

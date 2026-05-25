@@ -1,6 +1,6 @@
 ﻿using InventorySystem.Core.DTOs;
-using InventorySystem.Core.Enums;
-using InventorySystem.Core.Interfaces;
+using InventorySystem.Common.Enums;
+using InventorySystem.Service.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;

@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace InventorySystem.Infrastructure.Configurations
+namespace InventorySystem.Service.Configurations
 {
     public class OrderItemConfiguration
         : IEntityTypeConfiguration<OrderItem>

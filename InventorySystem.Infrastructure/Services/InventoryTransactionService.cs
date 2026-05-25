@@ -1,9 +1,9 @@
 ﻿using InventorySystem.Core.Entities;
-using InventorySystem.Core.Interfaces;
-using InventorySystem.Infrastructure.Data;
+using InventorySystem.Service.Data;
+using InventorySystem.Service.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
-namespace InventorySystem.Infrastructure.Services
+namespace InventorySystem.Service.Services
 {
     public class InventoryTransactionService : IInventoryTransactionService
     {

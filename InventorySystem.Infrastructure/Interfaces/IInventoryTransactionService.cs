@@ -1,6 +1,6 @@
 ﻿using InventorySystem.Core.Entities;
 
-namespace InventorySystem.Core.Interfaces
+namespace InventorySystem.Service.Interfaces
 {
     public interface IInventoryTransactionService
     {

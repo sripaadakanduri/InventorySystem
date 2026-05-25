@@ -1,6 +1,6 @@
 ﻿using InventorySystem.Core.DTOs.Users;
 
-namespace InventorySystem.Core.Interfaces
+namespace InventorySystem.Service.Interfaces
 {
     public interface IUserService
     {

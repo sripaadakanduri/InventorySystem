@@ -1,12 +1,9 @@
 ﻿using InventorySystem.Core.DTOs;
 using InventorySystem.Core.Entities;
-using InventorySystem.Core.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using InventorySystem.Service.Interfaces;
 
-namespace InventorySystem.Infrastructure.Services
+
+namespace InventorySystem.Service.Services
 {
     public class ProductService : IProductService
     {

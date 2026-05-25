@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from "react";
-import { createOrder, updateOrder } from "../../services/orderService";
+import { createOrder, updateOrder } from "../../services/ordersService";
 import api from "../../services/api";
 
 import {

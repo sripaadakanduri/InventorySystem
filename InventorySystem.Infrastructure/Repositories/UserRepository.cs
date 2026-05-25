@@ -1,8 +1,8 @@
-﻿using InventorySystem.Infrastructure.Data;
+﻿using InventorySystem.Service.Data;
 using InventorySystem.Core.Entities;
 using Microsoft.EntityFrameworkCore;
 
-namespace InventorySystem.Infrastructure.Repositories
+namespace InventorySystem.Service.Repositories
 {
     public class UserRepository
     {

@@ -1,6 +1,6 @@
-﻿using InventorySystem.Core.Interfaces;
-using InventorySystem.Infrastructure.Repositories;
-using InventorySystem.Infrastructure.Services;
+﻿using InventorySystem.Service.Interfaces;
+using InventorySystem.Service.Repositories;
+using InventorySystem.Service.Services;
 
 namespace InventorySystem.API.Extensions
 {

@@ -3,10 +3,10 @@ using System.Security.Claims;
 using System.Text;
 
 using InventorySystem.Core.Entities;
-
+using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 
-namespace InventorySystem.Infrastructure.Auth
+namespace InventorySystem.Service.Auth
 {
     public class JwtServices
     {

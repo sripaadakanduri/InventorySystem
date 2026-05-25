@@ -1,6 +1,6 @@
 ﻿using System.Text;
 using System.Security.Cryptography;
-namespace InventorySystem.Infrastructure.Helpers
+namespace InventorySystem.Service.Helpers
 {
     public class PasswordHasher
     {
