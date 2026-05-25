@@ -17,7 +17,7 @@ namespace InventorySystem.Infrastructure.Repositories
             _context = context;
         }
 
-        // Get all active products (optionally filter StockQuantity > 0)
+        // Get all active products
         public async Task<IEnumerable<Product>> GetAllAsync()
         {
             return await _context.Products
@@ -26,7 +26,7 @@ namespace InventorySystem.Infrastructure.Repositories
                 .ToListAsync();
         }
 
-        // Get by ID (non-deleted only)
+        // Get by ID
         public async Task<Product> GetByIdAsync(int id)
         {
             return await _context.Products
@@ -45,7 +45,7 @@ namespace InventorySystem.Infrastructure.Repositories
 
         public void Delete(Product product)
         {
-            _context.Products.Remove(product); // Rarely used; soft delete preferred
+            _context.Products.Remove(product); 
         }
 
         public async Task SaveChangesAsync()

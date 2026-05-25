@@ -39,7 +39,6 @@ const Navbar = () => {
                 "
             >
 
-                {/* Brand */}
                 <div
                     className="flex cursor-pointer items-center gap-3"
                     onClick={() => navigate("/dashboard")}
@@ -68,7 +67,6 @@ const Navbar = () => {
                 {/* Right Side */}
                 <div className="relative group">
 
-                    {/* Trigger */}
                     <div
                         className="
                             flex items-center gap-2
@@ -78,7 +76,6 @@ const Navbar = () => {
                         "
                     >
 
-                        {/* Avatar */}
                         <span
                             className="
                                 flex h-12 w-12 items-center justify-center
@@ -91,7 +88,6 @@ const Navbar = () => {
                                 : "U"}
                         </span>
 
-                        {/* Name */}
                         <div className="text-left">
 
                             <span className="font-semibold">
@@ -104,7 +100,6 @@ const Navbar = () => {
 
                         </div>
 
-                        {/* Chevron */}
                         <span
                             className="
                                 text-gray-400 transition duration-300
@@ -173,7 +168,6 @@ const Navbar = () => {
 
                         </div>
 
-                        {/* Divider */}
                         <div className="my-3 border border-gray-200"></div>
 
                         <div classNma="flex flex-col gap-y-3">
@@ -239,7 +233,6 @@ const Navbar = () => {
 
                         </Link>
 
-                        {/* Admin Section */}
                         {role === "Admin" && (
                             <>
 
@@ -300,7 +293,6 @@ const Navbar = () => {
                         </div>
 
 
-                        {/* Divider */}
                         <div className="my-3 border border-gray-200"></div>
 
                   

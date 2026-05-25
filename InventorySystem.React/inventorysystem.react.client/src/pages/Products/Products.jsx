@@ -29,7 +29,6 @@ function Products() {
         category: ""
     });
 
-    // Role
     const role =
         localStorage.getItem("role")?.toUpperCase();
 

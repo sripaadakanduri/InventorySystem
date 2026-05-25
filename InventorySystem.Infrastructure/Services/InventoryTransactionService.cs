@@ -14,7 +14,6 @@ namespace InventorySystem.Infrastructure.Services
             _context = context;
         }
 
-        // Get all transactions safely
         public async Task<IEnumerable<InventoryTransaction>> GetAllTransactionsAsync()
         {
             return await _context.InventoryTransactions
@@ -58,7 +57,6 @@ namespace InventorySystem.Infrastructure.Services
                 .ToListAsync();
         }
 
-        // Log transaction safely
         public async Task LogTransactionAsync(
             int productId,
             int userId,

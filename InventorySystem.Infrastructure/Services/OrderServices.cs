@@ -16,9 +16,7 @@ namespace InventorySystem.Infrastructure.Services
             _context = context;
         }
 
-        // -------------------------
-        // Create Order
-        // -------------------------
+   
         public async Task<OrderDto> CreateOrderAsync(CreateOrderDto dto, int userId)
         {
             using var transaction = await _context.Database.BeginTransactionAsync();
@@ -60,7 +58,6 @@ namespace InventorySystem.Infrastructure.Services
 
                     order.OrderItems.Add(orderItem);
 
-                    // Safe InventoryTransaction
                     var productExists = await _context.Products.AnyAsync(p => p.Id == product.Id);
                     var userExists = await _context.Users.AnyAsync(u => u.Id == userId);
 
@@ -139,9 +136,7 @@ namespace InventorySystem.Infrastructure.Services
             return orders.Select(MapOrderToDto).ToList();
         }
 
-        // -------------------------
-        // Cancel Order
-        // -------------------------
+
         public async Task<bool> CancelOrderAsync(int orderId, int userId)
         {
             using var transaction = await _context.Database.BeginTransactionAsync();
@@ -161,7 +156,6 @@ namespace InventorySystem.Infrastructure.Services
                 {
                     if (item.Product == null) continue;
 
-                    // Restore stock
                     item.Product.StockQuantity += item.Quantity;
                     item.Product.UpdatedAt = DateTime.UtcNow;
 
@@ -196,9 +190,7 @@ namespace InventorySystem.Infrastructure.Services
             }
         }
 
-        // -------------------------
-        // Update Order
-        // -------------------------
+ 
         public async Task<OrderDto> UpdateOrderAsync(int orderId, CreateOrderDto dto)
         {
             using var transaction = await _context.Database.BeginTransactionAsync();
@@ -213,7 +205,6 @@ namespace InventorySystem.Infrastructure.Services
 
                 if (order == null) throw new Exception("Order not found");
 
-                // Revert previous stock
                 foreach (var oldItem in order.OrderItems)
                 {
                     if (oldItem.Product != null)
@@ -238,10 +229,8 @@ namespace InventorySystem.Infrastructure.Services
                     }
                 }
 
-                // Remove old items
                 _context.OrderItems.RemoveRange(order.OrderItems);
 
-                // Add new items
                 decimal totalAmount = 0;
                 var newOrderItems = new List<OrderItem>();
 
@@ -299,9 +288,6 @@ namespace InventorySystem.Infrastructure.Services
             }
         }
 
-        // -------------------------
-        // Mapping Order -> DTO
-        // -------------------------
         private static OrderDto MapOrderToDto(Order order)
         {
             return new OrderDto

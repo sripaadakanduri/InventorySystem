@@ -155,7 +155,6 @@ function OrderForm({
             };
 
             if (orderToEdit) {
-                // Update order
                 const result = await updateOrder(
                     orderToEdit.id,
                     payload.items
@@ -167,7 +166,6 @@ function OrderForm({
                     onOrderUpdated(result);
                 }
             } else {
-                // Create order
                 const result = await createOrder(payload);
 
                 setSuccess("Order placed successfully");
