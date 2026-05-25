@@ -1,4 +1,4 @@
-﻿using InventorySystem.Core.Enums;
+﻿using InventorySystem.Common.Enums;
 
 namespace InventorySystem.Core.Entities
 {

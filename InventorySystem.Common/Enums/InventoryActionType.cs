@@ -1,4 +1,4 @@
-﻿namespace InventorySystem.Core.Enums
+﻿namespace InventorySystem.Common.Enums
 {
     public enum InventoryActionType
     {

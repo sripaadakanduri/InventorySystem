@@ -1,8 +1,4 @@
-﻿// ==========================================
-// FILE: InventorySystem.Core/DTOs/OrderDto.cs
-// ==========================================
-
-using InventorySystem.Core.Enums;
+﻿using InventorySystem.Common.Enums;
 
 namespace InventorySystem.Core.DTOs
 {

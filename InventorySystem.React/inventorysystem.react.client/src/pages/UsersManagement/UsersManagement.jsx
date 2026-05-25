@@ -1,6 +1,6 @@
     import { useEffect, useState } from "react";
-    import { getUsers, updateUserRole, createUser } from "../../../services/userService";
-    import Pagination from "../../../components/Pagination/Pagination";
+    import { getUsers, updateUserRole, createUser } from "../../services/userService";
+    import Pagination from "../../components/Pagination/Pagination";
     import { Users, Shield, ShieldOff, Plus, X } from "lucide-react";
 
     const UsersManagement = () => {

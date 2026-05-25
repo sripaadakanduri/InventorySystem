@@ -1,6 +1,6 @@
 ﻿using InventorySystem.Core.DTOs;
 using InventorySystem.Core.Entities;
-using InventorySystem.Core.Enums;
+using InventorySystem.Common.Enums;
 using InventorySystem.Core.Interfaces;
 using InventorySystem.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
@@ -91,9 +91,6 @@ namespace InventorySystem.Infrastructure.Services
             }
         }
 
-        // -------------------------
-        // Get Orders
-        // -------------------------
         public async Task<List<OrderDto>> GetAllOrdersAsync()
         {
             var orders = await _context.Orders

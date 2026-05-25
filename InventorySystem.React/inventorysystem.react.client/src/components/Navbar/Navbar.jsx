@@ -56,8 +56,8 @@ const Navbar = () => {
 
                     <div>
 
-                        <h1 className="text-2xl font-black tracking-[0.1 em] uppercase">
-                            Inventory<span className="text-primary ml-3">System</span>
+                        <h1 className="md:text-2xl text-lg  font-black tracking-[0.1 em] uppercase">
+                            Inventory<span className="text-primary ml-2 md:ml-3">System</span>
                         </h1>
 
                     </div>

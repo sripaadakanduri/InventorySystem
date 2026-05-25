@@ -9,7 +9,7 @@ import Dashboard from "./pages/Dashboard/Dashboard";
 import Products from "./pages/Products/Products";
 import Orders from "./pages/Orders/Orders";
 import Transactions from "./pages/Transactions/Transactions";
-import UsersManagement from "./pages/Admin/UsersManagement/UsersManagement";
+import UsersManagement from "./pages/UsersManagement/UsersManagement";
 
 function App() {
     return (
