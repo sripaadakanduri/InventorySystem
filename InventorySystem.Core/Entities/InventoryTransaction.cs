@@ -8,7 +8,6 @@
 
         public Product? Product { get; set; }
 
-        // FK
         public int UserId { get; set; }
 
         public User? User { get; set; }

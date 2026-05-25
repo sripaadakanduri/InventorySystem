@@ -7,7 +7,7 @@ namespace InventorySystem.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    //[Authorize(Roles = UserRoles.Admin)]
+    [Authorize(Roles = UserRoles.Admin)]
     public class InventoryTransactionsController : ControllerBase
     {
         private readonly IInventoryTransactionService _transactionService;
