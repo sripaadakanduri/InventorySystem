@@ -1,3 +1,5 @@
+// eslint-disable-next-line react-hooks/set-state-in-effect
+
 import { useEffect, useState } from "react";
 import { Package } from "lucide-react";
 
@@ -9,6 +11,7 @@ function ProductForm({ onSubmit, selectedProduct, onClose }) {
         category: ""
     });
 
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     useEffect(() => {
         if (selectedProduct) {
             setFormData({

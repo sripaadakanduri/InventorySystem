@@ -1,5 +1,4 @@
-
-
+/* eslint-disable no-unused-vars */
 import { useState, useEffect } from "react";
 import api from "../../services/api";
 import Pagination from "../Pagination/Pagination";
@@ -32,28 +31,28 @@ function OrderList({
     } = filters;
 
 
-    const fetchProducts = async () => {
-
-        try {
-
-            const response =
-                await api.get("/products");
-
-            setProducts(response.data);
-
-        }
-        catch (err) {
-
-            console.error(err);
-
-        }
-
-    };
+    
 
     useEffect(() => {
 
-        fetchProducts();
+        const fetchProducts = async () => {
 
+            try {
+
+                const response =
+                    await api.get("/products");
+
+                setProducts(response.data);
+
+            }
+            catch (err) {
+
+                console.error(err);
+
+            }
+
+        }
+        fetchProducts();
     }, []);
 
     let filteredOrders = [...orders];

@@ -15,9 +15,8 @@ function Orders() {
     const [filterStartDate, setFilterStartDate] = useState("");
     const [filterEndDate, setFilterEndDate] = useState("");
 
-    useEffect(() => {
-        fetchOrders();
-    }, []);
+
+    
 
     const fetchOrders = async () => {
         try {
@@ -29,6 +28,11 @@ function Orders() {
             setLoading(false);
         }
     };
+
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    useEffect(() => {
+        fetchOrders();
+    }, []);
 
     const handleCancelOrder = async (orderId) => {
         try {

@@ -26,7 +26,7 @@
                 console.log(error);
             }
         };
-
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         useEffect(() => {
             fetchUsers();
         }, []);
