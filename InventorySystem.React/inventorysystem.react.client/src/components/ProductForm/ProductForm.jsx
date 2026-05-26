@@ -1,4 +1,3 @@
-// eslint-disable-next-line react-hooks/set-state-in-effect
 
 import { useEffect, useState } from "react";
 import { Package } from "lucide-react";

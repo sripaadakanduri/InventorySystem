@@ -16,8 +16,6 @@
 
         public DateTime? LastLoginAt { get; set; }
 
-        // Navigation Properties
-
         public ICollection<Order> Orders { get; set; }
             = new List<Order>();
 
