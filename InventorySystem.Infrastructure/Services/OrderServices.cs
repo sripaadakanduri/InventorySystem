@@ -10,16 +10,18 @@ namespace InventorySystem.Service.Services
     public class OrderServices : IOrderService
     {
         private readonly AppDbContext _context;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public OrderServices(AppDbContext context)
+        public OrderServices(AppDbContext context, IUnitOfWork unitOfWork)
         {
             _context = context;
+            _unitOfWork = unitOfWork;
         }
 
    
         public async Task<OrderDto> CreateOrderAsync(CreateOrderDto dto, int userId)
         {
-            using var transaction = await _context.Database.BeginTransactionAsync();
+            using var transaction = await _unitOfWork.BeginTransactionAsync();
 
             try
             {
@@ -79,7 +81,7 @@ namespace InventorySystem.Service.Services
                 order.Status = OrderStatus.Confirmed;
 
                 await _context.Orders.AddAsync(order);
-                await _context.SaveChangesAsync();
+                await _unitOfWork.SaveChangesAsync();
                 await transaction.CommitAsync();
 
                 return await GetOrderByIdAsync(order.Id) ?? throw new Exception("Order creation failed");
@@ -136,7 +138,7 @@ namespace InventorySystem.Service.Services
 
         public async Task<bool> CancelOrderAsync(int orderId, int userId)
         {
-            using var transaction = await _context.Database.BeginTransactionAsync();
+            using var transaction = await _unitOfWork.BeginTransactionAsync();
 
             try
             {
@@ -175,7 +177,7 @@ namespace InventorySystem.Service.Services
                 }
 
                 order.Status = OrderStatus.Cancelled;
-                await _context.SaveChangesAsync();
+                await _unitOfWork.SaveChangesAsync();
                 await transaction.CommitAsync();
 
                 return true;
@@ -190,7 +192,7 @@ namespace InventorySystem.Service.Services
  
         public async Task<OrderDto> UpdateOrderAsync(int orderId, CreateOrderDto dto)
         {
-            using var transaction = await _context.Database.BeginTransactionAsync();
+            using var transaction = await _unitOfWork.BeginTransactionAsync();
 
             try
             {
@@ -273,7 +275,7 @@ namespace InventorySystem.Service.Services
                 order.Status = OrderStatus.Updated;
                 order.UpdatedAt = DateTime.UtcNow;
 
-                await _context.SaveChangesAsync();
+                await _unitOfWork.SaveChangesAsync();
                 await transaction.CommitAsync();
 
                 return MapOrderToDto(order);

@@ -116,8 +116,17 @@ namespace InventorySystem.API.Controllers
         [Authorize(Roles = UserRoles.Admin)]
         public async Task<IActionResult> Delete(int id)
         {
+            var userId = int.Parse(
+                User.FindFirst(ClaimTypes.NameIdentifier)!
+                    .Value
+            );
+
             var deleted =
-                await _service.DeleteProductAsync(id);
+                await _service.DeleteProductAsync
+                (
+                    id,
+                    userId
+                );
 
             if (!deleted)
             {
