@@ -116,9 +116,10 @@ namespace InventorySystem.Service.Services
         }
 
         // Soft delete
-        public async Task<bool> DeleteProductAsync(int id)
+        public async Task<bool> DeleteProductAsync(int id, int userId)
         {
             var product = await _repo.GetByIdAsync(id);
+
             if (product == null) return false;
 
             product.IsDeleted = true;
@@ -126,6 +127,15 @@ namespace InventorySystem.Service.Services
 
             _repo.Update(product);
             await _repo.SaveChangesAsync();
+
+            // Log delete transaction
+            await _transactionService.LogTransactionAsync(
+                product.Id,
+                userId,
+                -product.StockQuantity,
+                0,
+                "Product Deleted"
+            );
 
             return true;
         }
