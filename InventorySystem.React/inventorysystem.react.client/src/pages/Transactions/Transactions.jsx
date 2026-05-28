@@ -72,6 +72,7 @@ const Transactions = () => {
     const getBadgeStyle = (actionType) => {
         if (actionType === "StockIn" || actionType === "ManualAdd") return "bg-green-50 text-green-700 border-green-200";
         if (actionType === "StockOut" || actionType === "ManualRemove") return "bg-red-50 text-red-700 border-red-200";
+        if (actionType === "ProductDeleted") return "bg-rose-50 text-rose-700 border-rose-200";
         if (actionType === "OrderPlaced") return "bg-amber-50 text-amber-700 border-amber-200";
         if (actionType === "OrderCancelled") return "bg-gray-100 text-gray-700 border-gray-200";
         return "bg-blue-50 text-blue-700 border-blue-200";
@@ -141,6 +142,7 @@ const Transactions = () => {
                                         <option value="ManualRemove">ManualRemove</option>
                                         <option value="OrderPlaced">OrderPlaced</option>
                                         <option value="OrderCancelled">OrderCancelled</option>
+                                        <option value="ProductDeleted">ProductDeleted</option>
                                     </select>
                                 </div>
                             </th>
