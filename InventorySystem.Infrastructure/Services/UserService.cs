@@ -8,10 +8,12 @@ namespace InventorySystem.Service.Services
     public class UserService : IUserService
     {
         private readonly AppDbContext _context;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public UserService(AppDbContext context)
+        public UserService(AppDbContext context, IUnitOfWork unitOfWork)
         {
             _context = context;
+            _unitOfWork = unitOfWork;
         }
 
         public async Task<List<UserDto>> GetAllUsersAsync()
@@ -36,7 +38,7 @@ namespace InventorySystem.Service.Services
 
             user.Role = role;
 
-            await _context.SaveChangesAsync();
+            await _unitOfWork.SaveChangesAsync();
 
             return true;
         }

@@ -8,10 +8,12 @@ namespace InventorySystem.Service.Services
     public class InventoryTransactionService : IInventoryTransactionService
     {
         private readonly AppDbContext _context;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public InventoryTransactionService(AppDbContext context)
+        public InventoryTransactionService(AppDbContext context, IUnitOfWork unitOfWork)
         {
             _context = context;
+            _unitOfWork = unitOfWork;
         }
 
         public async Task<IEnumerable<InventoryTransaction>> GetAllTransactionsAsync()
@@ -85,7 +87,7 @@ namespace InventorySystem.Service.Services
             };
 
             await _context.InventoryTransactions.AddAsync(transaction);
-            await _context.SaveChangesAsync();
+            await _unitOfWork.SaveChangesAsync();
         }
     }
 }

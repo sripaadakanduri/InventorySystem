@@ -12,13 +12,13 @@ namespace InventorySystem.Service.Services
     {
         private readonly UserRepository _repo;
         private readonly JwtServices _jwt;
-        private readonly AppDbContext _context;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public AuthService(UserRepository userRepository, JwtServices jwt, AppDbContext context)
+        public AuthService(UserRepository userRepository, JwtServices jwt, IUnitOfWork unitOfWork)
         {
             _repo = userRepository;
             _jwt = jwt;
-            _context = context;
+            _unitOfWork = unitOfWork;
         }
 
         public async Task<AuthResponseDto> RegisterAsync(RegisterDto dto)
@@ -43,6 +43,8 @@ namespace InventorySystem.Service.Services
                 Role = string.IsNullOrEmpty(dto.Role) ? "User" : dto.Role
             };
             await _repo.AddAsync(user);
+            await _unitOfWork.SaveChangesAsync();
+
             var token = _jwt.GenerateToken(user);
             return new AuthResponseDto
             {
@@ -65,7 +67,7 @@ namespace InventorySystem.Service.Services
                 throw new InvalidOperationException("Invalid username or password.");
             }
             user.LastLoginAt = DateTime.UtcNow;
-            await _context.SaveChangesAsync();
+            await _unitOfWork.SaveChangesAsync();
 
             var token = _jwt.GenerateToken(user);
             return new AuthResponseDto

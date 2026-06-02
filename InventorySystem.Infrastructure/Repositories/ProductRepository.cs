@@ -44,10 +44,5 @@ using Microsoft.EntityFrameworkCore;
         {
             _context.Products.Remove(product); 
         }
-
-        public async Task SaveChangesAsync()
-        {
-            await _context.SaveChangesAsync();
-        }
     }
 }

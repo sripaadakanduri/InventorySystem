@@ -1,4 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import Navbar from "./components/Navbar/Navbar";
 import ProtectedRoute from "./utils/ProtectedRoute";
 import PublicRoute from "./utils/PublicRoute";
@@ -15,6 +17,7 @@ function App() {
     return (
         <BrowserRouter>
             <Navbar />
+            <ToastContainer position="top-right" autoClose={2500} />
             <Routes>
                 <Route path="/" element={<Navigate to="/dashboard" replace />} />
 

@@ -110,16 +110,21 @@
             }
 
 
-            [HttpDelete("{id}")]
-            [Authorize(Roles = UserRoles.Admin)]
-            public async Task<IActionResult> Delete(int id)
-            {
-                var userId = int.Parse(
-                    User.FindFirst(ClaimTypes.NameIdentifier)!.Value
-                );
+        [HttpDelete("{id}")]
+        [Authorize(Roles = UserRoles.Admin)]
+        public async Task<IActionResult> Delete(int id)
+        {
+            var userId = int.Parse(
+                User.FindFirst(ClaimTypes.NameIdentifier)!
+                    .Value
+            );
 
-                var deleted =
-                    await _service.DeleteProductAsync(id, userId);
+            var deleted =
+                await _service.DeleteProductAsync
+                (
+                    id,
+                    userId
+                );
 
                 if (!deleted)
                 {
@@ -129,10 +134,11 @@
                     });
                 }
 
-                return Ok(new
-                {
-                    message = "Product deleted successfully"
-                });
-            }
+            return Ok(new
+            {
+                message =
+                    "Product deleted successfully"
+            });
         }
     }
+}

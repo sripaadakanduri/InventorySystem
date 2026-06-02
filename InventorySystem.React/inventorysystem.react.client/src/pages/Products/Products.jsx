@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { FaPlus } from "react-icons/fa";
+import { toast } from "react-toastify";
 
 import ProductForm from "../../components/ProductForm/ProductForm";
 import ProductTable from "../../components/ProductTable/ProductTable";
@@ -23,6 +24,15 @@ function Products() {
     const [showForm, setShowForm] =
         useState(false);
 
+    const [isLoading, setIsLoading] =
+        useState(true);
+
+    const [deletingProductId, setDeletingProductId] =
+        useState(null);
+
+    const [productPendingDelete, setProductPendingDelete] =
+        useState(null);
+
     const [filters, setFilters] = useState({
         name: "",
         priceSort: "",
@@ -36,6 +46,8 @@ function Products() {
 
         try {
 
+            setIsLoading(true);
+
             const data = await getProducts();
 
             setProducts(data);
@@ -43,6 +55,10 @@ function Products() {
         } catch (error) {
 
             console.log(error);
+            toast.error("Unable to load products.");
+        } finally {
+
+            setIsLoading(false);
         }
     };
 
@@ -61,10 +77,12 @@ function Products() {
                     selectedProduct.id,
                     formData
                 );
+                toast.success("Product updated successfully.");
 
             } else {
 
                 await createProduct(formData);
+                toast.success("Product created successfully.");
             }
 
             setSelectedProduct(null);
@@ -76,27 +94,37 @@ function Products() {
         } catch (error) {
 
             console.log(error);
+            toast.error("Unable to save product.");
         }
     };
 
-    const handleDelete = async (id) => {
+    const handleDeleteRequest = (product) => {
 
-        const confirmDelete =
-            window.confirm(
-                "Are you sure you want to delete this product?"
-            );
+        setProductPendingDelete(product);
+    };
 
-        if (!confirmDelete) return;
+    const handleDeleteConfirm = async () => {
+
+        if (!productPendingDelete) return;
 
         try {
 
-            await deleteProduct(id);
+            setDeletingProductId(productPendingDelete.id);
+
+            await deleteProduct(productPendingDelete.id);
 
             await fetchProducts();
+
+            toast.success("Product deleted and transaction recorded.");
+            setProductPendingDelete(null);
 
         } catch (error) {
 
             console.log(error);
+            toast.error("Unable to delete product.");
+        } finally {
+
+            setDeletingProductId(null);
         }
     };
 
@@ -204,8 +232,40 @@ function Products() {
                 filters={filters}
                 onFilterChange={handleFilterChange}
                 onEdit={handleEdit}
-                onDelete={handleDelete}
+                onDelete={handleDeleteRequest}
+                deletingProductId={deletingProductId}
+                isLoading={isLoading}
             />
+
+            {productPendingDelete && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
+                    <div className="w-full max-w-md rounded-2xl border border-gray-200 bg-white p-6 shadow-2xl">
+                        <h2 className="text-xl font-bold text-gray-900">
+                            Delete product?
+                        </h2>
+                        <p className="mt-2 text-sm text-gray-600">
+                            {productPendingDelete.name} will be removed from active inventory and a ProductDeleted transaction will be recorded.
+                        </p>
+
+                        <div className="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+                            <button
+                                className="rounded-xl border border-gray-300 px-4 py-2 font-medium text-gray-700 transition hover:bg-gray-100"
+                                onClick={() => setProductPendingDelete(null)}
+                                disabled={deletingProductId === productPendingDelete.id}
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                className="rounded-xl bg-red-600 px-4 py-2 font-medium text-white transition hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-60"
+                                onClick={handleDeleteConfirm}
+                                disabled={deletingProductId === productPendingDelete.id}
+                            >
+                                {deletingProductId === productPendingDelete.id ? "Deleting..." : "Delete"}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
 
         </div>
     );

@@ -19,6 +19,9 @@ namespace InventorySystem.Service.Interfaces
             int userId
         );
 
-        Task<bool> DeleteProductAsync(int id, int userId);
+        Task<bool> DeleteProductAsync(
+            int id,
+            int userId
+        );
     }
 }

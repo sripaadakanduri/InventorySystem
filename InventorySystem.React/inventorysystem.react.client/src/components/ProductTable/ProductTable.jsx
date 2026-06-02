@@ -8,7 +8,9 @@ function ProductTable({
     filters,
     onFilterChange,
     onEdit,
-    onDelete
+    onDelete,
+    deletingProductId,
+    isLoading
 }) {
     const [currentPage, setCurrentPage] = useState(1);
     const [pageSize, setPageSize] = useState(10);
@@ -74,7 +76,13 @@ function ProductTable({
                     </tr>
                 </thead>
                 <tbody>
-                    {currentProducts.length > 0 ? (
+                    {isLoading ? (
+                        <tr>
+                            <td colSpan={role === "ADMIN" ? 5 : 4} className="p-8 text-center text-gray-500 text-lg">
+                                Loading products...
+                            </td>
+                        </tr>
+                    ) : currentProducts.length > 0 ? (
                         currentProducts.map((product) => (
                             <tr key={product.id} className="border-b border-gray-200 hover:bg-gray-100 hover:translate-x-0.5 hover:cursor-pointer transform transition duration-200">
                                 <td className="p-4 font-medium text-gray-900 text-center">{product.name}</td>
@@ -98,7 +106,9 @@ function ProductTable({
                                                 <Pencil className="w-5 h-5" />
                                             </button>
                                             <button
-                                                className="inline-flex items-center text-red-600 hover:text-white hover:scale-120 bg-red-50 hover:bg-red-600 border border-red-200 hover:border-red-600 p-2 rounded-lg transform transition-transform duration-200 shadow-sm"                                                onClick={() => onDelete(product.id)}
+                                                className="inline-flex items-center text-red-600 hover:text-white hover:scale-120 bg-red-50 hover:bg-red-600 border border-red-200 hover:border-red-600 p-2 rounded-lg transform transition-transform duration-200 shadow-sm disabled:opacity-50 disabled:hover:scale-100 disabled:cursor-not-allowed"
+                                                onClick={() => onDelete(product)}
+                                                disabled={deletingProductId === product.id}
                                                 title="Delete Product"
                                             >
                                                 <Trash2 className="w-5 h-5" />

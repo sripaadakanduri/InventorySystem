@@ -23,8 +23,6 @@ export const getProductById = async (id) => {
 export const createProduct = async (product) => {
   try {
       const response = await api.post(`/products`, product);
-      alert("Product updated successfully");
-
     return response.data;
   } catch (error) {
     console.error("Error creating product:", error);
@@ -46,7 +44,6 @@ export const updateProduct = async (id, product) => {
 export const deleteProduct = async (id) => {
   try {
       const response = await api.delete(`/products/${id}`);
-      alert("Product deleted Successfully")
     return response.data;
   } catch (error) {
     console.error("Error deleting product:", error);
