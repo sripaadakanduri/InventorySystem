@@ -140,14 +140,20 @@ namespace InventorySystem.API.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetOrders()
+        public async Task<IActionResult> GetOrders(
+            [FromQuery] OrderFilterDto filter
+        )
         {
             var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
             var role = User.FindFirst(ClaimTypes.Role)!.Value;
 
             bool isAdmin = role == UserRoles.Admin;
 
-            var orders = await _orderService.GetOrdersByUserAsync(userId, isAdmin);
+            var orders = await _orderService.GetOrdersByUserAsync(
+                userId,
+                isAdmin,
+                filter
+            );
 
             return Ok(orders);
         }

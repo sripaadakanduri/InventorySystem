@@ -1,7 +1,10 @@
 import api from './api';
 
-const getTransactions = async () => {
-    const response = await api.get('/InventoryTransactions');
+const getTransactions = async (filters = {}) => {
+    const response = await api.get('/InventoryTransactions', {
+        params: filters
+    });
+
     return response.data;
 };
 

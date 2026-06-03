@@ -1,8 +1,8 @@
-/* eslint-disable no-unused-vars */
 import { useEffect, useState } from "react";
+import { toast } from "react-toastify";
 import OrderList from "../../components/OrderList/OrderList";
 import OrderForm from "../../components/OrderForm/OrderForm";
-import { getAllOrders, cancelOrder, updateOrder } from "../../services/ordersService";
+import { getAllOrders, cancelOrder } from "../../services/ordersService";
 // import "./Orders.css";
 
 function Orders() {
@@ -10,20 +10,26 @@ function Orders() {
     const [loading, setLoading] = useState(true);
     const [orderToEdit, setOrderToEdit] = useState(null);
 
-    const [filterUser, setFilterUser] = useState("");
-    const [filterStatus, setFilterStatus] = useState("");
-    const [filterStartDate, setFilterStartDate] = useState("");
-    const [filterEndDate, setFilterEndDate] = useState("");
+    const [filters, setFilters] = useState({
+        user: "",
+        status: "",
+        startDate: "",
+        endDate: ""
+    });
 
 
     
 
-    const fetchOrders = async () => {
+    const fetchOrders = async (activeFilters = filters) => {
         try {
-            const data = await getAllOrders();
+            setLoading(true);
+
+            const data = await getAllOrders(activeFilters);
+
             setOrders(data);
         } catch (err) {
             console.error(err);
+            toast.error("Failed to load orders.");
         } finally {
             setLoading(false);
         }
@@ -34,24 +40,43 @@ function Orders() {
         fetchOrders();
     }, []);
 
+    const handleFilterChange = (e) => {
+        setFilters({
+            ...filters,
+            [e.target.name]: e.target.value
+        });
+    };
+
+    const handleFilterApply = () => {
+        fetchOrders(filters);
+    };
+
+    const handleInstantFilterChange = (e) => {
+        const updatedFilters = {
+            ...filters,
+            [e.target.name]: e.target.value
+        };
+
+        setFilters(updatedFilters);
+        fetchOrders(updatedFilters);
+    };
+    const handleKeyDown = (e) => {
+        if (e.key === "Enter") {
+            e.preventDefault();
+            handleFilterApply();
+        }
+    }
     const handleCancelOrder = async (orderId) => {
         try {
             setOrders(prev => prev.map(o => o.id === orderId ? { ...o, status: 4 } : o));
             await cancelOrder(orderId);
+            toast.success("Order cancelled successfully.");
         } catch (err) {
             console.error(err);
-            alert("Failed to cancel order");
-            fetchOrders();
+            toast.error("Failed to cancel order.");
+            fetchOrders(filters);
         }
     };
-
-    const filteredOrders = orders.filter(o => {
-        let userMatch = filterUser ? o.username.toLowerCase().includes(filterUser.toLowerCase()) : true;
-        let statusMatch = filterStatus ? o.status.toString() === filterStatus : true;
-        let startMatch = filterStartDate ? new Date(o.createdAt) >= new Date(filterStartDate) : true;
-        let endMatch = filterEndDate ? new Date(o.createdAt) <= new Date(filterEndDate) : true;
-        return userMatch && statusMatch && startMatch && endMatch;
-    });
 
     return (
         <div className="w-full max-w-7xl mx-auto flex flex-col gap-6 p-4 sm:p-6">
@@ -64,11 +89,9 @@ function Orders() {
             <div className="bg-white p-6 rounded-3xl border border-gray-200 shadow-lg">
                 <OrderForm
                     orderToEdit={orderToEdit}
-                    onOrderCreated={(newOrder) =>
-                        setOrders(prev => [newOrder, ...prev])
-                    }
-                    onOrderUpdated={(updatedOrder) => {
-                        setOrders(prev => prev.map(o => (o.id === updatedOrder.id ? updatedOrder : o)));
+                    onOrderCreated={() => fetchOrders(filters)}
+                    onOrderUpdated={() => {
+                        fetchOrders(filters);
                         setOrderToEdit(null);
                     }}
                     onCancelEdit={() => {
@@ -78,25 +101,27 @@ function Orders() {
             </div>
 
             {loading ? (
-                <p>Loading orders...</p>
+                <div className="flex items-center justify-center bg-transparent">
+                    <div className="relative flex gap-2">
+                        <div className="w-3 h-3 rounded-full bg-blue-400 animate-bounce"></div>
+                        <div className="w-3 h-3 rounded-full bg-blue-400 animate-bounce [animation-delay:0.15s]"></div>
+                        <div className="w-3 h-3 rounded-full bg-blue-400 animate-bounce [animation-delay:0.3s]"></div>
+                        <div className="w-3 h-3 rounded-full bg-blue-400 animate-bounce [animation-delay:0.45s]"></div>
+                    </div>
+                </div>
             ) : (
                 <OrderList
-                    orders={filteredOrders}
+                    orders={orders}
                     onCancelOrder={handleCancelOrder}
                     onSelectForEdit={(order) => {
                         setOrderToEdit(order);
                         window.scrollTo({ top: 0, behavior: "smooth" });
                     }}
-                    filters={{
-                        filterUser,
-                        setFilterUser,
-                        filterStatus,
-                        setFilterStatus,
-                        filterStartDate,
-                        setFilterStartDate,
-                        filterEndDate,
-                        setFilterEndDate
-                    }}
+                    filters={filters}
+                    onFilterChange={handleFilterChange}
+                    onFilterApply={handleFilterApply}
+                    onKeyDown={handleKeyDown}
+                    onInstantFilterChange={handleInstantFilterChange}
                 />
             )}
         </div>

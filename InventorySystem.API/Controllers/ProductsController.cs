@@ -21,10 +21,12 @@
 
 
             [HttpGet]
-            public async Task<IActionResult> GetAll()
+            public async Task<IActionResult> GetAll(
+                [FromQuery] ProductFilterDto filter
+            )
             {
                 var products =
-                    await _service.GetAllProductsAsync();
+                    await _service.GetAllProductsAsync(filter);
 
                 return Ok(products);
             }

@@ -15,9 +15,12 @@ namespace InventorySystem.Service.Services
             _transactionService = transactionService;
         }
 
-        public async Task<IEnumerable<ProductDto>> GetAllProductsAsync()
+        public async Task<IEnumerable<ProductDto>> GetAllProductsAsync(
+            ProductFilterDto? filter = null
+        )
         {
-            var products = await _unitOfWork.Products.GetAllAsync();
+            var products = await _unitOfWork.Products.GetAllAsync(filter);
+
             return products.Select(p => new ProductDto
             {
                 Id = p.Id,

@@ -154,7 +154,7 @@ const Navbar = () => {
                                     : "U"}
                             </div>
 
-                            <div class="">
+                            <div>
 
                                 <h1 className="text-lg font-semibold">
                                     {username.charAt(0).toUpperCase() + username.slice(1)}

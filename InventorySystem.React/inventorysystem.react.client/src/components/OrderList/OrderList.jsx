@@ -1,14 +1,18 @@
-/* eslint-disable no-unused-vars */
 import { useState, useEffect } from "react";
 import api from "../../services/api";
 import Pagination from "../Pagination/Pagination";
+import TableSkeleton from "../TableSkeleton/TableSkeleton";
 // import "./OrderList.css";
 
 function OrderList({
     orders,
     onCancelOrder,
     onSelectForEdit,
-    filters
+    filters,
+    onFilterChange,
+    onKeyDown,
+    onInstantFilterChange,
+    isLoading
 }) {
 
     const [selectedOrder, setSelectedOrder] = useState(null);
@@ -19,20 +23,7 @@ function OrderList({
 
     const [pageSize, setPageSize] =
         useState(10);
-    const {
-        filterUser,
-        setFilterUser,
-        filterStatus,
-        setFilterStatus,
-        filterStartDate,
-        setFilterStartDate,
-        filterEndDate,
-        setFilterEndDate
-    } = filters;
-
-
     
-
     useEffect(() => {
 
         const fetchProducts = async () => {
@@ -55,70 +46,9 @@ function OrderList({
         fetchProducts();
     }, []);
 
-    let filteredOrders = [...orders];
-
-    if (filterUser) {
-
-        filteredOrders =
-            filteredOrders.filter(order =>
-                order.username
-                    .toLowerCase()
-                    .includes(
-                        filterUser.toLowerCase()
-                    )
-            );
-
-    }
-
-    if (filterStatus) {
-
-        filteredOrders =
-            filteredOrders.filter(order =>
-                String(order.status) === filterStatus
-            );
-
-    }
-
-    if (filterStartDate) {
-
-        filteredOrders =
-            filteredOrders.filter(order => {
-
-                const orderDate =
-                    new Date(order.createdAt);
-
-                const startDate =
-                    new Date(filterStartDate);
-
-                return orderDate >= startDate;
-
-            });
-
-    }
-
-    if (filterEndDate) {
-
-        filteredOrders =
-            filteredOrders.filter(order => {
-
-                const orderDate =
-                    new Date(order.createdAt);
-
-                const endDate =
-                    new Date(filterEndDate);
-
-                endDate.setHours(
-                    23,
-                    59,
-                    59,
-                    999
-                );
-
-                return orderDate <= endDate;
-
-            });
-
-    }
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [orders]);
 
     const indexOfLastOrder =
         currentPage * pageSize;
@@ -127,37 +57,12 @@ function OrderList({
         indexOfLastOrder - pageSize;
 
     const currentOrders =
-        filteredOrders.slice(
+        orders.slice(
             indexOfFirstOrder,
             indexOfLastOrder
         );
 
 
-
-    const getStatusClass = (status) => {
-
-        switch (status) {
-
-            case 1:
-                return "pending";
-
-            case 2:
-                return "confirmed";
-
-            case 3:
-                return "failed";
-
-            case 4:
-                return "cancelled";
-            case 5:
-                return "Updated";
-
-            default:
-                return "";
-
-        }
-
-    };
 
     const getStatusText = (status) => {
 
@@ -214,11 +119,11 @@ function OrderList({
                             <div className="flex justify-center">
                                 <input
                                     type="text"
+                                    name="user"
                                     placeholder="Filter User..."
-                                    value={filterUser}
-                                    onChange={(e) =>
-                                        setFilterUser(e.target.value)
-                                    }
+                                    value={filters.user}
+                                    onChange={onFilterChange}
+                                    onKeyDown={onKeyDown}
                                     className="border border-gray-300 rounded-lg px-3 py-2 text-sm font-normal focus:outline-none focus:ring-2 focus:ring-blue-400 w-32"
                                 />
                             </div>
@@ -228,10 +133,9 @@ function OrderList({
                         <th className="p-2 px-4">
                             <div className="flex justify-center">
                                 <select
-                                    value={filterStatus}
-                                    onChange={(e) =>
-                                        setFilterStatus(e.target.value)
-                                    }
+                                    name="status"
+                                    value={filters.status}
+                                    onChange={onInstantFilterChange}
                                     className="border border-gray-300 rounded-lg px-3 py-2 text-sm font-normal focus:outline-none focus:ring-2 focus:ring-blue-400 w-32"
                                 >
                                     <option value="">All Statuses</option>
@@ -247,18 +151,17 @@ function OrderList({
                             <div className="flex flex-col gap-2 justify-center items-center">
                                 <input
                                     type="date"
-                                    value={filterStartDate}
-                                    onChange={(e) =>
-                                        setFilterStartDate(e.target.value)
-                                    }
+                                    name="startDate"
+                                    value={filters.startDate}
+                                    onChange={onInstantFilterChange}                                    
+                                    onKeyDown={onKeyDown}
                                     className="border border-gray-300 rounded-lg px-2 py-1 text-sm font-normal focus:outline-none focus:ring-2 focus:ring-blue-400 w-full max-w-[140px]"
                                 />
                                 <input
                                     type="date"
-                                    value={filterEndDate}
-                                    onChange={(e) =>
-                                        setFilterEndDate(e.target.value)
-                                    }
+                                    name="endDate"
+                                    value={filters.endDate}
+                                    onChange={onInstantFilterChange}
                                     className="border border-gray-300 rounded-lg px-2 py-1 text-sm font-normal focus:outline-none focus:ring-2 focus:ring-blue-400 w-full max-w-[140px]"
                                 />
                             </div>
@@ -268,7 +171,9 @@ function OrderList({
 
                 <tbody>
 
-                    {currentOrders.length > 0 ? (
+                    {isLoading ? (
+                        <TableSkeleton columns={5} />
+                    ) : currentOrders.length > 0 ? (
 
                         currentOrders.map((order) => (
 

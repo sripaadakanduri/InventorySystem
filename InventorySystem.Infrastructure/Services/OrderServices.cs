@@ -118,7 +118,11 @@ namespace InventorySystem.Service.Services
             return MapOrderToDto(order);
         }
 
-        public async Task<List<OrderDto>> GetOrdersByUserAsync(int userId, bool isAdmin)
+        public async Task<List<OrderDto>> GetOrdersByUserAsync(
+            int userId,
+            bool isAdmin,
+            OrderFilterDto? filter = null
+        )
         {
             IQueryable<Order> query = _context.Orders
                 .Include(o => o.User)
@@ -128,6 +132,44 @@ namespace InventorySystem.Service.Services
             if (!isAdmin)
             {
                 query = query.Where(o => o.UserId == userId);
+            }
+
+            if (filter != null)
+            {
+                if (!string.IsNullOrWhiteSpace(filter.User))
+                {
+                    var username = filter.User.Trim().ToLower();
+
+                    query = query.Where(o =>
+                        o.User != null &&
+                        o.User.Username.ToLower().Contains(username)
+                    );
+                }
+
+                if (filter.Status.HasValue)
+                {
+                    query = query.Where(o =>
+                        (int)o.Status == filter.Status.Value
+                    );
+                }
+
+                if (filter.StartDate.HasValue)
+                {
+                    var startDate = filter.StartDate.Value.Date;
+
+                    query = query.Where(o =>
+                        o.CreatedAt >= startDate
+                    );
+                }
+
+                if (filter.EndDate.HasValue)
+                {
+                    var endDate = filter.EndDate.Value.Date.AddDays(1);
+
+                    query = query.Where(o =>
+                        o.CreatedAt < endDate
+                    );
+                }
             }
 
             var orders = await query.OrderByDescending(o => o.CreatedAt).ToListAsync();

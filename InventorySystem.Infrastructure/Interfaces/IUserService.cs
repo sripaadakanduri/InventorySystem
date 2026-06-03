@@ -1,10 +1,11 @@
-﻿using InventorySystem.Core.DTOs.Users;
+﻿using InventorySystem.Core.DTOs;
+using InventorySystem.Core.DTOs.Users;
 
 namespace InventorySystem.Service.Interfaces
 {
     public interface IUserService
     {
-        Task<List<UserDto>> GetAllUsersAsync();
+        Task<List<UserDto>> GetAllUsersAsync(UserFilterDto? filter = null);
 
         Task<bool> UpdateUserRoleAsync(int userId, string role);
     }

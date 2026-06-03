@@ -1,4 +1,5 @@
-﻿using InventorySystem.Core.Entities;
+using InventorySystem.Core.DTOs;
+using InventorySystem.Core.Entities;
 using InventorySystem.Service.Data;
 using InventorySystem.Service.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -10,17 +11,75 @@ namespace InventorySystem.Service.Services
         private readonly AppDbContext _context;
         private readonly IUnitOfWork _unitOfWork;
 
-        public InventoryTransactionService(AppDbContext context, IUnitOfWork unitOfWork)
+        public InventoryTransactionService(
+            AppDbContext context,
+            IUnitOfWork unitOfWork
+        )
         {
             _context = context;
             _unitOfWork = unitOfWork;
         }
 
-        public async Task<IEnumerable<InventoryTransaction>> GetAllTransactionsAsync()
+        public async Task<IEnumerable<InventoryTransaction>> GetAllTransactionsAsync(
+            InventoryTransactionFilterDto? filter = null
+        )
         {
-            return await _context.InventoryTransactions
+            var query = _context.InventoryTransactions
                 .Include(t => t.Product)
                 .Include(t => t.User)
+                .AsQueryable();
+
+            if (filter != null)
+            {
+                if (!string.IsNullOrWhiteSpace(filter.Username))
+                {
+                    var username = filter.Username.Trim().ToLower();
+
+                    query = query.Where(t =>
+                        t.User != null &&
+                        t.User.Username.ToLower().Contains(username)
+                    );
+                }
+
+                if (!string.IsNullOrWhiteSpace(filter.Product))
+                {
+                    var product = filter.Product.Trim().ToLower();
+
+                    query = query.Where(t =>
+                        t.Product != null &&
+                        t.Product.Name.ToLower().Contains(product)
+                    );
+                }
+
+                if (!string.IsNullOrWhiteSpace(filter.ActionType))
+                {
+                    var actionType = filter.ActionType.Trim().ToLower();
+
+                    query = query.Where(t =>
+                        t.ActionType.ToLower() == actionType
+                    );
+                }
+
+                if (filter.StartDate.HasValue)
+                {
+                    var startDate = filter.StartDate.Value.Date;
+
+                    query = query.Where(t =>
+                        t.CreatedAt >= startDate
+                    );
+                }
+
+                if (filter.EndDate.HasValue)
+                {
+                    var endDate = filter.EndDate.Value.Date.AddDays(1);
+
+                    query = query.Where(t =>
+                        t.CreatedAt < endDate
+                    );
+                }
+            }
+
+            return await query
                 .OrderByDescending(t => t.CreatedAt)
                 .Select(t => new InventoryTransaction
                 {
@@ -37,7 +96,9 @@ namespace InventorySystem.Service.Services
                 .ToListAsync();
         }
 
-        public async Task<IEnumerable<InventoryTransaction>> GetTransactionsByProductIdAsync(int productId)
+        public async Task<IEnumerable<InventoryTransaction>> GetTransactionsByProductIdAsync(
+            int productId
+        )
         {
             return await _context.InventoryTransactions
                 .Include(t => t.Product)
@@ -68,13 +129,25 @@ namespace InventorySystem.Service.Services
         )
         {
             if (string.IsNullOrWhiteSpace(actionType))
+            {
                 throw new ArgumentException("ActionType is required");
+            }
 
-            var productExists = await _context.Products.AnyAsync(p => p.Id == productId);
-            var userExists = await _context.Users.AnyAsync(u => u.Id == userId);
+            var productExists =
+                await _context.Products.AnyAsync(p => p.Id == productId);
 
-            if (!productExists) throw new Exception($"Product {productId} does not exist");
-            if (!userExists) throw new Exception($"User {userId} does not exist");
+            var userExists =
+                await _context.Users.AnyAsync(u => u.Id == userId);
+
+            if (!productExists)
+            {
+                throw new Exception($"Product {productId} does not exist");
+            }
+
+            if (!userExists)
+            {
+                throw new Exception($"User {userId} does not exist");
+            }
 
             var transaction = new InventoryTransaction
             {

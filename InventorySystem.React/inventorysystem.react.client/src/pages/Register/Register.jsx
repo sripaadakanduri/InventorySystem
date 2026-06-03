@@ -1,4 +1,5 @@
 import { useState } from "react";
+import InlineNotification from "../../components/InlineNotification/InlineNotification";
 import useAuth from "../../hooks/useAuth";
 import { Link } from "react-router-dom";
 import { validateRegister } from "../../validators/authValidator";
@@ -15,6 +16,7 @@ export default function Register() {
     const [loading, setLoading] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
     const [showReqs, setShowReqs] = useState(false);
+    const [notification, setNotification] = useState(null);
 
     const passwordReqs = [
         { label: "At least 8 characters", met: form.password.length >= 8 },
@@ -33,19 +35,20 @@ export default function Register() {
         }
         setErrors({});
         setLoading(true);
+        setNotification(null);
         try {
             await handleRegister(form);
+            setNotification({
+                type: "success",
+                message: "Registration successful. Redirecting to login..."
+            });
         } catch (err) {
             const data = err?.response?.data;
             const message = data?.message || (typeof data === 'string' ? data : "Registration failed");
-            
-            if (message.toLowerCase().includes("email")) {
-                setErrors({ email: message });
-            } else if (message.toLowerCase().includes("username")) {
-                setErrors({ username: message });
-            } else {
-                setErrors({ general: message });
-            }
+            setNotification({
+                type: "error",
+                message
+            });
         } finally {
             setLoading(false);
         }
@@ -62,13 +65,12 @@ export default function Register() {
                     <p className="text-gray-500 mt-2">Join us and manage your inventory seamlessly.</p>
                 </div>
 
-                <form onSubmit={submit} className="space-y-5" noValidate>
-                    {errors.general && (
-                        <div className="bg-red-50 text-red-600 p-4 rounded-xl text-sm font-medium border border-red-100 text-center">
-                            {errors.general}
-                        </div>
-                    )}
+                <InlineNotification
+                    notification={notification}
+                    onClose={() => setNotification(null)}
+                />
 
+                <form onSubmit={submit} className="space-y-5" noValidate>
                     <div className="space-y-1">
                         <label className="text-sm font-semibold text-gray-700">Username</label>
                         <div className="relative">

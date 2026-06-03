@@ -20,6 +20,10 @@ namespace InventorySystem.Service.Interfaces
         );
         Task<OrderDto> UpdateOrderAsync(int orderId, CreateOrderDto dto);
 
-        Task<List<OrderDto>> GetOrdersByUserAsync(int userId, bool isAdmin);
+        Task<List<OrderDto>> GetOrdersByUserAsync(
+            int userId,
+            bool isAdmin,
+            OrderFilterDto? filter = null
+        );
     }
 }

@@ -4,7 +4,9 @@ namespace InventorySystem.Service.Interfaces
 {
     public interface IProductService
     {
-        Task<IEnumerable<ProductDto>> GetAllProductsAsync();
+        Task<IEnumerable<ProductDto>> GetAllProductsAsync(
+            ProductFilterDto? filter = null
+        );
 
         Task<ProductDto?> GetProductByIdAsync(int id);
 

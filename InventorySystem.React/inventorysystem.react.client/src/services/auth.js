@@ -10,7 +10,6 @@ export const login = async (data) => {
 
 export const register = async (data) => {
     const res = await API.post("/Auth/register", data);
-    alert("User registered successfully!");
     return res.data;
 };
 
@@ -26,8 +25,37 @@ export const logout = () => {
     localStorage.removeItem("username");
 };
 
+const decodeJwtPayload = (token) => {
+    try {
+        const base64Url = token.split(".")[1];
+        const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
+        const payload = atob(base64);
+
+        return JSON.parse(payload);
+    } catch {
+        return null;
+    }
+};
+
+export const isTokenExpired = (token) => {
+    const payload = decodeJwtPayload(token);
+
+    if (!payload?.exp) {
+        return true;
+    }
+
+    return Date.now() >= payload.exp * 1000;
+};
+
 export const getToken = () => {
-    return localStorage.getItem("token");
+    const token = localStorage.getItem("token");
+
+    if (token && isTokenExpired(token)) {
+        logout();
+        return null;
+    }
+
+    return token;
 };
 
 export const getRole = () => {
@@ -39,5 +67,5 @@ export const getUsername = () => {
 };
 
 export const isAuthenticated = () => {
-    return !!localStorage.getItem("token");
+    return !!getToken();
 };

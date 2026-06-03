@@ -2,6 +2,7 @@
 using InventorySystem.Service.Interfaces;
 using InventorySystem.Service.Data;
 using Microsoft.EntityFrameworkCore;
+using InventorySystem.Core.DTOs;
 
 namespace InventorySystem.Service.Services
 {
@@ -16,9 +17,29 @@ namespace InventorySystem.Service.Services
             _unitOfWork = unitOfWork;
         }
 
-        public async Task<List<UserDto>> GetAllUsersAsync()
+        public async Task<List<UserDto>> GetAllUsersAsync(UserFilterDto? filter = null)
         {
-            return await _context.Users
+            var query = _context.Users.AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(filter?.User))
+            {
+                var username = filter.User.Trim().ToLower();
+
+                query = query.Where(u =>
+                    u.Username.ToLower().Contains(username)
+                );
+            }
+
+            if (!string.IsNullOrWhiteSpace(filter?.Role))
+            {
+                var role = filter.Role.Trim().ToLower();
+
+                query = query.Where(u =>
+                    u.Role.ToLower() == role
+                );
+            }
+
+            return await query
                 .Select(u => new UserDto
                 {
                     Id = u.Id,

@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Pagination from "../Pagination/Pagination";
+import TableSkeleton from "../TableSkeleton/TableSkeleton";
 import { Pencil, Trash2 } from "lucide-react";
 
 function ProductTable({
@@ -7,13 +8,20 @@ function ProductTable({
     role,
     filters,
     onFilterChange,
+    onPriceSortChange,
     onEdit,
     onDelete,
     deletingProductId,
-    isLoading
+    isLoading,
+    onKeyDown,
+    onFilterApply
 }) {
     const [currentPage, setCurrentPage] = useState(1);
     const [pageSize, setPageSize] = useState(10);
+
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [products]);
 
     const indexOfLastProduct = currentPage * pageSize;
     const indexOfFirstProduct = indexOfLastProduct - pageSize;
@@ -41,6 +49,7 @@ function ProductTable({
                                     placeholder="Filter Name..."
                                     value={filters.name}
                                     onChange={onFilterChange}
+                                    onKeyDown={onKeyDown}
                                     className="border border-gray-300 rounded-lg px-3 py-2 text-sm font-normal focus:outline-none focus:ring-2 focus:ring-blue-400 w-32"
                                 />
                             </div>
@@ -50,7 +59,7 @@ function ProductTable({
                                 <select
                                     name="priceSort"
                                     value={filters.priceSort}
-                                    onChange={onFilterChange}
+                                    onChange={onPriceSortChange}
                                     className="border border-gray-300 rounded-lg px-3 py-2 text-sm font-normal focus:outline-none focus:ring-2 focus:ring-blue-400 w-32"
                                 >
                                     <option value="">Sort Price</option>
@@ -67,6 +76,7 @@ function ProductTable({
                                     placeholder="Filter Category..."
                                     value={filters.category}
                                     onChange={onFilterChange}
+                                    onKeyDown={onKeyDown}
                                     className="border border-gray-300 rounded-lg px-3 py-2 text-sm font-normal focus:outline-none focus:ring-2 focus:ring-blue-400 w-32"
                                 />
                             </div>
@@ -77,11 +87,7 @@ function ProductTable({
                 </thead>
                 <tbody>
                     {isLoading ? (
-                        <tr>
-                            <td colSpan={role === "ADMIN" ? 5 : 4} className="p-8 text-center text-gray-500 text-lg">
-                                Loading products...
-                            </td>
-                        </tr>
+                        <TableSkeleton columns={role === "ADMIN" ? 5 : 4} />
                     ) : currentProducts.length > 0 ? (
                         currentProducts.map((product) => (
                             <tr key={product.id} className="border-b border-gray-200 hover:bg-gray-100 hover:translate-x-0.5 hover:cursor-pointer transform transition duration-200">

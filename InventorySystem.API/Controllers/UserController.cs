@@ -3,6 +3,7 @@ using InventorySystem.Common.Enums;
 using InventorySystem.Service.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using InventorySystem.Core.DTOs;
 
 namespace InventorySystem.API.Controllers
 {
@@ -20,9 +21,11 @@ namespace InventorySystem.API.Controllers
 
         [HttpGet]
         [AllowAnonymous]
-        public async Task<IActionResult> GetAllUsers()
+        public async Task<IActionResult> GetAllUsers(
+        [FromQuery] UserFilterDto filter
+        )
         {
-            var users = await _userService.GetAllUsersAsync();
+            var users = await _userService.GetAllUsersAsync(filter);
 
             return Ok(users);
         }

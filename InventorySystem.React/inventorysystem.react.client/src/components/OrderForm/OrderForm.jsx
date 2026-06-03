@@ -1,4 +1,5 @@
 import { useEffect, useState, useRef } from "react";
+import InlineNotification from "../InlineNotification/InlineNotification";
 import { createOrder, updateOrder } from "../../services/ordersService";
 import api from "../../services/api";
 
@@ -86,8 +87,7 @@ function OrderForm({
     ]);
 
     const [loading, setLoading] = useState(false);
-    const [error, setError] = useState("");
-    const [success, setSuccess] = useState("");
+    const [notification, setNotification] = useState(null);
 
     useEffect(() => {
         if (orderToEdit) {
@@ -143,8 +143,7 @@ function OrderForm({
         e.preventDefault();
 
         setLoading(true);
-        setError("");
-        setSuccess("");
+        setNotification(null);
 
         try {
             const payload = {
@@ -160,7 +159,10 @@ function OrderForm({
                     payload.items
                 );
 
-                setSuccess("Order updated successfully");
+                setNotification({
+                    type: "success",
+                    message: "Order updated successfully."
+                });
 
                 if (onOrderUpdated) {
                     onOrderUpdated(result);
@@ -168,7 +170,10 @@ function OrderForm({
             } else {
                 const result = await createOrder(payload);
 
-                setSuccess("Order placed successfully");
+                setNotification({
+                    type: "success",
+                    message: "Order placed successfully."
+                });
 
                 setItems([
                     {
@@ -182,10 +187,11 @@ function OrderForm({
                 }
             }
         } catch (err) {
-            setError(
-                err.response?.data?.message ||
-                "Failed to submit order"
-            );
+            const message = err.response?.data?.message || "Failed to submit order.";
+            setNotification({
+                type: "error",
+                message
+            });
         }
 
         setLoading(false);
@@ -204,9 +210,14 @@ function OrderForm({
                 </h2>
             </div>
 
+            <InlineNotification
+                notification={notification}
+                onClose={() => setNotification(null)}
+            />
+
             <form
                 onSubmit={handleSubmit}
-                className="space-y-6"
+                className="space-y-6 mt-5"
             >
                 <div className="space-y-3">
                     <div className="hidden md:flex gap-4">
@@ -316,9 +327,6 @@ function OrderForm({
                                     }
                                 ]);
 
-                                setError("");
-                                setSuccess("");
-
                                 if (onCancelEdit) {
                                     onCancelEdit();
                                 }
@@ -341,24 +349,6 @@ function OrderForm({
                                 : "Place Order"}
                     </button>
                 </div>
-
-                {error && (
-                    <div className="flex items-center justify-between bg-red-100 text-red-700 px-4 py-3 rounded-lg border border-red-300">
-                        <span>{error}</span>
-                        <button type="button" onClick={() => setError("")} className="text-red-500 hover:text-red-700 transition">
-                            <X className="w-5 h-5" />
-                        </button>
-                    </div>
-                )}
-
-                {success && (
-                    <div className="flex items-center justify-between bg-green-100 text-green-700 px-4 py-3 rounded-lg border border-green-300">
-                        <span>{success}</span>
-                        <button type="button" onClick={() => setSuccess("")} className="text-green-500 hover:text-green-700 transition">
-                            <X className="w-5 h-5" />
-                        </button>
-                    </div>
-                )}
             </form>
         </div>
     );

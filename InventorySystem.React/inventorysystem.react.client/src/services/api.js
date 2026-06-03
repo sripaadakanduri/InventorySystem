@@ -1,5 +1,8 @@
 import axios from "axios";
-import { getToken } from "./auth";
+import {
+    getToken,
+    logout
+} from "./auth";
 
 const api = axios.create({
     baseURL: "https://localhost:7236/api"
@@ -17,6 +20,24 @@ api.interceptors.request.use(
         return config;
     },
     (error) => {
+        return Promise.reject(error);
+    }
+);
+
+api.interceptors.response.use(
+    (response) => response,
+    (error) => {
+        if (error.response?.status === 401) {
+            logout();
+
+            if (
+                window.location.pathname !== "/login" &&
+                window.location.pathname !== "/register"
+            ) {
+                window.location.replace("/login");
+            }
+        }
+
         return Promise.reject(error);
     }
 );

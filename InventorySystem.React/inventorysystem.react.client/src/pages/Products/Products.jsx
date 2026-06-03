@@ -1,9 +1,10 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { FaPlus } from "react-icons/fa";
-import { toast } from "react-toastify";
 
+import InlineNotification from "../../components/InlineNotification/InlineNotification";
 import ProductForm from "../../components/ProductForm/ProductForm";
 import ProductTable from "../../components/ProductTable/ProductTable";
+import useDebouncedEffect from "../../hooks/useDebouncedEffect";
 
 import {
     getProducts,
@@ -38,31 +39,34 @@ function Products() {
         priceSort: "",
         category: ""
     });
+    const [notification, setNotification] = useState(null);
 
     const role =
         localStorage.getItem("role")?.toUpperCase();
 
-    const fetchProducts = async () => {
+    const fetchProducts = async (activeFilters = filters) => {
 
         try {
 
             setIsLoading(true);
 
-            const data = await getProducts();
+            const data = await getProducts(activeFilters);
 
             setProducts(data);
 
         } catch (error) {
 
             console.log(error);
-            toast.error("Unable to load products.");
+            setNotification({
+                type: "error",
+                message: "Unable to load products."
+            });
         } finally {
 
             setIsLoading(false);
         }
     };
 
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     useEffect(() => {
         fetchProducts();
     }, []);
@@ -77,24 +81,33 @@ function Products() {
                     selectedProduct.id,
                     formData
                 );
-                toast.success("Product updated successfully.");
+                setNotification({
+                    type: "success",
+                    message: "Product updated successfully."
+                });
 
             } else {
 
                 await createProduct(formData);
-                toast.success("Product created successfully.");
+                setNotification({
+                    type: "success",
+                    message: "Product created successfully."
+                });
             }
 
             setSelectedProduct(null);
 
             setShowForm(false);
 
-            await fetchProducts();
+            await fetchProducts(filters);
 
         } catch (error) {
 
             console.log(error);
-            toast.error("Unable to save product.");
+            setNotification({
+                type: "error",
+                message: "Unable to save product."
+            });
         }
     };
 
@@ -113,15 +126,21 @@ function Products() {
 
             await deleteProduct(productPendingDelete.id);
 
-            await fetchProducts();
+            await fetchProducts(filters);
 
-            toast.success("Product deleted and transaction recorded.");
+            setNotification({
+                type: "success",
+                message: "Product deleted and transaction recorded."
+            });
             setProductPendingDelete(null);
 
         } catch (error) {
 
             console.log(error);
-            toast.error("Unable to delete product.");
+            setNotification({
+                type: "error",
+                message: "Unable to delete product."
+            });
         } finally {
 
             setDeletingProductId(null);
@@ -155,42 +174,25 @@ function Products() {
         });
     };
 
-    const filteredProducts = useMemo(() => {
+    const handlePriceSortChange = (e) => {
 
-        let filtered = products.filter((product) => {
+        const updatedFilters = {
+            ...filters,
+            priceSort: e.target.value
+        };
 
-            const matchesName =
-                product.name
-                    .toLowerCase()
-                    .includes(filters.name.toLowerCase());
-
-            const matchesCategory =
-                product.category
-                    .toLowerCase()
-                    .includes(filters.category.toLowerCase());
-
-            return matchesName && matchesCategory;
-        });
-
-        if (filters.priceSort === "lowToHigh") {
-
-            filtered.sort(
-                (a, b) => a.price - b.price
-            );
-
-        } else if (
-            filters.priceSort === "highToLow"
-        ) {
-
-            filtered.sort(
-                (a, b) => b.price - a.price
-            );
+        setFilters(updatedFilters);
+        fetchProducts(updatedFilters);
+    };
+    const handleFilterApply = () => {
+        fetchProducts(filters);
+    };
+    const handleKeyDown = (e) => {
+        if (e.key === "Enter") {
+            e.preventDefault();
+            handleFilterApply();
         }
-
-        return filtered;
-
-    }, [products, filters]);
-
+    }
     return (
         <div className="w-full max-w-7xl mx-auto flex flex-col gap-6 p-4 sm:p-6">
 
@@ -213,6 +215,11 @@ function Products() {
                 )}
             </div>
 
+            <InlineNotification
+                notification={notification}
+                onClose={() => setNotification(null)}
+            />
+
             {showForm && role === "ADMIN" && (
                 <div className="bg-white p-6 rounded-3xl border border-gray-200 shadow-xl">
                     <ProductForm
@@ -227,13 +234,16 @@ function Products() {
             )}
 
             <ProductTable
-                products={filteredProducts}
+                products={products}
                 role={role}
                 filters={filters}
                 onFilterChange={handleFilterChange}
+                onPriceSortChange={handlePriceSortChange}
                 onEdit={handleEdit}
                 onDelete={handleDeleteRequest}
+                onFilterchange={handleFilterChange}
                 deletingProductId={deletingProductId}
+                onKeyDown={handleKeyDown}
                 isLoading={isLoading}
             />
 

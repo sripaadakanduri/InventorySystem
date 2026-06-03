@@ -146,7 +146,7 @@ export default function Dashboard() {
                                         text-blue-600 justify-center items-center gap-x-2
                                     "
                                 >
-                                <div class="w-2 h-2 rounded-full bg-blue-600"></div>
+                                <div className="w-2 h-2 rounded-full bg-blue-600"></div>
                                     Inventory Management Platform
                                 </div>
                             </div>

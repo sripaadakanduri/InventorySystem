@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import InlineNotification from "../../components/InlineNotification/InlineNotification";
 import useAuth from "../../hooks/useAuth";
 import { Eye, EyeOff, Lock, User } from "lucide-react";
 
@@ -9,7 +10,7 @@ const Login = () => {
         username: "",
         password: ""
     });
-    const [error, setError] = useState("");
+    const [notification, setNotification] = useState(null);
     const [loading, setLoading] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
 
@@ -23,12 +24,20 @@ const Login = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
-        setError("");
+        setNotification(null);
         try {
             await handleLogin(formData);
+            setNotification({
+                type: "success",
+                message: "Login successful."
+            });
         } catch (err) {
             const data = err?.response?.data;
-            setError(data?.message || (typeof data === 'string' ? data : "Invalid username or password."));
+            const message = data?.message || (typeof data === 'string' ? data : "Invalid username or password.");
+            setNotification({
+                type: "error",
+                message
+            });
         } finally {
             setLoading(false);
         }
@@ -45,13 +54,12 @@ const Login = () => {
                     <p className="text-gray-500 mt-2">Please enter your details to sign in.</p>
                 </div>
 
-                <form onSubmit={handleSubmit} className="space-y-6">
-                    {error && (
-                        <div className="bg-red-50 text-red-600 p-4 rounded-xl text-sm font-medium border border-red-100 text-center">
-                            {error}
-                        </div>
-                    )}
+                <InlineNotification
+                    notification={notification}
+                    onClose={() => setNotification(null)}
+                />
 
+                <form onSubmit={handleSubmit} className="space-y-6">
                     <div className="space-y-2">
                         <label className="text-sm font-semibold text-gray-700">Username</label>
                         <div className="relative">
@@ -99,9 +107,15 @@ const Login = () => {
                         className="w-full bg-blue-500 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-xl shadow-lg transition-all transform active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed flex justify-center items-center"
                     >
                         {loading ? (
-                            <span className="flex items-center gap-2">
+                            <span className="flex items-center gap-3">
                                 <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                                Logging in...
+
+                                <div className="flex items-center gap-1">
+                                    <span>Logging in</span>
+                                    <div className="w-1 h-1 rounded-full bg-white animate-bounce"></div>
+                                    <div className="w-1 h-1 rounded-full bg-white animate-bounce [animation-delay:0.15s]"></div>
+                                    <div className="w-1 h-1 rounded-full bg-white animate-bounce [animation-delay:0.3s]"></div>
+                                </div>
                             </span>
                         ) : "Sign In"}
                     </button>

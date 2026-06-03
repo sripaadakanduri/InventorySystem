@@ -1,10 +1,14 @@
     import { useEffect, useState } from "react";
+    import InlineNotification from "../../components/InlineNotification/InlineNotification";
     import { getUsers, updateUserRole, createUser } from "../../services/userService";
     import Pagination from "../../components/Pagination/Pagination";
+    import TableSkeleton from "../../components/TableSkeleton/TableSkeleton";
+    import useDebouncedEffect from "../../hooks/useDebouncedEffect";
     import { Users, Shield, ShieldOff, Plus, X } from "lucide-react";
 
     const UsersManagement = () => {
         const [users, setUsers] = useState([]);
+        const [loading, setLoading] = useState(true);
         const [showAddModal, setShowAddModal] = useState(false);
         const [newUser, setNewUser] = useState({
             username: "",
@@ -15,15 +19,26 @@
 
         const [currentPage, setCurrentPage] = useState(1);
         const [pageSize, setPageSize] = useState(10);
-        const [filterUsername, setFilterUsername] = useState("");
-        const [filterRole, setFilterRole] = useState("");
+        const [filters, setFilters] = useState({
+            Username: "",
+            Role: ""
+        });
+        const [notification, setNotification] = useState(null);
 
-        const fetchUsers = async () => {
+        const fetchUsers = async (filterParams = filters) => {
             try {
-                const data = await getUsers();
+                setLoading(true);
+                const data = await getUsers(filterParams);
                 setUsers(data);
             } catch (error) {
                 console.log(error);
+                setNotification({
+                    type: "error",
+                    message: "Failed to load users."
+                });
+            }
+            finally {
+                setLoading(false);
             }
         };
         // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -31,12 +46,24 @@
             fetchUsers();
         }, []);
 
+        useDebouncedEffect(() => {
+            fetchUsers(filters);
+        }, [filters.Username], 400);
+
         const handleRoleUpdate = async (id, role) => {
             try {
                 await updateUserRole(id, role);
-                fetchUsers();
+                setNotification({
+                    type: "success",
+                    message: "User role updated successfully."
+                });
+                fetchUsers(filters);
             } catch (error) {
                 console.log(error);
+                setNotification({
+                    type: "error",
+                    message: "Failed to update user role."
+                });
             }
         };
 
@@ -44,6 +71,10 @@
             e.preventDefault();
             try {
                 await createUser(newUser);
+                setNotification({
+                    type: "success",
+                    message: "User created successfully."
+                });
                 setShowAddModal(false);
                 setNewUser({
                     username: "",
@@ -51,33 +82,43 @@
                     password: "",
                     role: "User"
                 });
-                fetchUsers();
+                fetchUsers(filters);
             } catch (error) {
                 console.error(error);
                 const message = typeof error.response?.data === 'string'
                     ? error.response.data
                     : error.response?.data?.title || "An error occurred";
-                alert(message);
+                setNotification({
+                    type: "error",
+                    message
+                });
             }
         };
 
-        let filteredUsers = [...users];
+        const handleFilterChange = (e) => {
+            const updatedFilters = {
+                ...filters,
+                [e.target.name]: e.target.value
+            };
 
-        if (filterUsername) {
-            filteredUsers = filteredUsers.filter(user =>
-                user.username.toLowerCase().includes(filterUsername.toLowerCase())
-            );
-        }
+            setFilters(updatedFilters);
+            setCurrentPage(1);
+        };
 
-        if (filterRole) {
-            filteredUsers = filteredUsers.filter(user =>
-                user.role === filterRole
-            );
-        }
+        const handleInstantFilterChange = (e) => {
+            const updatedFilters = {
+                ...filters,
+                [e.target.name]: e.target.value
+            };
+
+            setFilters(updatedFilters);
+            setCurrentPage(1);
+            fetchUsers(updatedFilters);
+        };
 
         const indexOfLastUser = currentPage * pageSize;
         const indexOfFirstUser = indexOfLastUser - pageSize;
-        const currentUsers = filteredUsers.slice(indexOfFirstUser, indexOfLastUser);
+        const currentUsers = users.slice(indexOfFirstUser, indexOfLastUser);
 
         return (
             <div className="max-w-7xl mx-auto p-6 mt-8">
@@ -93,6 +134,11 @@
                     </button>
                 </div>
 
+                <InlineNotification
+                    notification={notification}
+                    onClose={() => setNotification(null)}
+                />
+
                 <div className="w-full overflow-x-auto rounded-3xl border border-gray-200 shadow-lg bg-white mt-6">
                     <table className="w-full border-collapse">
                         <thead className="bg-blue-50 text-white border-b border-gray-200">
@@ -107,12 +153,10 @@
                                     <div className="flex justify-center">
                                         <input
                                             type="text"
+                                            name="Username"
                                             placeholder="Filter by name..."
-                                            value={filterUsername}
-                                            onChange={(e) => {
-                                                setFilterUsername(e.target.value);
-                                                setCurrentPage(1);
-                                            }}
+                                            value={filters.Username}
+                                            onChange={handleFilterChange}
                                             className="border border-gray-300 rounded-lg px-3 py-2 text-sm font-normal text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-400 w-32"
                                         />
                                     </div>
@@ -121,11 +165,9 @@
                                 <th className="p-2 px-4">
                                     <div className="flex justify-center">
                                         <select
-                                            value={filterRole}
-                                            onChange={(e) => {
-                                                setFilterRole(e.target.value);
-                                                setCurrentPage(1);
-                                            }}
+                                            name="Role"
+                                            value={filters.Role}
+                                            onChange={handleInstantFilterChange}
                                             className="border border-gray-300 rounded-lg px-3 py-2 text-sm font-normal text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-400 w-32"
                                         >
                                             <option value="">All Roles</option>
@@ -138,7 +180,9 @@
                             </tr>
                         </thead>
                         <tbody>
-                            {currentUsers.length > 0 ? (
+                            {loading ? (
+                                <TableSkeleton columns={4} />
+                            ) : currentUsers.length > 0 ? (
                                 currentUsers.map((user) => (
                                     <tr key={user.id} className="border-b border-gray-200 hover:bg-indigo-50 transition duration-150 cursor-pointer hover:translate-0.5 transform">
                                         <td className="p-4 text-center font-medium text-gray-900">{user.username.charAt(0).toUpperCase() + user.username.slice(1)}</td>
@@ -186,7 +230,7 @@
                     <div className="p-4 bg-white rounded-b-3xl">
                         <Pagination
                             currentPage={currentPage}
-                            totalItems={filteredUsers.length}
+                            totalItems={users.length}
                             pageSize={pageSize}
                             onPageChange={setCurrentPage}
                             onPageSizeChange={setPageSize}

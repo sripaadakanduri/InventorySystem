@@ -1,14 +1,17 @@
 import api from "./api";
 
-export const getUsers = async () => {
+export const getUsers = async (filters = {}) => {
+    const params = {};
 
-    const response = await api.get("/users");
+    if (filters.Username) params.User = filters.Username;
+    if (filters.Role) params.Role = filters.Role;
+
+    const response = await api.get("/users", { params });
 
     return response.data;
 };
 
 export const updateUserRole = async (id, role) => {
-
     const response = await api.put(`/users/${id}/role`, {
         role
     });
