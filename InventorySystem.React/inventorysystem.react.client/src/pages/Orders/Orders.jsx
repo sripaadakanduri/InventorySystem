@@ -3,7 +3,6 @@ import { toast } from "react-toastify";
 import OrderList from "../../components/OrderList/OrderList";
 import OrderForm from "../../components/OrderForm/OrderForm";
 import { getAllOrders, cancelOrder } from "../../services/ordersService";
-// import "./Orders.css";
 
 function Orders() {
     const [orders, setOrders] = useState([]);
@@ -17,15 +16,10 @@ function Orders() {
         endDate: ""
     });
 
-
-    
-
     const fetchOrders = async (activeFilters = filters) => {
         try {
             setLoading(true);
-
             const data = await getAllOrders(activeFilters);
-
             setOrders(data);
         } catch (err) {
             console.error(err);
@@ -35,7 +29,6 @@ function Orders() {
         }
     };
 
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     useEffect(() => {
         fetchOrders();
     }, []);
@@ -60,12 +53,7 @@ function Orders() {
         setFilters(updatedFilters);
         fetchOrders(updatedFilters);
     };
-    const handleKeyDown = (e) => {
-        if (e.key === "Enter") {
-            e.preventDefault();
-            handleFilterApply();
-        }
-    }
+
     const handleCancelOrder = async (orderId) => {
         try {
             setOrders(prev => prev.map(o => o.id === orderId ? { ...o, status: 4 } : o));
@@ -120,7 +108,6 @@ function Orders() {
                     filters={filters}
                     onFilterChange={handleFilterChange}
                     onFilterApply={handleFilterApply}
-                    onKeyDown={handleKeyDown}
                     onInstantFilterChange={handleInstantFilterChange}
                 />
             )}

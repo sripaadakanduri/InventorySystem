@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from "react";
-import InlineNotification from "../InlineNotification/InlineNotification";
+import { toast } from "react-toastify";
 import { createOrder, updateOrder } from "../../services/ordersService";
 import api from "../../services/api";
 
@@ -87,7 +87,6 @@ function OrderForm({
     ]);
 
     const [loading, setLoading] = useState(false);
-    const [notification, setNotification] = useState(null);
 
     useEffect(() => {
         if (orderToEdit) {
@@ -143,7 +142,6 @@ function OrderForm({
         e.preventDefault();
 
         setLoading(true);
-        setNotification(null);
 
         try {
             const payload = {
@@ -159,10 +157,7 @@ function OrderForm({
                     payload.items
                 );
 
-                setNotification({
-                    type: "success",
-                    message: "Order updated successfully."
-                });
+                toast.success("Order updated successfully.");
 
                 if (onOrderUpdated) {
                     onOrderUpdated(result);
@@ -170,10 +165,7 @@ function OrderForm({
             } else {
                 const result = await createOrder(payload);
 
-                setNotification({
-                    type: "success",
-                    message: "Order placed successfully."
-                });
+                toast.success("Order placed successfully.");
 
                 setItems([
                     {
@@ -188,10 +180,7 @@ function OrderForm({
             }
         } catch (err) {
             const message = err.response?.data?.message || "Failed to submit order.";
-            setNotification({
-                type: "error",
-                message
-            });
+            toast.error(message);
         }
 
         setLoading(false);
@@ -209,11 +198,6 @@ function OrderForm({
                         : "Create Order"}
                 </h2>
             </div>
-
-            <InlineNotification
-                notification={notification}
-                onClose={() => setNotification(null)}
-            />
 
             <form
                 onSubmit={handleSubmit}

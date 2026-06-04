@@ -1,9 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import transactionService from '../../services/transactionService';
 import Pagination from '../../components/Pagination/Pagination';
-import InlineNotification from '../../components/InlineNotification/InlineNotification';
-import TableSkeleton from '../../components/TableSkeleton/TableSkeleton';
-import useDebouncedEffect from '../../hooks/useDebouncedEffect';
+import { toast } from 'react-toastify';
 import { Activity } from 'lucide-react';
 
 const Transactions = () => {
@@ -16,10 +14,9 @@ const Transactions = () => {
         startDate: "",
         endDate: ""
     });
-    const [notification, setNotification] = useState(null);
 
     const [currentPage, setCurrentPage] = useState(1);
-    const [pageSize, setPageSize] = useState(10);
+    const pageSize = 10;
 
     const indexOfLastItem = currentPage * pageSize;
     const indexOfFirstItem = indexOfLastItem - pageSize;
@@ -28,17 +25,11 @@ const Transactions = () => {
     const fetchTransactions = async (activeFilters = filters) => {
         try {
             setLoading(true);
-
-            const data =
-                await transactionService.getTransactions(activeFilters);
-
+            const data = await transactionService.getTransactions(activeFilters);
             setTransactions(data);
         } catch (error) {
             console.error("Error fetching transactions:", error);
-            setNotification({
-                type: "error",
-                message: "Failed to load transactions."
-            });
+            toast.error("Failed to load transactions.");
         } finally {
             setLoading(false);
         }
@@ -48,10 +39,6 @@ const Transactions = () => {
         fetchTransactions();
     }, []);
 
-    useDebouncedEffect(() => {
-        fetchTransactions(filters);
-    }, [filters.username, filters.product], 400);
-
     const handleFilterChange = (e) => {
         setFilters({
             ...filters,
@@ -59,6 +46,17 @@ const Transactions = () => {
         });
 
         setCurrentPage(1);
+    };
+
+    const handleFilterApply = () => {
+        fetchTransactions(filters);
+        setCurrentPage(1);
+    };
+
+    const handleFilterKeyDown = (e) => {
+        if (e.key === "Enter") {
+            handleFilterApply();
+        }
     };
 
     const handleInstantFilterChange = (e) => {
@@ -81,6 +79,12 @@ const Transactions = () => {
         return "bg-blue-50 text-blue-700 border-blue-200";
     };
 
+    if (loading) return (
+        <div className="flex justify-center items-center min-h-[50vh]">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
+        </div>
+    );
+
     return (
         <div className="max-w-7xl mx-auto p-6 mt-8 ">
             <div className="inline-flex items-center gap-3 mb-8 group">
@@ -90,11 +94,6 @@ const Transactions = () => {
                     <p className="text-gray-500 mt-1 group-hover:translate-x-2 transition transform duration-300">Track every stock change across the system.</p>
                 </div>
             </div>
-
-            <InlineNotification
-                notification={notification}
-                onClose={() => setNotification(null)}
-            />
 
             <div className="w-full overflow-x-auto rounded-3xl shadow-lg bg-white mt-6">
                 <table className="w-full border-collapse">
@@ -116,6 +115,7 @@ const Transactions = () => {
                                         placeholder="Filter user..."
                                         value={filters.username}
                                         onChange={handleFilterChange}
+                                        onKeyDown={handleFilterKeyDown}
                                         className="border border-gray-300 rounded-lg px-3 py-2 text-sm font-normal focus:outline-none focus:ring-2 focus:ring-blue-400 w-32"
                                     />
                                 </div>
@@ -128,6 +128,7 @@ const Transactions = () => {
                                         placeholder="Filter product..."
                                         value={filters.product}
                                         onChange={handleFilterChange}
+                                        onKeyDown={handleFilterKeyDown}
                                         className="border border-gray-300 rounded-lg px-3 py-2 text-sm font-normal focus:outline-none focus:ring-2 focus:ring-blue-400 w-32"
                                     />
                                 </div>
@@ -174,9 +175,7 @@ const Transactions = () => {
                         </tr>
                     </thead>
                     <tbody>
-                        {loading ? (
-                            <TableSkeleton columns={6} />
-                        ) : currentTransactions.length > 0 ? (
+                        {currentTransactions.length > 0 ? (
                             currentTransactions.map(t => (
                                 <tr key={t.id} className="border-b border-gray-200 hover:bg-gray-100 cursor-pointer hover:translate-0.5 transform transition duration-150">
                                     <td className="p-4 text-center font-medium text-gray-900">{(t.user?.username.charAt(0).toUpperCase() + t.user?.username.slice(1)) || `User ${t.userId}`}</td>
@@ -210,7 +209,6 @@ const Transactions = () => {
                         totalItems={transactions.length}
                         pageSize={pageSize}
                         onPageChange={setCurrentPage}
-                        onPageSizeChange={setPageSize}
                     />
                 </div>
             </div>

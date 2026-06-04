@@ -1,10 +1,9 @@
 import { useEffect, useState } from "react";
 import { FaPlus } from "react-icons/fa";
+import { toast } from "react-toastify";
 
-import InlineNotification from "../../components/InlineNotification/InlineNotification";
 import ProductForm from "../../components/ProductForm/ProductForm";
 import ProductTable from "../../components/ProductTable/ProductTable";
-import useDebouncedEffect from "../../hooks/useDebouncedEffect";
 
 import {
     getProducts,
@@ -13,56 +12,30 @@ import {
     deleteProduct
 } from "../../services/ProductService";
 
-
-
 function Products() {
-
     const [products, setProducts] = useState([]);
-
-    const [selectedProduct, setSelectedProduct] =
-        useState(null);
-
-    const [showForm, setShowForm] =
-        useState(false);
-
-    const [isLoading, setIsLoading] =
-        useState(true);
-
-    const [deletingProductId, setDeletingProductId] =
-        useState(null);
-
-    const [productPendingDelete, setProductPendingDelete] =
-        useState(null);
-
+    const [selectedProduct, setSelectedProduct] = useState(null);
+    const [showForm, setShowForm] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
+    const [deletingProductId, setDeletingProductId] = useState(null);
+    const [productPendingDelete, setProductPendingDelete] = useState(null);
     const [filters, setFilters] = useState({
         name: "",
         priceSort: "",
         category: ""
     });
-    const [notification, setNotification] = useState(null);
 
-    const role =
-        localStorage.getItem("role")?.toUpperCase();
+    const role = localStorage.getItem("role")?.toUpperCase();
 
     const fetchProducts = async (activeFilters = filters) => {
-
         try {
-
             setIsLoading(true);
-
             const data = await getProducts(activeFilters);
-
             setProducts(data);
-
         } catch (error) {
-
             console.log(error);
-            setNotification({
-                type: "error",
-                message: "Unable to load products."
-            });
+            toast.error("Unable to load products.");
         } finally {
-
             setIsLoading(false);
         }
     };
@@ -72,85 +45,50 @@ function Products() {
     }, []);
 
     const handleSubmit = async (formData) => {
-
         try {
-
             if (selectedProduct) {
-
                 await updateProduct(
                     selectedProduct.id,
                     formData
                 );
-                setNotification({
-                    type: "success",
-                    message: "Product updated successfully."
-                });
-
+                toast.success("Product updated successfully.");
             } else {
-
                 await createProduct(formData);
-                setNotification({
-                    type: "success",
-                    message: "Product created successfully."
-                });
+                toast.success("Product created successfully.");
             }
 
             setSelectedProduct(null);
-
             setShowForm(false);
-
             await fetchProducts(filters);
-
         } catch (error) {
-
             console.log(error);
-            setNotification({
-                type: "error",
-                message: "Unable to save product."
-            });
+            toast.error("Unable to save product.");
         }
     };
 
     const handleDeleteRequest = (product) => {
-
         setProductPendingDelete(product);
     };
 
     const handleDeleteConfirm = async () => {
-
         if (!productPendingDelete) return;
 
         try {
-
             setDeletingProductId(productPendingDelete.id);
-
             await deleteProduct(productPendingDelete.id);
-
             await fetchProducts(filters);
-
-            setNotification({
-                type: "success",
-                message: "Product deleted and transaction recorded."
-            });
+            toast.success("Product deleted and transaction recorded.");
             setProductPendingDelete(null);
-
         } catch (error) {
-
             console.log(error);
-            setNotification({
-                type: "error",
-                message: "Unable to delete product."
-            });
+            toast.error("Unable to delete product.");
         } finally {
-
             setDeletingProductId(null);
         }
     };
 
     const handleEdit = (product) => {
-
         setSelectedProduct(product);
-
         setShowForm(true);
 
         window.scrollTo({
@@ -160,14 +98,11 @@ function Products() {
     };
 
     const handleCreate = () => {
-
         setSelectedProduct(null);
-
         setShowForm(true);
     };
 
     const handleFilterChange = (e) => {
-
         setFilters({
             ...filters,
             [e.target.name]: e.target.value
@@ -175,7 +110,6 @@ function Products() {
     };
 
     const handlePriceSortChange = (e) => {
-
         const updatedFilters = {
             ...filters,
             priceSort: e.target.value
@@ -184,18 +118,13 @@ function Products() {
         setFilters(updatedFilters);
         fetchProducts(updatedFilters);
     };
+
     const handleFilterApply = () => {
         fetchProducts(filters);
     };
-    const handleKeyDown = (e) => {
-        if (e.key === "Enter") {
-            e.preventDefault();
-            handleFilterApply();
-        }
-    }
+
     return (
         <div className="w-full max-w-7xl mx-auto flex flex-col gap-6 p-4 sm:p-6">
-
             <div className="flex flex-col sm:flex-row sm:items-center shadow-lg justify-between gap-4 bg-white p-6 rounded-3xl mt-8 border border-gray-200">
                 <div>
                     <h1 className="text-2xl font-bold text-gray-900">
@@ -214,11 +143,6 @@ function Products() {
                     </button>
                 )}
             </div>
-
-            <InlineNotification
-                notification={notification}
-                onClose={() => setNotification(null)}
-            />
 
             {showForm && role === "ADMIN" && (
                 <div className="bg-white p-6 rounded-3xl border border-gray-200 shadow-xl">
@@ -239,11 +163,10 @@ function Products() {
                 filters={filters}
                 onFilterChange={handleFilterChange}
                 onPriceSortChange={handlePriceSortChange}
+                onFilterApply={handleFilterApply}
                 onEdit={handleEdit}
                 onDelete={handleDeleteRequest}
-                onFilterchange={handleFilterChange}
                 deletingProductId={deletingProductId}
-                onKeyDown={handleKeyDown}
                 isLoading={isLoading}
             />
 
@@ -276,7 +199,6 @@ function Products() {
                     </div>
                 </div>
             )}
-
         </div>
     );
 }

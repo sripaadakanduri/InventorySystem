@@ -1,5 +1,5 @@
 import { useState } from "react";
-import InlineNotification from "../../components/InlineNotification/InlineNotification";
+import { toast } from "react-toastify";
 import useAuth from "../../hooks/useAuth";
 import { Link } from "react-router-dom";
 import { validateRegister } from "../../validators/authValidator";
@@ -16,7 +16,6 @@ export default function Register() {
     const [loading, setLoading] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
     const [showReqs, setShowReqs] = useState(false);
-    const [notification, setNotification] = useState(null);
 
     const passwordReqs = [
         { label: "At least 8 characters", met: form.password.length >= 8 },
@@ -35,20 +34,13 @@ export default function Register() {
         }
         setErrors({});
         setLoading(true);
-        setNotification(null);
         try {
             await handleRegister(form);
-            setNotification({
-                type: "success",
-                message: "Registration successful. Redirecting to login..."
-            });
+            toast.success("Registration successful! Redirecting to login...");
         } catch (err) {
             const data = err?.response?.data;
             const message = data?.message || (typeof data === 'string' ? data : "Registration failed");
-            setNotification({
-                type: "error",
-                message
-            });
+            toast.error(message);
         } finally {
             setLoading(false);
         }
@@ -64,11 +56,6 @@ export default function Register() {
                     <h2 className="text-3xl font-bold text-gray-900">Create Account</h2>
                     <p className="text-gray-500 mt-2">Join us and manage your inventory seamlessly.</p>
                 </div>
-
-                <InlineNotification
-                    notification={notification}
-                    onClose={() => setNotification(null)}
-                />
 
                 <form onSubmit={submit} className="space-y-5" noValidate>
                     <div className="space-y-1">

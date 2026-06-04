@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import Pagination from "../Pagination/Pagination";
-import TableSkeleton from "../TableSkeleton/TableSkeleton";
 import { Pencil, Trash2 } from "lucide-react";
 
 function ProductTable({
@@ -9,12 +8,11 @@ function ProductTable({
     filters,
     onFilterChange,
     onPriceSortChange,
+    onFilterApply,
     onEdit,
     onDelete,
     deletingProductId,
-    isLoading,
-    onKeyDown,
-    onFilterApply
+    isLoading
 }) {
     const [currentPage, setCurrentPage] = useState(1);
     const [pageSize, setPageSize] = useState(10);
@@ -22,6 +20,12 @@ function ProductTable({
     useEffect(() => {
         setCurrentPage(1);
     }, [products]);
+
+    const handleFilterKeyDown = (e) => {
+        if (e.key === "Enter") {
+            onFilterApply();
+        }
+    };
 
     const indexOfLastProduct = currentPage * pageSize;
     const indexOfFirstProduct = indexOfLastProduct - pageSize;
@@ -49,7 +53,7 @@ function ProductTable({
                                     placeholder="Filter Name..."
                                     value={filters.name}
                                     onChange={onFilterChange}
-                                    onKeyDown={onKeyDown}
+                                    onKeyDown={handleFilterKeyDown}
                                     className="border border-gray-300 rounded-lg px-3 py-2 text-sm font-normal focus:outline-none focus:ring-2 focus:ring-blue-400 w-32"
                                 />
                             </div>
@@ -76,7 +80,7 @@ function ProductTable({
                                     placeholder="Filter Category..."
                                     value={filters.category}
                                     onChange={onFilterChange}
-                                    onKeyDown={onKeyDown}
+                                    onKeyDown={handleFilterKeyDown}
                                     className="border border-gray-300 rounded-lg px-3 py-2 text-sm font-normal focus:outline-none focus:ring-2 focus:ring-blue-400 w-32"
                                 />
                             </div>
@@ -87,7 +91,11 @@ function ProductTable({
                 </thead>
                 <tbody>
                     {isLoading ? (
-                        <TableSkeleton columns={role === "ADMIN" ? 5 : 4} />
+                        <tr>
+                            <td colSpan={role === "ADMIN" ? 5 : 4} className="p-8 text-center text-gray-500 text-lg">
+                                Loading products...
+                            </td>
+                        </tr>
                     ) : currentProducts.length > 0 ? (
                         currentProducts.map((product) => (
                             <tr key={product.id} className="border-b border-gray-200 hover:bg-gray-100 hover:translate-x-0.5 hover:cursor-pointer transform transition duration-200">

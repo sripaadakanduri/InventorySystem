@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import InlineNotification from "../../components/InlineNotification/InlineNotification";
+import { toast } from "react-toastify";
 import useAuth from "../../hooks/useAuth";
 import { Eye, EyeOff, Lock, User } from "lucide-react";
 
@@ -10,7 +10,6 @@ const Login = () => {
         username: "",
         password: ""
     });
-    const [notification, setNotification] = useState(null);
     const [loading, setLoading] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
 
@@ -24,20 +23,13 @@ const Login = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
-        setNotification(null);
         try {
             await handleLogin(formData);
-            setNotification({
-                type: "success",
-                message: "Login successful."
-            });
+            toast.success("Login successful!");
         } catch (err) {
             const data = err?.response?.data;
             const message = data?.message || (typeof data === 'string' ? data : "Invalid username or password.");
-            setNotification({
-                type: "error",
-                message
-            });
+            toast.error(message);
         } finally {
             setLoading(false);
         }
@@ -53,11 +45,6 @@ const Login = () => {
                     <h2 className="text-3xl font-bold text-gray-900">Welcome Back</h2>
                     <p className="text-gray-500 mt-2">Please enter your details to sign in.</p>
                 </div>
-
-                <InlineNotification
-                    notification={notification}
-                    onClose={() => setNotification(null)}
-                />
 
                 <form onSubmit={handleSubmit} className="space-y-6">
                     <div className="space-y-2">
