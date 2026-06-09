@@ -6,8 +6,9 @@
   <Project Path="InventorySystem.Common/InventorySystem.Common.csproj" Id="6a3a1b0a-0f42-47ec-8a65-4e0319d1ba4d" />
   <Project Path="InventorySystem.Core/InventorySystem.Core.csproj" Id="38190bd4-8f8c-4963-99c1-3f76a1897f10" />
   <Project Path="InventorySystem.Infrastructure/InventorySystem.Service.csproj" Id="cd145a30-84aa-4e2c-ba37-2dfe98d0c5cf" />
-  <Project Path="InventorySystem.React/inventorysystem.react.client/inventorysystem.react.client.esproj" DisplayName="InventorySystem.react.client">
+  <Project Path="InventorySystem.React/inventorysystem.react.client/inventorysystem.react.client.esproj">
     <Build />
     <Deploy />
   </Project>
+  <Project Path="InventorySystem.Tests/InventorySystem.Tests.csproj" Id="75141b07-a108-4716-9e9f-9eb837d9cc68" />
 </Solution>
