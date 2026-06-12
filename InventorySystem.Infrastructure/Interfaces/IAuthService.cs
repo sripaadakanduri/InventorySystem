@@ -5,5 +5,6 @@ namespace InventorySystem.Service.Interfaces
     {
         Task<AuthResponseDto> LoginAsync(LoginDto loginDto);
         Task<AuthResponseDto> RegisterAsync(RegisterDto registerDto);
+        Task<AuthResponseDto> GoogleLoginAsync(GoogleLoginDto dto);
     }
 }

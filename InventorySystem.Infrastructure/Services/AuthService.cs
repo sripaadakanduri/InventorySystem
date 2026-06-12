@@ -5,6 +5,8 @@ using InventorySystem.Service.Data;
 using InventorySystem.Service.Helpers;
 using InventorySystem.Service.Interfaces;
 using InventorySystem.Service.Repositories;
+using Microsoft.Extensions.Configuration;
+using Google.Apis.Auth;
 
 namespace InventorySystem.Service.Services
 {
@@ -13,12 +15,14 @@ namespace InventorySystem.Service.Services
         private readonly UserRepository _repo;
         private readonly JwtServices _jwt;
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IConfiguration _config;
 
-        public AuthService(UserRepository userRepository, JwtServices jwt, IUnitOfWork unitOfWork)
+        public AuthService(UserRepository userRepository, JwtServices jwt, IUnitOfWork unitOfWork, IConfiguration config)
         {
             _repo = userRepository;
             _jwt = jwt;
             _unitOfWork = unitOfWork;
+            _config = config;
         }
 
         public async Task<AuthResponseDto> RegisterAsync(RegisterDto dto)
@@ -66,6 +70,49 @@ namespace InventorySystem.Service.Services
             {
                 throw new InvalidOperationException("Invalid username or password.");
             }
+            user.LastLoginAt = DateTime.UtcNow;
+            await _unitOfWork.SaveChangesAsync();
+
+            var token = _jwt.GenerateToken(user);
+            return new AuthResponseDto
+            {
+                Token = token,
+                Username = user.Username,
+                Role = user.Role
+            };
+        }
+
+        public async Task<AuthResponseDto> GoogleLoginAsync(GoogleLoginDto dto)
+        {
+            var settings = new GoogleJsonWebSignature.ValidationSettings
+            {
+                Audience = new[] { _config["Authentication:Google:ClientId"] }
+            };
+
+            GoogleJsonWebSignature.Payload payload;
+            try
+            {
+                payload = await GoogleJsonWebSignature.ValidateAsync(dto.IdToken, settings);
+            }
+            catch (InvalidJwtException ex)
+            {
+                throw new InvalidOperationException("Invalid Google token.", ex);
+            }
+
+            var user = await _repo.GetByEmailAsync(payload.Email);
+            if (user == null)
+            {
+                user = new User
+                {
+                    Username = payload.Email.Split('@')[0],
+                    Email = payload.Email,
+                    PasswordHash = string.Empty,
+                    Role = "User"
+                };
+                await _repo.AddAsync(user);
+                await _unitOfWork.SaveChangesAsync();
+            }
+
             user.LastLoginAt = DateTime.UtcNow;
             await _unitOfWork.SaveChangesAsync();
 

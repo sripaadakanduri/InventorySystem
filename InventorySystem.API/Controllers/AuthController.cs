@@ -42,6 +42,20 @@ namespace InventorySystem.API.Controllers
                 return BadRequest(ex.Message);
             }
         }
+
+        [HttpPost("google-login")]
+        public async Task<IActionResult> GoogleLogin(GoogleLoginDto dto)
+        {
+            try
+            {
+                var result = await _service.GoogleLoginAsync(dto);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
         [Authorize]
         [HttpGet("me")]
         public IActionResult Me()

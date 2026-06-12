@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 
 import {
     login,
+    googleLogin,
     register,
     logout,
     isAuthenticated,
@@ -31,6 +32,15 @@ const useAuth = () => {
         }
     };
 
+    const handleGoogleLogin = async (idToken) => {
+        try {
+            await googleLogin(idToken);
+            navigate("/dashboard", { replace: true });
+        } catch (err) {
+            throw err;
+        }
+    };
+
     const handleRegister = async (data) => {
 
         try {
@@ -53,6 +63,7 @@ const useAuth = () => {
 
     return {
         handleLogin,
+        handleGoogleLogin,
         handleRegister,
         handleLogout,
         authenticated: isAuthenticated(),

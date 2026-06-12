@@ -8,6 +8,12 @@ export const login = async (data) => {
     return res.data;
 };
 
+export const googleLogin = async (idToken) => {
+    const res = await API.post("/Auth/google-login", { idToken });
+    saveAuthData(res.data);
+    return res.data;
+};
+
 export const register = async (data) => {
     const res = await API.post("/Auth/register", data);
     alert("User registered successfully!");
