@@ -140,13 +140,13 @@ const Navbar = () => {
                         "
                     >
 
-                        <div className="grid grid-cols-2 justify-center items-center">
+                        <div className="flex gap-6 justify-center items-center">
 
                             <div
                                 className="
                                     mt-2 flex h-12 w-12 items-center justify-center
                                     rounded-full bg-purple-500
-                                    text-lg font-bold text-white ml-15
+                                    text-lg font-bold text-white 
                                 "
                             >
                                 {username
@@ -170,7 +170,7 @@ const Navbar = () => {
 
                         <div className="my-3 border border-gray-200"></div>
 
-                        <div classNma="flex flex-col gap-y-3">
+                        <div classNam="flex flex-col gap-y-3">
                         <Link
                             to="/dashboard"
                             className={`

@@ -136,7 +136,6 @@ const Login = () => {
                             onError={() => {
                                 toast.error('Google login failed.');
                             }}
-                            useOneTap
                         />
                     </div>
 

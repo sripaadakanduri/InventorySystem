@@ -8,7 +8,6 @@ import {
     Minus,
     PackagePlus,
     ChevronDown,
-    X
 } from "lucide-react";
 
 const SearchableProductSelect = ({ value, onChange, products }) => {
@@ -335,6 +334,7 @@ function OrderForm({
                 </div>
             </form>
         </div>
+        
     );
 }
 
