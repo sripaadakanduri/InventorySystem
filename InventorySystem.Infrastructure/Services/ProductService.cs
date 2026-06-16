@@ -1,6 +1,13 @@
 using InventorySystem.Core.DTOs;
 using InventorySystem.Core.Entities;
 using InventorySystem.Service.Interfaces;
+using System.Globalization;
+using CsvHelper;
+using CsvHelper.Configuration;
+using System.Runtime.CompilerServices;
+using Microsoft.AspNetCore.Http;
+using Microsoft.IdentityModel.Protocols.OpenIdConnect;
+
 
 namespace InventorySystem.Service.Services
 {
@@ -172,5 +179,82 @@ namespace InventorySystem.Service.Services
                 throw;
             }
         }
+
+        public async Task<byte[]> ImportProductsAsync(IFormFile file)
+        {
+            var validProducts = new List<Product>();
+            var failedProducts = new List<FailedDto>();
+
+            using var reader = new StreamReader(file.OpenReadStream());
+
+            var config = new CsvConfiguration(CultureInfo.InvariantCulture)
+            {
+                HeaderValidated = null,
+                MissingFieldFound = null
+            };
+
+            using var csv = new CsvReader(reader, config);
+            var records = csv.GetRecords<BaseDto>().ToList();
+            foreach(var record in records)
+            {
+                var errors = new List<string>();
+
+                if (string.IsNullOrWhiteSpace(record.Name))
+                    errors.Add("Name is required");
+                if (record.Price <= 0)
+                    errors.Add("Price must be greater than 0");
+                if (record.StockQuantity <= 0)
+                    errors.Add("quantity must be greater than 0");
+
+                if (errors.Any())
+                {
+                    failedProducts.Add(new FailedDto
+                    {
+                        Name = record.Name,
+                        Price = record.Price,
+                        StockQuantity = record.StockQuantity,
+                        Category = record.Category,
+                        ErrorMessage = string.Join(",", errors)
+
+                    });
+                }
+                else
+                {
+                    validProducts.Add(new Product
+                    {
+                        Name = record.Name,
+                        Price = record.Price,
+                        StockQuantity = record.StockQuantity,
+                        Category = record.Category
+                    });
+                }
+            }
+            if (validProducts.Any())
+            {
+                await _unitOfWork.Products.AddRangeAsync(validProducts);
+                await _unitOfWork.SaveChangesAsync();
+            }
+
+            if (!failedProducts.Any())
+            {
+                return Array.Empty<byte>();
+            }
+
+            return GenerateFailedCsv(failedProducts);
+        }
+
+        public byte[] GenerateFailedCsv(List<FailedDto> failedProducts)
+        {
+            using var memoryStream = new MemoryStream();
+
+            using var writer = new StreamWriter(memoryStream);
+
+            using var csv = new CsvWriter(writer, CultureInfo.InvariantCulture);
+
+            csv.WriteRecords(failedProducts);
+            writer.Flush();
+            return memoryStream.ToArray();
+        }
     }
+
 }

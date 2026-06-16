@@ -87,12 +87,12 @@ const Transactions = () => {
 
     return (
         <div className="max-w-7xl mx-auto p-6 mt-8 ">
-            <div className="inline-flex items-center gap-3 mb-8 group">
+            <div className="inline-flex items-center gap-3 mb-8 group ml-3">
                 <Activity className="w-8 h-8 text-indigo-600 group-hover:scale-x-150 group-hover:translate-x-0.5 transition transform duration-300" />
                 <div>
                     <h2 className="text-3xl font-bold text-gray-800 group-hover:translate-x-2 transition transform duration-300">Audit Trail</h2>
                     <p className="text-gray-500 mt-1 group-hover:translate-x-2 transition transform duration-300">Track every stock change across the system.</p>
-                </div>
+                </div>    
             </div>
 
             <div className="w-full overflow-x-auto rounded-3xl shadow-lg bg-white mt-6">

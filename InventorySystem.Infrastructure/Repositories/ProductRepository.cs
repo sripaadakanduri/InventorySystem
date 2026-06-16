@@ -105,5 +105,10 @@ namespace InventorySystem.Service.Repositories
         {
             _context.Products.Remove(product);
         }
+
+        public async Task AddRangeAsync(IEnumerable<Product> products)
+        {
+            await _context.Products.AddRangeAsync(products);
+        }
     }
 }

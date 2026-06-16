@@ -10,5 +10,6 @@ namespace InventorySystem.Service.Interfaces
         Task AddAsync(Product product);
         void Update(Product product);
         void Delete(Product product);
+        Task AddRangeAsync(IEnumerable<Product> products);
     }
 }

@@ -22,6 +22,7 @@ function Orders() {
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [orderToEdit, setOrderToEdit] = useState(null);
+    const [open, setOpen] = useState(false);
 
     const [filters, setFilters] = useState({
         user: "",
@@ -99,30 +100,48 @@ function Orders() {
                 <h1 className="text-2xl font-bold text-gray-900">
                     Order Management
                 </h1>
-                <div className="relative group">
-                    <button className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white font-medium px-4 py-2 rounded-xl shadow-md transition">
+
+                <div
+                    className="relative inline-block group"
+                    onMouseEnter={() => setOpen(true)}
+                    onMouseLeave={() => setOpen(false)}
+                >
+                    {/* Main Button */}
+                    <button
+                        className={`flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white font-medium px-8 py-3 shadow-md transition-all duration-300 ${open ? "rounded-t-xl rounded-b-none" : "rounded-xl"}`}
+                    >
                         Export Orders
-                        <ChevronDown size={18} />
+                        <ChevronDown
+                            size={18}
+                            className={`transition-transform duration-300 ${open ? "rotate-180" : ""
+                                }`}
+                        />
                     </button>
 
-                    <div className="absolute right-0 mt-1 w-60 bg-white border border-gray-200 rounded-xl shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
-
+                    {/* Dropdown */}
+                    <div className="absolute left-0 top-full w-full z-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible">
                         <button
                             onClick={() => exportToExcel(orders, products)}
-                            className="w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-100 transition"
+                            className={`flex items-center gap-4 w-full bg-white px-4 py-3 text-left border-x hover:bg-gray-100 border-gray-200 transition-all duration-300  ${open
+                                    ? "opacity-100 translate-y-0"
+                                    : "opacity-0 -translate-y-3 pointer-events-none"
+                                } `}
                         >
                             <FileSpreadsheet className="text-green-600" size={20} />
                             <div className="text-left">
-                                <p className="font-medium text-gray-800">Export to Excel</p>
+                                <p className="font-medium text-md text-gray-800">Export to Excel</p>
                                 <p className="text-xs text-gray-500">
-                                    Download spreadsheet format
+                                    Download sheets
                                 </p>
                             </div>
                         </button>
 
                         <button
                             onClick={() => exportToCSV(orders, products)}
-                            className="w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-100 transition"
+                            className={`flex items-center gap-4 w-full bg-white px-4 py-3 text-left border-x hover:bg-gray-100 border-gray-200 transition-all duration-300 delay-75 ${open
+                                    ? "opacity-100 translate-y-0"
+                                    : "opacity-0 -translate-y-3 pointer-events-none"
+                                }`}
                         >
                             <FileText className="text-blue-600" size={20} />
                             <div className="text-left">
@@ -135,7 +154,10 @@ function Orders() {
 
                         <button
                             onClick={() => exportToPDF(orders, products)}
-                            className="w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-100 transition"
+                            className={`flex items-center gap-4 w-full bg-white px-4 py-3 text-left border-x border-gray-200 hover:bg-gray-100 transition-all duration-300 delay-150 ${open
+                                    ? "opacity-100 translate-y-0"
+                                    : "opacity-0 -translate-y-3 pointer-events-none"
+                                }`}
                         >
                             <File className="text-red-600" size={20} />
                             <div className="text-left">
@@ -146,11 +168,12 @@ function Orders() {
                             </div>
                         </button>
 
-                        <div className="border-t border-gray-200"></div>
-
                         <button
                             onClick={printOrders}
-                            className="w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-100 transition rounded-b-xl"
+                            className={`flex items-center gap-4 w-full bg-white px-4 py-3 text-left border border-gray-200 hover:bg-gray-100 rounded-b-xl shadow-lg transition-all duration-300 delay-200  ${open
+                                    ? "opacity-100 translate-y-0"
+                                    : "opacity-0 -translate-y-3 pointer-events-none"
+                                } `}
                         >
                             <Printer className="text-gray-600" size={20} />
                             <div className="text-left">
@@ -162,6 +185,8 @@ function Orders() {
                         </button>
                     </div>
                 </div>
+
+                
             </div>
 
             

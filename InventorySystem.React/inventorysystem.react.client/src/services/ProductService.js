@@ -54,3 +54,14 @@ export const deleteProduct = async (id) => {
   }
 
 }
+
+export const importProducts = async (formData) => {
+
+    return await api.post(
+        "/products/import",
+        formData,
+        {
+            responseType: "blob"
+        }
+    );
+};

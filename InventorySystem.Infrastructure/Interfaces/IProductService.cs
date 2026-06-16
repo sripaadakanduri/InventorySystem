@@ -1,4 +1,5 @@
 ﻿using InventorySystem.Core.DTOs;
+using Microsoft.AspNetCore.Http;
 
 namespace InventorySystem.Service.Interfaces
 {
@@ -25,5 +26,8 @@ namespace InventorySystem.Service.Interfaces
             int id,
             int userId
         );
+
+        Task<byte[]> ImportProductsAsync(IFormFile file);
+
     }
 }

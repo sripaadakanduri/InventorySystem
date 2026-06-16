@@ -1,11 +1,12 @@
-﻿    using System.Security.Claims;
-    using InventorySystem.Core.DTOs;
-    using InventorySystem.Common.Enums;
-    using InventorySystem.Service.Interfaces;
-    using Microsoft.AspNetCore.Authorization;
-    using Microsoft.AspNetCore.Mvc;
+﻿using System.Security.Claims;
+using InventorySystem.Core.DTOs;
+using InventorySystem.Common.Enums;
+using InventorySystem.Service.Interfaces;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Http;
 
-    namespace InventorySystem.API.Controllers
+namespace InventorySystem.API.Controllers
     {
         [ApiController]
         [Route("api/[controller]")]
@@ -142,5 +143,28 @@
                     "Product deleted successfully"
             });
         }
+        [HttpPost("import")]
+        [Consumes("multipart/form-data")]
+        public async Task<IActionResult> ImportProducts([FromForm] IFormFile file)
+        {
+            if (file == null || file.Length == 0)
+                return BadRequest("File is required.");
+
+            var failedProductsCsv = await _service.ImportProductsAsync(file);
+
+            if (failedProductsCsv.Length > 0)
+            {
+                return File(
+                    failedProductsCsv,
+                    "text/csv",
+                    "Response.csv");
+            }
+
+            return Ok(new
+            {
+                message = "Products imported successfully."
+            });
+        }
+
     }
 }
