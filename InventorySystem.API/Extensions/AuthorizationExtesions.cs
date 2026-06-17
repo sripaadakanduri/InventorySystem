@@ -31,6 +31,15 @@ namespace InventorySystem.API.Extensions
                                     )
                                 )
                         };
+
+                    options.Events = new JwtBearerEvents
+                    {
+                        OnMessageReceived = context =>
+                        {
+                            context.Token = context.Request.Cookies["AuthToken"];
+                            return Task.CompletedTask;
+                        }
+                    };
                 });
 
             return services;

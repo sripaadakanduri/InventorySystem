@@ -29,13 +29,18 @@ var allowedOrigins = builder.Configuration
     .GetSection("AllowedOrigins")
     .Get<string[]>();
 
+allowedOrigins = allowedOrigins?.Length > 0
+    ? allowedOrigins
+    : new[] { "http://localhost:5176" };
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowReact", policy =>
     {
         policy.WithOrigins(allowedOrigins!)
               .AllowAnyHeader()
-              .AllowAnyMethod();
+              .AllowAnyMethod()
+              .AllowCredentials();
     });
 });
 
@@ -58,6 +63,8 @@ if (app.Environment.IsDevelopment())
 app.UseCors("AllowReact");
 app.UseHttpsRedirection();
 
-app.MapControllers();
+app.UseAuthentication();
 app.UseAuthorization();
+
+app.MapControllers();
 app.Run();

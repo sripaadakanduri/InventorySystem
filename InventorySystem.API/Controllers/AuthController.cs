@@ -2,6 +2,7 @@
 using InventorySystem.Service.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 namespace InventorySystem.API.Controllers
 {
     [ApiController]
@@ -21,7 +22,8 @@ namespace InventorySystem.API.Controllers
             try
             {
                 var result = await _service.RegisterAsync(dto);
-                return Ok(result);
+                SetAuthCookie(result.Token);
+                return Ok(CreateUserResponse(result.Username, result.Role));
             }
             catch (Exception ex)
             {
@@ -35,7 +37,8 @@ namespace InventorySystem.API.Controllers
             try
             {
                 var result = await _service.LoginAsync(dto);
-                return Ok(result);
+                SetAuthCookie(result.Token);
+                return Ok(CreateUserResponse(result.Username, result.Role));
             }
             catch (Exception ex)
             {
@@ -49,21 +52,59 @@ namespace InventorySystem.API.Controllers
             try
             {
                 var result = await _service.GoogleLoginAsync(dto);
-                return Ok(result);
+                SetAuthCookie(result.Token);
+                return Ok(CreateUserResponse(result.Username, result.Role));
             }
             catch (Exception ex)
             {
                 return BadRequest(ex.Message);
             }
         }
+
+        [HttpPost("logout")]
+        public IActionResult Logout()
+        {
+            Response.Cookies.Delete("AuthToken", new CookieOptions
+            {
+                Secure = true,
+                SameSite = SameSiteMode.None
+            });
+
+            return Ok();
+        }
+
         [Authorize]
         [HttpGet("me")]
-        public IActionResult Me()
+        public IActionResult Me()   
         {
             return Ok(new
             {
-                Username = User.Identity?.Name
+                Username = User.Identity?.Name,
+                Role = User.FindFirstValue(ClaimTypes.Role)
             });
+        }
+
+        private void SetAuthCookie(string token)
+        {
+            Response.Cookies.Append(
+                "AuthToken",
+                token,
+                new CookieOptions
+                {
+                    HttpOnly = true,
+                    Secure = true,
+                    SameSite = SameSiteMode.None,
+                    Expires = DateTimeOffset.UtcNow.AddHours(2)
+                });
+        }
+
+        private static object CreateUserResponse(string username, string role)
+        {
+            return new
+            {
+                Username = username,
+                Role = role
+            };
         }
     }
 }

@@ -1,68 +1,61 @@
 import API from "./api";
 
+const readValue = (data, key) => data?.[key] ?? data?.[key.charAt(0).toUpperCase() + key.slice(1)];
+
+const saveUserData = (data) => {
+    const role = readValue(data, "role");
+    const username = readValue(data, "username");
+
+    if (role) {
+        localStorage.setItem("role", role);
+    }
+
+    if (username) {
+        localStorage.setItem("username", username);
+    }
+};
+
+const clearUserData = () => {
+    localStorage.removeItem("role");
+    localStorage.removeItem("username");
+};
+
 export const login = async (data) => {
     const res = await API.post("/Auth/login", data);
-
-    saveAuthData(res.data);
-
+    saveUserData(res.data);
     return res.data;
 };
 
 export const googleLogin = async (idToken) => {
     const res = await API.post("/Auth/google-login", { idToken });
-    saveAuthData(res.data);
+    saveUserData(res.data);
     return res.data;
 };
 
 export const register = async (data) => {
     const res = await API.post("/Auth/register", data);
-    alert("User registered successfully!");
+    saveUserData(res.data);
     return res.data;
 };
 
-export const saveAuthData = (data) => {
-    localStorage.setItem("token", data.token);
-    localStorage.setItem("role", data.role);
-    localStorage.setItem("username", data.username);
-};
-
-export const logout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("role");
-    localStorage.removeItem("username");
-};
-
-const decodeJwtPayload = (token) => {
+export const logout = async () => {
     try {
-        const base64Url = token.split(".")[1];
-        const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
-        const payload = atob(base64);
-
-        return JSON.parse(payload);
-    } catch {
-        return null;
+        await API.post("/Auth/logout");
+    } finally {
+        clearUserData();
+        window.location.replace("/login");
     }
 };
 
-export const isTokenExpired = (token) => {
-    const payload = decodeJwtPayload(token);
-
-    if (!payload?.exp) {
+export const isAuthenticated = async () => {
+    try {
+        const res = await API.get("/Auth/me");
+        saveUserData(res.data);
         return true;
+    } catch {
+        clearUserData();
+        return false;
     }
-
-    return Date.now() >= payload.exp * 1000;
-};
-
-export const getToken = () => {
-    const token = localStorage.getItem("token");
-
-    if (token && isTokenExpired(token)) {
-        logout();
-        return null;
-    }
-
-    return token;
 };
 
 export const getRole = () => {
@@ -71,8 +64,4 @@ export const getRole = () => {
 
 export const getUsername = () => {
     return localStorage.getItem("username");
-};
-
-export const isAuthenticated = () => {
-    return !!getToken();
 };

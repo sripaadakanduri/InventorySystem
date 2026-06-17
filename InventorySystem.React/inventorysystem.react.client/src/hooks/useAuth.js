@@ -6,7 +6,6 @@ import {
     googleLogin,
     register,
     logout,
-    isAuthenticated,
     getRole,
     getUsername
 } from "../services/auth";
@@ -54,9 +53,9 @@ const useAuth = () => {
         }
     };
 
-    const handleLogout = () => {
+    const handleLogout = async () => {
 
-        logout();
+        await logout();
 
         navigate("/login", { replace: true });
     };
@@ -66,7 +65,7 @@ const useAuth = () => {
         handleGoogleLogin,
         handleRegister,
         handleLogout,
-        authenticated: isAuthenticated(),
+        authenticated: Boolean(getRole() || getUsername()),
         role: getRole(),
         username: getUsername()
     };
