@@ -110,5 +110,14 @@ namespace InventorySystem.Service.Repositories
         {
             await _context.Products.AddRangeAsync(products);
         }
+
+        public async Task<Product?> GetByNameAndCategoryAsync(string name, string category)
+        {
+            return await _context.Products
+                .FirstOrDefaultAsync(p =>
+                    !p.IsDeleted &&
+                    p.Name.ToLower() == name.ToLower() &&
+                    p.Category.ToLower() == category.ToLower());
+        }
     }
 }

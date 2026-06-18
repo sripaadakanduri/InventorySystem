@@ -59,6 +59,16 @@ namespace InventorySystem.Service.Services
 
             try
             {
+                var existingProduct = await _unitOfWork.Products
+                    .GetByNameAndCategoryAsync(dto.Name, dto.Category);
+
+                if (existingProduct != null)
+                {
+                    throw new DuplicateProductException(
+                        existingProduct.Name,
+                        existingProduct.Category);
+                }
+
                 var product = new Product
                 {
                     Name = dto.Name,
@@ -205,7 +215,14 @@ namespace InventorySystem.Service.Services
                     errors.Add("Price must be greater than 0");
                 if (record.StockQuantity <= 0)
                     errors.Add("quantity must be greater than 0");
+                var existingProduct =
+                    await _unitOfWork.Products.GetByNameAndCategoryAsync(
+                        record.Name,
+                        record.Category
+                    );
 
+                if (existingProduct != null)
+                    errors.Add("Product already exists");
                 if (errors.Any())
                 {
                     failedProducts.Add(new FailedDto

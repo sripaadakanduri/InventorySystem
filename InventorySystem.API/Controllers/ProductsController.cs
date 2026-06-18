@@ -55,23 +55,32 @@ namespace InventorySystem.API.Controllers
             [Authorize(Roles = UserRoles.Admin)]
             public async Task<IActionResult> Create(BaseDto dto)
             {
-                var userId = int.Parse(
-                    User.FindFirst(ClaimTypes.NameIdentifier)!
-                        .Value
-                );
+                try
+                {
+                    var userId = int.Parse(
+                        User.FindFirst(ClaimTypes.NameIdentifier)!.Value
+                    );
 
-                var product =
-                    await _service.CreateProductAsync
-                    (
+                    var product = await _service.CreateProductAsync(
                         dto,
                         userId
                     );
 
-                return CreatedAtAction(
-                    nameof(GetById),
-                    new { id = product.Id },
-                    product
-                );
+                    return CreatedAtAction(
+                        nameof(GetById),
+                        new { id = product.Id },
+                        product
+                    );
+                }
+                catch (DuplicateProductException ex)
+                {
+                    return Conflict(new
+                    {
+                        message = ex.Message,
+                        name = ex.ProductName,
+                        category = ex.Category
+                    });
+                }
             }
 
 

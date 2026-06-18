@@ -11,5 +11,6 @@ namespace InventorySystem.Service.Interfaces
         void Update(Product product);
         void Delete(Product product);
         Task AddRangeAsync(IEnumerable<Product> products);
+        Task<Product?> GetByNameAndCategoryAsync(string name, string category);
     }
 }

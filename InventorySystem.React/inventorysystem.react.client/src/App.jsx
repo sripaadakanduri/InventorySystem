@@ -17,7 +17,14 @@ function App() {
     return (
         <BrowserRouter>
             <Navbar />
-            <ToastContainer position="top-right" autoClose={2500} />
+            <ToastContainer
+                position="top-left"
+                autoClose={3000}
+                newestOnTop
+                closeOnClick
+                pauseOnHover
+                draggable
+            />  
             <Routes>
                 <Route path="/" element={<Navigate to="/dashboard" replace />} />
 

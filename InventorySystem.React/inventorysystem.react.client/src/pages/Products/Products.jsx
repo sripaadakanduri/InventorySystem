@@ -70,6 +70,28 @@ function Products() {
             await fetchProducts(filters);
         } catch (error) {
             console.log(error);
+
+            if (error.response?.status === 409) {
+                const { name, category } = error.response.data;
+
+                const duplicateFilters = {
+                    ...filters,
+                    name,
+                    category
+                };
+
+                setFilters(duplicateFilters);
+
+                await fetchProducts(duplicateFilters);
+
+                toast.error(
+                    `Product Already Exists :${name} (${category})`
+                );
+
+                setShowForm(false);
+                return;
+            }
+
             toast.error("Unable to save product.");
         }
     };
@@ -132,62 +154,76 @@ function Products() {
     };
 
 
-    const handleImport = async () => {
+   const handleImport = async () => {
+    if (!selectedFile) {
+        toast.error("Please select a CSV file.");
+        return;
+    }
 
-        if (!selectedFile) {
-            toast.error("Please select a CSV file.");
-            return;
+    try {
+        const formData = new FormData();
+        formData.append("file", selectedFile);
+
+        const response = await importProducts(formData);
+
+        const originalText = await selectedFile.text();
+
+        const totalProducts =
+            originalText
+                .split("\n")
+                .filter(line => line.trim())
+                .length - 1;
+
+        let failedCount = 0;
+
+        if (response.data.size > 0) {
+            const failedCsvText = await response.data.text();
+
+            failedCount =
+                failedCsvText
+                    .split("\n")
+                    .filter(line => line.trim())
+                    .length - 1;
+
+            const url = window.URL.createObjectURL(
+                new Blob([response.data])
+            );
+
+            const link = document.createElement("a");
+
+            link.href = url;
+            link.download = "FailedProducts.csv";
+
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+
+            window.URL.revokeObjectURL(url);
         }
 
-        try {
+        const importedCount = totalProducts - failedCount;
 
-            const formData = new FormData();
-
-            formData.append("file", selectedFile);
-
-            const response = await importProducts(formData);
-
-            toast.success("Products imported successfully.");
-
-            // Download failed CSV if one was returned
-            if (response.data.size > 0) {
-
-                const url = window.URL.createObjectURL(
-                    new Blob([response.data])
-                );
-
-                const link = document.createElement("a");
-
-                link.href = url;
-
-                link.setAttribute(
-                    "download",
-                    "FailedProducts.csv"
-                );
-
-                document.body.appendChild(link);
-
-                link.click();
-
-                link.remove();
-
-                window.URL.revokeObjectURL(url);
-            }
-
-            setShowAddModal(false);
-
-            setSelectedFile(null);
-
-            await fetchProducts(filters);
-
+        if (importedCount > 0) {
+            toast.success(
+                `${importedCount} product${importedCount !== 1 ? "s" : ""} imported successfully`
+            );
         }
-        catch (error) {
 
-            console.error(error);
-
-            toast.error("Unable to import products.");
+        if (failedCount > 0) {
+            toast.error(
+                `${failedCount} product${failedCount !== 1 ? "s" : ""} failed to import`
+            );
         }
-    };
+
+        setShowAddModal(false);
+        setSelectedFile(null);
+
+        await fetchProducts(filters);
+    } catch (error) {
+        console.error(error);
+        toast.error("Unable to import products.");
+    }
+};
 
     return (
         <div className="w-full max-w-7xl mx-auto flex flex-col gap-6 p-4 sm:p-6">
@@ -236,7 +272,7 @@ function Products() {
                             }`}
                         >
                             <button
-                                className="flex items-center justify-center gap-4 w-full bg-white px-4 py-3 text-left border-x border-b border-gray-200 hover:bg-gray-100"
+                                className="flex items-center justify-center gap-4 w-full bg-white px-4 py-3 text-left border-x border-b border-gray-200 hover:bg-gray-100 duration-300 delay-100"
                                 onClick={handleCreate}
                             >
                                 <Plus size={16} />
@@ -244,7 +280,7 @@ function Products() {
                             </button>
 
                             <button
-                                className="flex items-center justify-center gap-4 w-full bg-white px-4 py-3 text-left border-x border-b border-gray-200 hover:bg-gray-100 rounded-b-xl"
+                                className="flex items-center justify-center gap-4 w-full bg-white px-4 py-3 text-left border-x border-b border-gray-200 hover:bg-gray-100 rounded-b-xl duration-300 delay-200"
                                 onClick={() => setShowAddModal(true)}
                             >
                                 <Upload size={16} />
@@ -418,14 +454,14 @@ function Products() {
                                     setShowAddModal(false);
                                     setSelectedFile(null);
                                 }}
-                                className="rounded-xl border border-gray-300 px-5 py-2 text-gray-700 hover:bg-gray-100"
+                                className="rounded-xl border border-gray-300 px-5 py-2 text-gray-700 hover:bg-gray-100 hover:bg-red-500 hover:text-white transition duration-300"
                             >
                                 Cancel
                             </button>
 
                             <button
                                 disabled={!selectedFile}
-                                className="rounded-xl bg-green-600 px-5 py-2 text-white hover:bg-green-700 disabled:bg-gray-300 disabled:cursor-not-allowed"
+                                className="rounded-xl bg-green-500 px-5 py-2 text-white hover:bg-green-600 disabled:bg-gray-300 disabled:cursor-not-allowed duration-300"
                                 onClick={() => {
                                     handleImport(selectedFile);
                                 }}
