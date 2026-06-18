@@ -2,11 +2,25 @@ import React, { useState, useEffect } from 'react';
 import transactionService from '../../services/transactionService';
 import Pagination from '../../components/Pagination/Pagination';
 import { toast } from 'react-toastify';
-import { Activity } from 'lucide-react';
+import {
+    Activity,
+    ChevronDown,
+    FileSpreadsheet,
+    FileText,
+    File,
+    Printer
+} from 'lucide-react';
+import {
+    exportTransactionsToCSV,
+    exportTransactionsToExcel,
+    exportTransactionsToPDF,
+    printTransactions
+} from '../../components/transactionExportUtils';
 
 const Transactions = () => {
     const [transactions, setTransactions] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [open, setOpen] = useState(false);
     const [filters, setFilters] = useState({
         username: "",
         product: "",
@@ -87,12 +101,96 @@ const Transactions = () => {
 
     return (
         <div className="max-w-7xl mx-auto p-6 mt-8 ">
-            <div className="inline-flex items-center gap-3 mb-8 group ml-3">
-                <Activity className="w-8 h-8 text-indigo-600 group-hover:scale-x-150 group-hover:translate-x-0.5 transition transform duration-300" />
-                <div>
-                    <h2 className="text-3xl font-bold text-gray-800 group-hover:translate-x-2 transition transform duration-300">Audit Trail</h2>
-                    <p className="text-gray-500 mt-1 group-hover:translate-x-2 transition transform duration-300">Track every stock change across the system.</p>
-                </div>    
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8 ml-3">
+                <div className="inline-flex items-center gap-3 group">
+                    <Activity className="w-8 h-8 text-indigo-600 group-hover:scale-x-150 group-hover:translate-x-0.5 transition transform duration-300" />
+                    <div>
+                        <h2 className="text-3xl font-bold text-gray-800 group-hover:translate-x-2 transition transform duration-300">Audit Trail</h2>
+                        <p className="text-gray-500 mt-1 group-hover:translate-x-2 transition transform duration-300">Track every stock change across the system.</p>
+                    </div>
+                </div>
+
+                <div
+                    className="relative inline-block group self-start sm:self-auto"
+                    onMouseEnter={() => setOpen(true)}
+                    onMouseLeave={() => setOpen(false)}
+                >
+                    <button
+                        className={`flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white font-medium px-8 py-3 shadow-md transition-all duration-300 ${open ? "rounded-t-xl rounded-b-none" : "rounded-xl"}`}
+                    >
+                        Export Logs
+                        <ChevronDown
+                            size={18}
+                            className={`transition-transform duration-300 ${open ? "rotate-180" : ""}`}
+                        />
+                    </button>
+
+                    <div className="absolute left-0 top-full w-full z-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible">
+                        <button
+                            onClick={() => exportTransactionsToExcel(transactions)}
+                            className={`flex items-center gap-4 w-full bg-white px-4 py-3 text-left border-x hover:bg-gray-100 border-gray-200 transition-all duration-300  ${open
+                                    ? "opacity-100 translate-y-0"
+                                    : "opacity-0 -translate-y-3 pointer-events-none"
+                                } `}
+                        >
+                            <FileSpreadsheet className="text-green-600" size={20} />
+                            <div className="text-left">
+                                <p className="font-medium text-md text-gray-800">Export to Excel</p>
+                                <p className="text-xs text-gray-500">
+                                    Download sheets
+                                </p>
+                            </div>
+                        </button>
+
+                        <button
+                            onClick={() => exportTransactionsToCSV(transactions)}
+                            className={`flex items-center gap-4 w-full bg-white px-4 py-3 text-left border-x hover:bg-gray-100 border-gray-200 transition-all duration-300 delay-75 ${open
+                                    ? "opacity-100 translate-y-0"
+                                    : "opacity-0 -translate-y-3 pointer-events-none"
+                                }`}
+                        >
+                            <FileText className="text-blue-600" size={20} />
+                            <div className="text-left">
+                                <p className="font-medium text-gray-800">Export to CSV</p>
+                                <p className="text-xs text-gray-500">
+                                    Universal data format
+                                </p>
+                            </div>
+                        </button>
+
+                        <button
+                            onClick={() => exportTransactionsToPDF(transactions)}
+                            className={`flex items-center gap-4 w-full bg-white px-4 py-3 text-left border-x border-gray-200 hover:bg-gray-100 transition-all duration-300 delay-150 ${open
+                                    ? "opacity-100 translate-y-0"
+                                    : "opacity-0 -translate-y-3 pointer-events-none"
+                                }`}
+                        >
+                            <File className="text-red-600" size={20} />
+                            <div className="text-left">
+                                <p className="font-medium text-gray-800">Export to PDF</p>
+                                <p className="text-xs text-gray-500">
+                                    Shareable document
+                                </p>
+                            </div>
+                        </button>
+
+                        <button
+                            onClick={printTransactions}
+                            className={`flex items-center gap-4 w-full bg-white px-4 py-3 text-left border border-gray-200 hover:bg-gray-100 rounded-b-xl shadow-lg transition-all duration-300 delay-200  ${open
+                                    ? "opacity-100 translate-y-0"
+                                    : "opacity-0 -translate-y-3 pointer-events-none"
+                                } `}
+                        >
+                            <Printer className="text-gray-600" size={20} />
+                            <div className="text-left">
+                                <p className="font-medium text-gray-800">Print Logs</p>
+                                <p className="text-xs text-gray-500">
+                                    Print current log list
+                                </p>
+                            </div>
+                        </button>
+                    </div>
+                </div>
             </div>
 
             <div className="w-full overflow-x-auto rounded-3xl shadow-lg bg-white mt-6">
