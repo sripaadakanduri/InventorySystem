@@ -194,6 +194,7 @@ namespace InventorySystem.Service.Services
         {
             var validProducts = new List<Product>();
             var failedProducts = new List<FailedDto>();
+            var importProductKeys = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
             using var reader = new StreamReader(file.OpenReadStream());
 
@@ -208,29 +209,44 @@ namespace InventorySystem.Service.Services
             foreach(var record in records)
             {
                 var errors = new List<string>();
+                var name = record.Name?.Trim() ?? string.Empty;
+                var category = record.Category?.Trim() ?? string.Empty;
 
-                if (string.IsNullOrWhiteSpace(record.Name))
+                if (string.IsNullOrWhiteSpace(name))
                     errors.Add("Name is required");
                 if (record.Price <= 0)
                     errors.Add("Price must be greater than 0");
                 if (record.StockQuantity <= 0)
                     errors.Add("quantity must be greater than 0");
+                if (string.IsNullOrWhiteSpace(category))
+                    errors.Add("Category is required");
+
                 var existingProduct =
                     await _unitOfWork.Products.GetByNameAndCategoryAsync(
-                        record.Name,
-                        record.Category
+                        name,
+                        category
                     );
 
                 if (existingProduct != null)
                     errors.Add("Product already exists");
+
+                var importKey = $"{name}|{category}";
+
+                if (!string.IsNullOrWhiteSpace(name) &&
+                    !string.IsNullOrWhiteSpace(category) &&
+                    !importProductKeys.Add(importKey))
+                {
+                    errors.Add("Duplicate product in import file");
+                }
+
                 if (errors.Any())
                 {
                     failedProducts.Add(new FailedDto
                     {
-                        Name = record.Name,
+                        Name = name,
                         Price = record.Price,
                         StockQuantity = record.StockQuantity,
-                        Category = record.Category,
+                        Category = category,
                         ErrorMessage = string.Join(",", errors)
 
                     });
@@ -239,10 +255,10 @@ namespace InventorySystem.Service.Services
                 {
                     validProducts.Add(new Product
                     {
-                        Name = record.Name,
+                        Name = name,
                         Price = record.Price,
                         StockQuantity = record.StockQuantity,
-                        Category = record.Category
+                        Category = category
                     });
                 }
             }
