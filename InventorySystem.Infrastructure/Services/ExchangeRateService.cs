@@ -31,7 +31,7 @@ namespace InventorySystem.Service.Services
             }
 
             var apiKey = _configuration["ExchangeRateApi:ApiKey"];
-            var baseCurrency = _configuration["ExchangeRateApi: BaseCurrency"] ?? "INR";
+            var baseCurrency = _configuration["ExchangeRateApi: BaseCurrency"] ?? "USD";
 
             if (string.IsNullOrEmpty(apiKey))
             {

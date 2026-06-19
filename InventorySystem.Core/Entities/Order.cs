@@ -16,8 +16,8 @@ namespace InventorySystem.Core.Entities
 
         public decimal TotalAmount { get; set; }
 
-        public string Currency { get; set; } = "INR";
-        public decimal ExchnageRate { get; set; } = 1.0m;
+        public string Currency { get; set; } = "USD";
+        public decimal ExchangeRate { get; set; } = 1.0m;
 
         public DateTime CreatedAt { get; set; }
             = DateTime.UtcNow;

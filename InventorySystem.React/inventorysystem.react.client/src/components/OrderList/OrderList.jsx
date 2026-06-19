@@ -9,7 +9,10 @@ function OrderList({
     filters,
     onFilterChange,
     onFilterApply,
-    onInstantFilterChange
+    onInstantFilterChange,
+    exchangeRates,
+    selectedCurrency,
+    setSelectedCurrency
 }) {
     const [selectedOrder, setSelectedOrder] = useState(null);
     const [products, setProducts] = useState([]);
@@ -21,8 +24,7 @@ function OrderList({
             try {
                 const response = await api.get("/products");
                 setProducts(response.data);
-            }
-            catch (err) {
+            } catch (err) {
                 console.error(err);
             }
         };
@@ -70,12 +72,23 @@ function OrderList({
             <table className="w-full border-separate border-spacing-0 rounded-3xl">
                 <thead className="bg-blue-50 text-gray-700">
                     <tr className="border-b border-gray-200">
-                        <th className="p-4 text-center font-semibold border-b border-gray-200">User</th>
-                        <th className="p-4 text-center font-semibold border-b border-gray-200">Total</th>
-                        <th className="p-4 text-center font-semibold border-b border-gray-200">Quantity</th>
-                        <th className="p-4 text-center font-semibold border-b border-gray-200">Status</th>
-                        <th className="p-4 text-center font-semibold border-b border-gray-200">Created</th>
+                        <th className="p-4 text-center font-semibold border-b border-gray-200">
+                            User
+                        </th>
+                        <th className="p-4 text-center font-semibold border-b border-gray-200">
+                            Total
+                        </th>
+                        <th className="p-4 text-center font-semibold border-b border-gray-200">
+                            Quantity
+                        </th>
+                        <th className="p-4 text-center font-semibold border-b border-gray-200">
+                            Status
+                        </th>
+                        <th className="p-4 text-center font-semibold border-b border-gray-200">
+                            Created
+                        </th>
                     </tr>
+
                     <tr>
                         <th className="p-2 px-4">
                             <div className="flex justify-center">
@@ -90,8 +103,11 @@ function OrderList({
                                 />
                             </div>
                         </th>
+
                         <th className="p-2 px-4"></th>
+
                         <th className="p-2 px-4"></th>
+
                         <th className="p-2 px-4">
                             <div className="flex justify-center">
                                 <select
@@ -109,6 +125,7 @@ function OrderList({
                                 </select>
                             </div>
                         </th>
+
                         <th className="p-2 px-4">
                             <div className="flex flex-col gap-2 justify-center items-center">
                                 <input
@@ -118,6 +135,7 @@ function OrderList({
                                     onChange={onInstantFilterChange}
                                     className="border border-gray-300 rounded-lg px-2 py-1 text-sm font-normal focus:outline-none focus:ring-2 focus:ring-blue-400 w-full max-w-[140px]"
                                 />
+
                                 <input
                                     type="date"
                                     name="endDate"
@@ -136,33 +154,40 @@ function OrderList({
                             <tr
                                 key={order.id}
                                 onClick={() => openViewModal(order)}
-                                className="hover:bg-gray-50 hover:translate-0.5 cursor-pointer transition transform duration-150 border border-gray-200 items-center justify-center"
+                                className="hover:bg-gray-50 cursor-pointer transition transform duration-150 border border-gray-200"
                             >
                                 <td className="p-4 text-center">
-                                    {order.username.charAt(0).toUpperCase() + order.username.slice(1)}
+                                    {order.username.charAt(0).toUpperCase() +
+                                        order.username.slice(1)}
                                 </td>
-                                <td className="p-4 font-medium text-black-600 text-center">
-                                    ${order.totalAmount}
+
+                                <td className="p-4 font-medium text-center">
+                                    {(parseFloat(order.totalAmount) *
+                                        (order.exchangeRate || 1)).toFixed(2)}{" "}
+                                    {order.currency || "USD"}
                                 </td>
+
                                 <td className="p-4 text-center">
                                     {order.totalQuantity}
                                 </td>
+
                                 <td className="p-4 text-center">
                                     <span
                                         className={`px-3 py-1 rounded-full text-sm font-medium ${order.status === 1
-                                            ? "bg-yellow-100 text-yellow-700"
-                                            : order.status === 2
-                                                ? "bg-green-50 text-green-700"
-                                                : order.status === 3
-                                                    ? "bg-red-100 text-red-700"
-                                                    : order.status === 4
-                                                        ? "bg-gray-200 text-gray-700"
-                                                        : "bg-blue-50 text-blue-700"
+                                                ? "bg-yellow-100 text-yellow-700"
+                                                : order.status === 2
+                                                    ? "bg-green-50 text-green-700"
+                                                    : order.status === 3
+                                                        ? "bg-red-100 text-red-700"
+                                                        : order.status === 4
+                                                            ? "bg-gray-200 text-gray-700"
+                                                            : "bg-blue-50 text-blue-700"
                                             }`}
                                     >
                                         {getStatusText(order.status)}
                                     </span>
                                 </td>
+
                                 <td className="p-4 text-gray-600 text-center">
                                     {new Date(order.createdAt).toLocaleString()}
                                 </td>
@@ -201,11 +226,12 @@ function OrderList({
                             <h3 className="text-2xl font-bold text-gray-800">
                                 Order #{selectedOrder.id}
                             </h3>
+
                             <button
                                 className="text-gray-500 hover:text-red-500 text-2xl font-bold"
                                 onClick={() => setSelectedOrder(null)}
                             >
-                                x
+                                ×
                             </button>
                         </div>
 
@@ -213,14 +239,13 @@ function OrderList({
                             <table className="w-full border border-gray-200 rounded-xl overflow-hidden">
                                 <thead className="bg-blue-50">
                                     <tr>
-                                        <th className="text-left p-4 border-gray-200">
-                                            Product
-                                        </th>
-                                        <th className="text-left p-4 border-gray-200">
-                                            Quantity
-                                        </th>
+                                        <th className="text-left p-4">Product</th>
+                                        <th className="text-left p-4">Price</th>
+                                        <th className="text-left p-4">Quantity</th>
+                                        <th className="text-left p-4">Total</th>
                                     </tr>
                                 </thead>
+
                                 <tbody>
                                     {selectedOrder.items.map((item, idx) => {
                                         const prod = products.find(
@@ -230,15 +255,32 @@ function OrderList({
                                         return (
                                             <tr
                                                 key={idx}
-                                                className="border-b border-gray-200 hover:bg-gray-100 transition transform duration-300"
+                                                className="border-b border-gray-200 hover:bg-gray-100 transition duration-300"
                                             >
                                                 <td className="p-4">
                                                     {prod
                                                         ? prod.name
                                                         : `Product #${item.productId}`}
                                                 </td>
+
+                                                <td className="p-4 text-gray-700">
+                                                    {(
+                                                        parseFloat(item.unitPrice) *
+                                                        (selectedOrder.exchangeRate || 1)
+                                                    ).toFixed(2)}{" "}
+                                                    {selectedOrder.currency || "USD"}
+                                                </td>
+
                                                 <td className="p-4">
                                                     {item.quantity}
+                                                </td>
+
+                                                <td className="p-4 font-medium">
+                                                    {(
+                                                        parseFloat(item.totalPrice) *
+                                                        (selectedOrder.exchangeRate || 1)
+                                                    ).toFixed(2)}{" "}
+                                                    {selectedOrder.currency || "USD"}
                                                 </td>
                                             </tr>
                                         );

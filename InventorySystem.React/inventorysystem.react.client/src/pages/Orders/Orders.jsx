@@ -4,6 +4,8 @@ import OrderList from "../../components/OrderList/OrderList";
 import OrderForm from "../../components/OrderForm/OrderForm";
 import { getAllOrders, cancelOrder } from "../../services/ordersService";
 import api from "../../services/api";
+import { getLatestRates } from "../../services/exchangeRateService";
+
 import {
     exportToCSV,
     exportToExcel,
@@ -23,6 +25,8 @@ function Orders() {
     const [loading, setLoading] = useState(true);
     const [orderToEdit, setOrderToEdit] = useState(null);
     const [open, setOpen] = useState(false);
+    const [exchangeRates, setExchangeRates] = useState({ USD: 1.0 });
+    const [selectedCurrency, setSelectedCurrency] = useState("USD");
 
     const [filters, setFilters] = useState({
         user: "",
@@ -34,8 +38,14 @@ function Orders() {
     const fetchOrders = async (activeFilters = filters) => {
         try {
             setLoading(true);
-            const data = await getAllOrders(activeFilters);
+
+            const [data, ratesData] = await Promise.all([
+                getAllOrders(activeFilters),
+                getLatestRates().catch(() => ({ USD: 1.0 }))
+            ]);
+
             setOrders(data);
+            setExchangeRates(ratesData);
         } catch (err) {
             console.error(err);
             toast.error("Failed to load orders.");
@@ -94,12 +104,51 @@ function Orders() {
         }
     };
 
+    const getFilteredOrdersForExport = async () => {
+        const data = await getAllOrders(filters);
+        setOrders(data);
+        return data;
+    };
+
+    const handleExportOrders = async (exportAction) => {
+        try {
+            const filteredOrders = await getFilteredOrdersForExport();
+            exportAction(filteredOrders, products);
+        } catch (err) {
+            console.error(err);
+            toast.error("Failed to export filtered orders.");
+        }
+    };
+
     return (
         <div className="w-full max-w-7xl mx-auto flex flex-col gap-6 p-4 sm:p-6">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 rounded-3xl mt-8 border border-gray-200 shadow-lg">
-                <h1 className="text-2xl font-bold text-gray-900">
+            
+
+            
+
+            <div className="bg-white p-6 rounded-3xl border border-gray-200 shadow-lg">
+                <h1 className="flex text-3xl font-bold text-gray-900  justify-center mb-15 hover:scale-105 transition duration-300">
                     Order Management
                 </h1>
+                <OrderForm
+                    orderToEdit={orderToEdit}
+                    onOrderCreated={() => fetchOrders(filters)}
+                    onOrderUpdated={() => {
+                        fetchOrders(filters);
+                        setOrderToEdit(null);
+                    }}
+                    onCancelEdit={() => {
+                        setOrderToEdit(null);
+                    }}
+                    exchangeRates={exchangeRates}
+                    selectedCurrency={selectedCurrency}
+                    setSelectedCurrency={setSelectedCurrency}
+                />
+            </div>
+
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 rounded-3xl mt-8 border border-gray-200 shadow-lg">
+
+                <div className="text-3xl font-bold ">Order List</div>
 
                 <div
                     className="relative inline-block group"
@@ -121,10 +170,10 @@ function Orders() {
                     {/* Dropdown */}
                     <div className="absolute left-0 top-full w-full z-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible">
                         <button
-                            onClick={() => exportToExcel(orders, products)}
+                            onClick={() => handleExportOrders(exportToExcel)}
                             className={`flex items-center gap-4 w-full bg-white px-4 py-3 text-left border-x hover:bg-gray-100 border-gray-200 transition-all duration-300  ${open
-                                    ? "opacity-100 translate-y-0"
-                                    : "opacity-0 -translate-y-3 pointer-events-none"
+                                ? "opacity-100 translate-y-0"
+                                : "opacity-0 -translate-y-3 pointer-events-none"
                                 } `}
                         >
                             <FileSpreadsheet className="text-green-600" size={20} />
@@ -137,10 +186,10 @@ function Orders() {
                         </button>
 
                         <button
-                            onClick={() => exportToCSV(orders, products)}
+                            onClick={() => handleExportOrders(exportToCSV)}
                             className={`flex items-center gap-4 w-full bg-white px-4 py-3 text-left border-x hover:bg-gray-100 border-gray-200 transition-all duration-300 delay-75 ${open
-                                    ? "opacity-100 translate-y-0"
-                                    : "opacity-0 -translate-y-3 pointer-events-none"
+                                ? "opacity-100 translate-y-0"
+                                : "opacity-0 -translate-y-3 pointer-events-none"
                                 }`}
                         >
                             <FileText className="text-blue-600" size={20} />
@@ -153,10 +202,10 @@ function Orders() {
                         </button>
 
                         <button
-                            onClick={() => exportToPDF(orders, products)}
+                            onClick={() => handleExportOrders(exportToPDF)}
                             className={`flex items-center gap-4 w-full bg-white px-4 py-3 text-left border-x border-gray-200 hover:bg-gray-100 transition-all duration-300 delay-150 ${open
-                                    ? "opacity-100 translate-y-0"
-                                    : "opacity-0 -translate-y-3 pointer-events-none"
+                                ? "opacity-100 translate-y-0"
+                                : "opacity-0 -translate-y-3 pointer-events-none"
                                 }`}
                         >
                             <File className="text-red-600" size={20} />
@@ -171,8 +220,8 @@ function Orders() {
                         <button
                             onClick={printOrders}
                             className={`flex items-center gap-4 w-full bg-white px-4 py-3 text-left border border-gray-200 hover:bg-gray-100 rounded-b-xl shadow-lg transition-all duration-300 delay-200  ${open
-                                    ? "opacity-100 translate-y-0"
-                                    : "opacity-0 -translate-y-3 pointer-events-none"
+                                ? "opacity-100 translate-y-0"
+                                : "opacity-0 -translate-y-3 pointer-events-none"
                                 } `}
                         >
                             <Printer className="text-gray-600" size={20} />
@@ -186,23 +235,7 @@ function Orders() {
                     </div>
                 </div>
 
-                
-            </div>
 
-            
-
-            <div className="bg-white p-6 rounded-3xl border border-gray-200 shadow-lg">
-                <OrderForm
-                    orderToEdit={orderToEdit}
-                    onOrderCreated={() => fetchOrders(filters)}
-                    onOrderUpdated={() => {
-                        fetchOrders(filters);
-                        setOrderToEdit(null);
-                    }}
-                    onCancelEdit={() => {
-                        setOrderToEdit(null);
-                    }}
-                />
             </div>
 
             {loading ? (
@@ -215,18 +248,21 @@ function Orders() {
                     </div>
                 </div>
             ) : (
-                <OrderList
-                    orders={orders}
-                    onCancelOrder={handleCancelOrder}
-                    onSelectForEdit={(order) => {
-                        setOrderToEdit(order);
-                        window.scrollTo({ top: 0, behavior: "smooth" });
-                    }}
-                    filters={filters}
-                    onFilterChange={handleFilterChange}
-                    onFilterApply={handleFilterApply}
-                    onInstantFilterChange={handleInstantFilterChange}
-                />
+                    <OrderList
+                        orders={orders}
+                        onCancelOrder={handleCancelOrder}
+                        onSelectForEdit={(order) => {
+                            setOrderToEdit(order);
+                            window.scrollTo({ top: 0, behavior: "smooth" });
+                        }}
+                        filters={filters}
+                        onFilterChange={handleFilterChange}
+                        onFilterApply={handleFilterApply}
+                        onInstantFilterChange={handleInstantFilterChange}
+                        exchangeRates={exchangeRates}
+                        selectedCurrency={selectedCurrency}
+                        setSelectedCurrency={setSelectedCurrency}
+                    />
             )}
         </div>
     );

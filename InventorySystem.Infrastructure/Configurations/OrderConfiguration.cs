@@ -13,6 +13,15 @@ namespace InventorySystem.Service.Configurations
             builder.Property(x => x.TotalAmount)
                 .HasColumnType("decimal(18,2)");
 
+            builder.Property(x => x.Currency)
+                .HasMaxLength(3)
+                .IsRequired()
+                .HasDefaultValue("INR");
+
+            builder.Property(x => x.ExchangeRate)
+                .HasColumnType("decimal(18,6)")
+                .HasDefaultValue(1.0m);
+
             builder.HasMany(x => x.OrderItems)
                 .WithOne(x => x.Order)
                 .HasForeignKey(x => x.OrderId);

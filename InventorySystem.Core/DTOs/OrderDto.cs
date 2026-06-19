@@ -12,8 +12,8 @@ namespace InventorySystem.Core.DTOs
 
         public decimal TotalAmount { get; set; }
 
-        public string Currency { get; set; } = "INR";
-        public decimal ExchnageRate { get; set; } = 1.0m;
+        public string Currency { get; set; } = "USD";
+        public decimal ExchangeRate { get; set; } = 1.0m;
         public int TotalQuantity { get; set; }
 
         public DateTime CreatedAt { get; set; }

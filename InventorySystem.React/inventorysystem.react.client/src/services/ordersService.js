@@ -26,8 +26,7 @@ export const cancelOrder = async (orderId) => {
     return response.data;
 };
 
-export const updateOrder = async (orderId, updatedItems) => {
-    const payload = { items: updatedItems };
+export const updateOrder = async (orderId, payload) => {
     const response = await api.put(`${ORDER_BASE_URL}/${orderId}`, payload);
     return response.data;
 };

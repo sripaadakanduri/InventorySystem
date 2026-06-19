@@ -43,7 +43,7 @@ const Login = () => {
             await handleGoogleLogin(credentialResponse.credential);
             toast.success("Login successful!");
         } catch (err) {
-            toast.error("Google login failed.");
+            toast.error("Google login failed."+err);
         } finally {
             setLoading(false);
         }

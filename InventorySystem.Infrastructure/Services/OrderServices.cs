@@ -79,6 +79,8 @@ namespace InventorySystem.Service.Services
 
                 order.TotalAmount = totalAmount;
                 order.Status = OrderStatus.Confirmed;
+                order.Currency = dto.Currency;
+                order.ExchangeRate = dto.ExchangeRate;
 
                 await _context.Orders.AddAsync(order);
                 await _unitOfWork.SaveChangesAsync();
@@ -316,6 +318,8 @@ namespace InventorySystem.Service.Services
                 order.TotalAmount = totalAmount;
                 order.Status = OrderStatus.Updated;
                 order.UpdatedAt = DateTime.UtcNow;
+                order.Currency = dto.Currency;
+                order.ExchangeRate = dto.ExchangeRate;
 
                 await _unitOfWork.SaveChangesAsync();
                 await transaction.CommitAsync();
@@ -337,6 +341,8 @@ namespace InventorySystem.Service.Services
                 Username = order.User?.Username ?? "",
                 Status = order.Status,
                 TotalAmount = order.TotalAmount,
+                Currency = order.Currency,
+                ExchangeRate = order.ExchangeRate,
                 TotalQuantity = order.OrderItems.Sum(x => x.Quantity),
                 CreatedAt = order.CreatedAt,
                 Items = order.OrderItems.Select(x => new OrderItemDto

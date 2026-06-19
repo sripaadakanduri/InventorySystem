@@ -84,6 +84,23 @@ const Transactions = () => {
         fetchTransactions(updatedFilters);
     };
 
+    const getFilteredTransactionsForExport = async () => {
+        const data = await transactionService.getTransactions(filters);
+        setTransactions(data);
+        setCurrentPage(1);
+        return data;
+    };
+
+    const handleExportTransactions = async (exportAction) => {
+        try {
+            const filteredTransactions = await getFilteredTransactionsForExport();
+            exportAction(filteredTransactions);
+        } catch (error) {
+            console.error("Error exporting transactions:", error);
+            toast.error("Failed to export filtered audit logs.");
+        }
+    };
+
     const getBadgeStyle = (actionType) => {
         if (actionType === "StockIn" || actionType === "ManualAdd") return "bg-green-50 text-green-700 border-green-200";
         if (actionType === "StockOut" || actionType === "ManualRemove") return "bg-red-50 text-red-700 border-red-200";
@@ -127,7 +144,7 @@ const Transactions = () => {
 
                     <div className="absolute left-0 top-full w-full z-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible">
                         <button
-                            onClick={() => exportTransactionsToExcel(transactions)}
+                            onClick={() => handleExportTransactions(exportTransactionsToExcel)}
                             className={`flex items-center gap-4 w-full bg-white px-4 py-3 text-left border-x hover:bg-gray-100 border-gray-200 transition-all duration-300  ${open
                                     ? "opacity-100 translate-y-0"
                                     : "opacity-0 -translate-y-3 pointer-events-none"
@@ -143,7 +160,7 @@ const Transactions = () => {
                         </button>
 
                         <button
-                            onClick={() => exportTransactionsToCSV(transactions)}
+                            onClick={() => handleExportTransactions(exportTransactionsToCSV)}
                             className={`flex items-center gap-4 w-full bg-white px-4 py-3 text-left border-x hover:bg-gray-100 border-gray-200 transition-all duration-300 delay-75 ${open
                                     ? "opacity-100 translate-y-0"
                                     : "opacity-0 -translate-y-3 pointer-events-none"
@@ -159,7 +176,7 @@ const Transactions = () => {
                         </button>
 
                         <button
-                            onClick={() => exportTransactionsToPDF(transactions)}
+                            onClick={() => handleExportTransactions(exportTransactionsToPDF)}
                             className={`flex items-center gap-4 w-full bg-white px-4 py-3 text-left border-x border-gray-200 hover:bg-gray-100 transition-all duration-300 delay-150 ${open
                                     ? "opacity-100 translate-y-0"
                                     : "opacity-0 -translate-y-3 pointer-events-none"

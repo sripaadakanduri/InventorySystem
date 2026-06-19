@@ -12,6 +12,9 @@ import {
     deleteProduct,
     importProducts
 } from "../../services/ProductService";
+
+import { getLatestRates } from "../../services/exchangeRateService";
+
 import {
   ChevronDown,
   Plus,
@@ -33,13 +36,22 @@ function Products() {
     });
     const [showAddModal, setShowAddModal] = useState(false);
     const [selectedFile, setSelectedFile] = useState(null);
+    const [exchangeRates, setExchangeRates] = useState({ USD: 1.0 });
+    const [selectedCurrency, setSelectedCurrency] = useState("USD");
+
     const role = localStorage.getItem("role")?.toUpperCase();
 
     const fetchProducts = async (activeFilters = filters) => {
         try {
             setIsLoading(true);
-            const data = await getProducts(activeFilters);
-            setProducts(data);
+
+            const [productsData, ratesData] = await Promise.all([
+                getProducts(activeFilters),
+                getLatestRates().catch(() => ({ USD: 1.0 }))
+            ]);
+
+            setProducts(productsData);
+            setExchangeRates(ratesData);
         } catch (error) {
             console.log(error);
             toast.error("Unable to load products.");
@@ -315,6 +327,9 @@ function Products() {
                 onDelete={handleDeleteRequest}
                 deletingProductId={deletingProductId}
                 isLoading={isLoading}
+                exchangeRates={exchangeRates}
+                selectedCurrency={selectedCurrency}
+                setSelectedCurrency={setSelectedCurrency}
             />
 
             {productPendingDelete && (

@@ -17,24 +17,43 @@ const SearchableProductSelect = ({ value, onChange, products }) => {
 
     useEffect(() => {
         const handleClickOutside = (event) => {
-            if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+            if (
+                dropdownRef.current &&
+                !dropdownRef.current.contains(event.target)
+            ) {
                 setIsOpen(false);
                 setSearch("");
             }
         };
+
         document.addEventListener("mousedown", handleClickOutside);
-        return () => document.removeEventListener("mousedown", handleClickOutside);
+
+        return () =>
+            document.removeEventListener(
+                "mousedown",
+                handleClickOutside
+            );
     }, []);
 
-    const selectedProduct = products.find(p => p.id === Number(value));
+    const selectedProduct = products.find(
+        (p) => p.id === Number(value)
+    );
 
     return (
         <div className="relative w-full" ref={dropdownRef}>
             <div
-                className={`w-full border border-gray-300 rounded-lg px-4 py-3 bg-white flex justify-between items-center cursor-pointer ${!selectedProduct ? 'text-gray-500' : 'text-gray-900'}`}
+                className={`w-full border border-gray-300 rounded-lg px-4 py-3 bg-white flex justify-between items-center cursor-pointer ${!selectedProduct
+                        ? "text-gray-500"
+                        : "text-gray-900"
+                    }`}
                 onClick={() => setIsOpen(!isOpen)}
             >
-                <span className="truncate">{selectedProduct ? selectedProduct.name : "Select Product"}</span>
+                <span className="truncate">
+                    {selectedProduct
+                        ? selectedProduct.name
+                        : "Select Product"}
+                </span>
+
                 <ChevronDown className="w-4 h-4 ml-2 text-gray-500 flex-shrink-0" />
             </div>
 
@@ -45,28 +64,48 @@ const SearchableProductSelect = ({ value, onChange, products }) => {
                             type="text"
                             placeholder="Search..."
                             value={search}
-                            onChange={(e) => setSearch(e.target.value)}
+                            onChange={(e) =>
+                                setSearch(e.target.value)
+                            }
                             className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
                             autoFocus
                         />
                     </div>
+
                     <ul className="max-h-48 overflow-y-auto">
-                        {products.filter(p => p.name.toLowerCase().includes(search.toLowerCase())).map(product => (
-                            <li
-                                key={product.id}
-                                className="px-4 py-2 hover:bg-blue-50 cursor-pointer text-gray-800 text-sm"
-                                onClick={() => {
-                                    onChange(product.id);
-                                    setIsOpen(false);
-                                    setSearch("");
-                                }}
-                            >
-                                {product.name}
-                            </li>
-                        ))}
-                        {products.filter(p => p.name.toLowerCase().includes(search.toLowerCase())).length === 0 && (
-                            <li className="px-4 py-3 text-sm text-gray-500 text-center">No products found</li>
-                        )}
+                        {products
+                            .filter((p) =>
+                                p.name
+                                    .toLowerCase()
+                                    .includes(
+                                        search.toLowerCase()
+                                    )
+                            )
+                            .map((product) => (
+                                <li
+                                    key={product.id}
+                                    className="px-4 py-2 hover:bg-blue-50 cursor-pointer text-gray-800 text-sm"
+                                    onClick={() => {
+                                        onChange(product.id);
+                                        setIsOpen(false);
+                                        setSearch("");
+                                    }}
+                                >
+                                    {product.name}
+                                </li>
+                            ))}
+
+                        {products.filter((p) =>
+                            p.name
+                                .toLowerCase()
+                                .includes(
+                                    search.toLowerCase()
+                                )
+                        ).length === 0 && (
+                                <li className="px-4 py-3 text-sm text-gray-500 text-center">
+                                    No products found
+                                </li>
+                            )}
                     </ul>
                 </div>
             )}
@@ -78,27 +117,42 @@ function OrderForm({
     onOrderCreated,
     orderToEdit,
     onOrderUpdated,
-    onCancelEdit
+    onCancelEdit,
+    exchangeRates,
+    selectedCurrency,
+    setSelectedCurrency
 }) {
     const [products, setProducts] = useState([]);
     const [items, setItems] = useState([
-        { productId: "", quantity: 1 }
+        {
+            productId: "",
+            quantity: 1
+        }
     ]);
 
     const [loading, setLoading] = useState(false);
 
     useEffect(() => {
         if (orderToEdit) {
-            const mappedItems = orderToEdit.items.map((i) => ({
-                productId: i.productId,
-                quantity: i.quantity
-            }));
-
-            setItems(mappedItems);
+            setItems(
+                orderToEdit.items.map((i) => ({
+                    productId: i.productId,
+                    quantity: i.quantity
+                }))
+            );
         } else {
-            setItems([{ productId: "", quantity: 1 }]);
+            setItems([
+                {
+                    productId: "",
+                    quantity: 1
+                }
+            ]);
         }
     }, [orderToEdit]);
+
+    useEffect(() => {
+        fetchProducts();
+    }, []);
 
     const fetchProducts = async () => {
         try {
@@ -108,10 +162,6 @@ function OrderForm({
             console.error(err);
         }
     };
-
-    useEffect(() => {
-        fetchProducts();
-    }, []);
 
     const handleAddItem = () => {
         setItems([
@@ -124,11 +174,7 @@ function OrderForm({
     };
 
     const handleRemoveItem = (index) => {
-        const updatedItems = items.filter(
-            (_, i) => i !== index
-        );
-
-        setItems(updatedItems);
+        setItems(items.filter((_, i) => i !== index));
     };
 
     const handleChange = (index, field, value) => {
@@ -147,13 +193,16 @@ function OrderForm({
                 items: items.map((item) => ({
                     productId: Number(item.productId),
                     quantity: Number(item.quantity)
-                }))
+                })),
+                currency: selectedCurrency,
+                exchangeRate:
+                    exchangeRates[selectedCurrency] || 1
             };
 
             if (orderToEdit) {
                 const result = await updateOrder(
                     orderToEdit.id,
-                    payload.items
+                    payload
                 );
 
                 toast.success("Order updated successfully.");
@@ -178,8 +227,10 @@ function OrderForm({
                 }
             }
         } catch (err) {
-            const message = err.response?.data?.message || "Failed to submit order.";
-            toast.error(message);
+            toast.error(
+                err.response?.data?.message ||
+                "Failed to submit order."
+            );
         }
 
         setLoading(false);
@@ -187,7 +238,6 @@ function OrderForm({
 
     return (
         <div className="w-full">
-
             <div className="flex items-center gap-3 mb-8">
                 <PackagePlus className="w-8 h-8 text-blue-500" />
 
@@ -204,48 +254,80 @@ function OrderForm({
             >
                 <div className="space-y-3">
                     <div className="hidden md:flex gap-4">
-                        <div className="flex-1 text-sm font-semibold text-gray-700">Product</div>
-                        <div className="w-32 text-sm font-semibold text-gray-700">Quantity</div>
-                        <div className="w-32 text-sm font-semibold text-gray-700 text-center">Availability</div>
+                        <div className="flex-1 text-sm font-semibold text-gray-700">
+                            Product
+                        </div>
+
+                        <div className="w-32 text-sm font-semibold text-gray-700 text-center">
+                            Price
+                        </div>
+
+                        <div className="w-32 text-sm font-semibold text-gray-700">
+                            Quantity
+                        </div>
+
+                        <div className="w-32 text-sm font-semibold text-gray-700 text-center">
+                            Availability
+                        </div>
+
                         <div className="w-[104px]"></div>
                     </div>
 
                     {items.map((item, index) => {
                         const selectedProduct = products.find(
-                            (p) => p.id === Number(item.productId)
+                            (p) =>
+                                p.id === Number(item.productId)
                         );
 
                         const availableQuantity =
-                            selectedProduct
-                                ? selectedProduct.stockQuantity
-                                : null;
+                            selectedProduct?.stockQuantity;
 
                         return (
                             <div
                                 key={index}
-                                className="flex flex-col md:flex-row gap-4 items-start md:items-center w-full"
+                                className="flex flex-col md:flex-row gap-4 items-start md:items-center"
                             >
                                 <div className="flex-1 w-full">
-                                    <label className="md:hidden text-sm font-semibold text-gray-700 mb-1 block">Product</label>
                                     <SearchableProductSelect
                                         value={item.productId}
-                                        onChange={(newVal) =>
+                                        onChange={(value) =>
                                             handleChange(
                                                 index,
                                                 "productId",
-                                                newVal
+                                                value
                                             )
                                         }
                                         products={products}
                                     />
                                 </div>
 
+                                <div className="w-full md:w-54 flex justify-center">
+                                    {selectedProduct ? (
+                                        <span className="bg-gray-100 text-gray-700 text-sm font-medium px-4 py-3 rounded-lg w-full text-center border border-gray-200">
+                                            {(
+                                                parseFloat(
+                                                    selectedProduct.price
+                                                ) *
+                                                (exchangeRates[
+                                                    selectedCurrency
+                                                ] || 1)
+                                            ).toFixed(2)}{" "}
+                                            {selectedCurrency}
+                                        </span>
+                                    ) : (
+                                        <span className="w-full text-center text-gray-400">
+                                            --
+                                        </span>
+                                    )}
+                                </div>
+
                                 <div className="w-full md:w-32">
-                                    <label className="md:hidden text-sm font-semibold text-gray-700 mb-1 block">Quantity</label>
                                     <input
                                         type="number"
                                         min="1"
-                                        max={availableQuantity || 1}
+                                        max={
+                                            availableQuantity || 1
+                                        }
                                         value={item.quantity}
                                         onChange={(e) =>
                                             handleChange(
@@ -255,7 +337,7 @@ function OrderForm({
                                             )
                                         }
                                         required
-                                        className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-400 bg-white"
+                                        className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-400"
                                     />
                                 </div>
 
@@ -265,31 +347,34 @@ function OrderForm({
                                             Stock: {availableQuantity}
                                         </span>
                                     ) : (
-                                        <span className="hidden md:block w-full px-4 py-3 text-center text-gray-400 text-sm">
+                                        <span className="text-gray-400">
                                             --
                                         </span>
                                     )}
                                 </div>
 
-                                <div className="w-full md:w-[104px] flex gap-2 justify-end md:justify-center">
+                                <div className="w-full md:w-[104px] flex gap-2 justify-end">
                                     {items.length > 1 && (
                                         <button
                                             type="button"
-                                            onClick={() => handleRemoveItem(index)}
-                                            className="bg-red-50 hover:bg-red-100 text-red-500 p-3 rounded-lg transition duration-200 border border-red-200 shadow-sm flex items-center justify-center w-full md:w-auto"
-                                            title="Remove Item"
+                                            onClick={() =>
+                                                handleRemoveItem(
+                                                    index
+                                                )
+                                            }
+                                            className="bg-red-50 hover:bg-red-100 text-red-500 p-3 rounded-lg"
                                         >
                                             <Minus className="w-5 h-5" />
                                         </button>
                                     )}
+
                                     {index === items.length - 1 && (
                                         <button
                                             type="button"
                                             onClick={handleAddItem}
-                                            className="group bg-blue-500 hover:bg-blue-600 hover:scale-105 text-white p-3 rounded-lg transform transition duration-200 shadow-sm flex items-center justify-center w-full md:w-auto"
-                                            title="Add Item"
+                                            className="bg-blue-500 hover:bg-blue-600 text-white p-3 rounded-lg"
                                         >
-                                            <Plus className="w-5 h-5 group-hover:rotate-90 transition transform duration-300" />
+                                            <Plus className="w-5 h-5" />
                                         </button>
                                     )}
                                 </div>
@@ -298,23 +383,40 @@ function OrderForm({
                     })}
                 </div>
 
+
                 <div className="flex flex-wrap gap-4 justify-end pt-4">
+                    <div className="flex items-center gap-3">
+                    <label className="font-medium">
+                        Currency:
+                    </label>
+
+                    <select
+                        value={selectedCurrency}
+                        onChange={(e) =>
+                            setSelectedCurrency(
+                                e.target.value
+                            )
+                        }
+                        className="border border-gray-300 rounded-lg px-3 py-2"
+                    >
+                        {Object.keys(exchangeRates).map(
+                            (currency) => (
+                                <option
+                                    key={currency}
+                                    value={currency}
+                                >
+                                    {currency}
+                                </option>
+                            )
+                        )}
+                    </select>
+                </div>
+                
                     {orderToEdit && (
                         <button
                             type="button"
-                            onClick={() => {
-                                setItems([
-                                    {
-                                        productId: "",
-                                        quantity: 1
-                                    }
-                                ]);
-
-                                if (onCancelEdit) {
-                                    onCancelEdit();
-                                }
-                            }}
-                            className="bg-red-500 hover:bg-red-600 text-white px-8 py-3 rounded-xl font-semibold shadow-lg transition duration-200"
+                            onClick={onCancelEdit}
+                            className="bg-red-500 hover:bg-red-600 text-white px-8 py-3 rounded-xl font-semibold shadow-lg"
                         >
                             Cancel Edit
                         </button>
@@ -323,7 +425,7 @@ function OrderForm({
                     <button
                         type="submit"
                         disabled={loading}
-                        className="bg-green-500 hover:bg-green-600 text-white px-8 py-3 rounded-xl font-semibold shadow-lg transition duration-200"
+                        className="bg-green-500 hover:bg-green-600 text-white px-8 py-3 rounded-xl font-semibold shadow-lg"
                     >
                         {loading
                             ? "Processing..."
@@ -334,7 +436,6 @@ function OrderForm({
                 </div>
             </form>
         </div>
-        
     );
 }
 
