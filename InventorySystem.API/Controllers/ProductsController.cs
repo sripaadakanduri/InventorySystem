@@ -154,7 +154,7 @@ namespace InventorySystem.API.Controllers
         }
         [HttpPost("import")]
         [Consumes("multipart/form-data")]
-        public async Task<IActionResult> ImportProducts([FromForm] IFormFile file)
+        public async Task<IActionResult> ImportProducts( IFormFile file)
         {
             if (file == null || file.Length == 0)
                 return BadRequest("File is required.");

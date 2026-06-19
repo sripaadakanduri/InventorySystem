@@ -24,6 +24,9 @@ builder.Services.AddScoped<IOrderService, OrderServices>();
 builder.Services.AddScoped<IInventoryTransactionService, InventoryTransactionService>();
 builder.Services.AddScoped<IUserService, UserService>();
 
+builder.Services.AddMemoryCache();
+//builder.Services.AddHttpClient();
+builder.Services.AddHttpClient<IExchangeRateService, ExchangeRateService>();
 
 var allowedOrigins = builder.Configuration
     .GetSection("AllowedOrigins")

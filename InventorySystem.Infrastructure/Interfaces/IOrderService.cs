@@ -25,5 +25,6 @@ namespace InventorySystem.Service.Interfaces
             bool isAdmin,
             OrderFilterDto? filter = null
         );
+
     }
 }
