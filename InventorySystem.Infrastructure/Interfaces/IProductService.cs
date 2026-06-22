@@ -27,7 +27,7 @@ namespace InventorySystem.Service.Interfaces
             int userId
         );
 
-        Task<byte[]> ImportProductsAsync(IFormFile file);
+        Task<byte[]> ImportProductsAsync(IFormFile file, int userId);
 
     }
 }

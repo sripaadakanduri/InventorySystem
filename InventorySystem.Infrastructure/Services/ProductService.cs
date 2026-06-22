@@ -7,6 +7,7 @@ using CsvHelper.Configuration;
 using System.Runtime.CompilerServices;
 using Microsoft.AspNetCore.Http;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
+using System.Runtime.Intrinsics.Arm;
 
 
 namespace InventorySystem.Service.Services
@@ -190,13 +191,18 @@ namespace InventorySystem.Service.Services
             }
         }
 
-        public async Task<byte[]> ImportProductsAsync(IFormFile file)
+        public async Task<byte[]> ImportProductsAsync(IFormFile file, int userId)
         {
             var validProducts = new List<Product>();
             var failedProducts = new List<FailedDto>();
             var importProductKeys = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
             using var reader = new StreamReader(file.OpenReadStream());
+
+            var dbProducts = await _unitOfWork.Products.GetAllAsync();
+            var existingCategories = new HashSet<string>(
+                dbProducts.Select(p => p.Category?.Trim() ?? string.Empty))
+                .Where(c => !string.IsNullOrEmpty(c));
 
             var config = new CsvConfiguration(CultureInfo.InvariantCulture)
             {
@@ -220,6 +226,10 @@ namespace InventorySystem.Service.Services
                     errors.Add("quantity must be greater than 0");
                 if (string.IsNullOrWhiteSpace(category))
                     errors.Add("Category is required");
+                if (!existingCategories.Contains(category))
+                {
+                    errors.Add("category not foound");
+                }
 
                 var existingProduct =
                     await _unitOfWork.Products.GetByNameAndCategoryAsync(
@@ -266,6 +276,17 @@ namespace InventorySystem.Service.Services
             {
                 await _unitOfWork.Products.AddRangeAsync(validProducts);
                 await _unitOfWork.SaveChangesAsync();
+
+                foreach (var product in validProducts)
+                {
+                    await _transactionService.LogTransactionAsync(
+                        product.Id,
+                        userId,
+                        product.StockQuantity,
+                        product.StockQuantity,
+                        "Product Imported"
+                    );
+                }
             }
 
             if (!failedProducts.Any())

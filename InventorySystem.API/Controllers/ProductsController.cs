@@ -158,8 +158,11 @@ namespace InventorySystem.API.Controllers
         {
             if (file == null || file.Length == 0)
                 return BadRequest("File is required.");
+            var userId = int.Parse(
+                        User.FindFirst(ClaimTypes.NameIdentifier)!.Value
+                    );
 
-            var failedProductsCsv = await _service.ImportProductsAsync(file);
+            var failedProductsCsv = await _service.ImportProductsAsync(file,userId);
 
             if (failedProductsCsv.Length > 0)
             {

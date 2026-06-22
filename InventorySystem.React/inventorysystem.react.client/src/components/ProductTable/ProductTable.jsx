@@ -6,7 +6,9 @@ function ProductTable({
     products,
     role,
     filters,
+    categories = [],
     onFilterChange,
+    onCategoryFilterChange,
     onPriceSortChange,
     onFilterApply,
     onEdit,
@@ -130,15 +132,19 @@ function ProductTable({
 
                         <th className="p-2 px-4">
                             <div className="flex justify-center">
-                                <input
-                                    type="text"
+                                <select
                                     name="category"
-                                    placeholder="Filter Category..."
                                     value={filters.category}
-                                    onChange={onFilterChange}
-                                    onKeyDown={handleFilterKeyDown}
+                                    onChange={onCategoryFilterChange}
                                     className="border border-gray-300 rounded-lg px-3 py-2 text-sm font-normal focus:outline-none focus:ring-2 focus:ring-blue-400 w-32"
-                                />
+                                >
+                                    <option value="">All Categories</option>
+                                    {categories.map((cat) => (
+                                        <option key={cat} value={cat}>
+                                            {cat}
+                                        </option>
+                                    ))}
+                                </select>
                             </div>
                         </th>
 
@@ -183,10 +189,10 @@ function ProductTable({
                                 <td className="p-4 text-center font-bold">
                                     <span
                                         className={`${product.stockQuantity > 20
-                                                ? "text-green-600"
-                                                : product.stockQuantity > 0
-                                                    ? "text-yellow-600"
-                                                    : "text-red-600"
+                                            ? "text-green-600"
+                                            : product.stockQuantity > 0
+                                                ? "text-yellow-600"
+                                                : "text-red-600"
                                             }`}
                                     >
                                         {product.stockQuantity}

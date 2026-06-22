@@ -2,13 +2,14 @@
 import { useEffect, useState } from "react";
 import { Package } from "lucide-react";
 
-function ProductForm({ onSubmit, selectedProduct, onClose }) {
+function ProductForm({ onSubmit, selectedProduct, categories = [], onClose }) {
     const [formData, setFormData] = useState({
         name: "",
         price: "",
         stockQuantity: "",
         category: ""
     });
+    const [isNewCategory, setIsNewCategory] = useState(false);
 
     // eslint-disable-next-line react-hooks/set-state-in-effect
     useEffect(() => {
@@ -19,6 +20,10 @@ function ProductForm({ onSubmit, selectedProduct, onClose }) {
                 stockQuantity: selectedProduct.stockQuantity || "",
                 category: selectedProduct.category || ""
             });
+            const exists = categories.some(
+                (c) => c.toLowerCase() === (selectedProduct.category || "").toLowerCase()
+            );
+            setIsNewCategory(categories.length === 0 || (!exists && !!selectedProduct.category));
         } else {
             setFormData({
                 name: "",
@@ -26,8 +31,9 @@ function ProductForm({ onSubmit, selectedProduct, onClose }) {
                 stockQuantity: "",
                 category: ""
             });
+            setIsNewCategory(categories.length === 0);
         }
-    }, [selectedProduct]);
+    }, [selectedProduct, categories]);
 
     const handleChange = (e) => {
         setFormData({
@@ -65,16 +71,50 @@ function ProductForm({ onSubmit, selectedProduct, onClose }) {
                         />
                     </div>
                     <div className="flex flex-col gap-2">
-                        <label className="text-sm font-semibold text-gray-700">Category</label>
-                        <input
-                            type="text"
-                            name="category"
-                            placeholder="e.g. Electronics"
-                            value={formData.category}
-                            onChange={handleChange}
-                            className="border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-400"
-                            required
-                        />
+                        <div className="flex items-center justify-between">
+                            <label className="text-sm font-semibold text-gray-700">Category</label>
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    const nextIsNew = !isNewCategory;
+                                    setIsNewCategory(nextIsNew);
+                                    if (nextIsNew) {
+                                        setFormData(prev => ({ ...prev, category: "" }));
+                                    } else {
+                                        setFormData(prev => ({ ...prev, category: categories[0] || "" }));
+                                    }
+                                }}
+                                className="text-xs text-blue-600 hover:text-blue-800 hover:underline focus:outline-none font-medium"
+                            >
+                                {isNewCategory ? "Choose Existing" : "+ Add New Category"}
+                            </button>
+                        </div>
+                        {isNewCategory ? (
+                            <input
+                                type="text"
+                                name="category"
+                                placeholder="Enter new category name..."
+                                value={formData.category}
+                                onChange={handleChange}
+                                className="border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                                required
+                            />
+                        ) : (
+                            <select
+                                name="category"
+                                value={formData.category}
+                                onChange={handleChange}
+                                className="border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-400 bg-white"
+                                required
+                            >
+                                <option value="" disabled>-- Select Category --</option>
+                                {categories.map((cat) => (
+                                    <option key={cat} value={cat}>
+                                        {cat}
+                                    </option>
+                                ))}
+                            </select>
+                        )}
                     </div>
                     <div className="flex flex-col gap-2">
                         <label className="text-sm font-semibold text-gray-700">Price ($)</label>
@@ -104,7 +144,7 @@ function ProductForm({ onSubmit, selectedProduct, onClose }) {
                 </div>
 
                 <div className="flex flex-wrap gap-4 pt-4 justify-end">
-                 <button
+                    <button
                         type="button"
                         onClick={onClose}
                         className="bg-red-500 hover:bg-red-600 text-white px-8 py-3 rounded-xl font-semibold shadow-lg transition duration-200"
@@ -117,7 +157,7 @@ function ProductForm({ onSubmit, selectedProduct, onClose }) {
                     >
                         {selectedProduct ? "Update Product" : "Save Product"}
                     </button>
-                   
+
                 </div>
             </form>
         </div>

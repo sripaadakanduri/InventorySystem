@@ -37,8 +37,19 @@ function Products() {
     const [showImportModal, setShowImportModal] = useState(false);
     const [exchangeRates, setExchangeRates] = useState({ USD: 1.0 });
     const [selectedCurrency, setSelectedCurrency] = useState("USD");
+    const [categories, setCategories] = useState([]);
 
     const role = localStorage.getItem("role")?.toUpperCase();
+
+    const fetchCategories = async () => {
+        try {
+            const allProducts = await getProducts({});
+            const uniqueCategories = [...new Set(allProducts.map((p) => p.category).filter(Boolean))].sort();
+            setCategories(uniqueCategories);
+        } catch (error) {
+            console.error("Unable to load categories:", error);
+        }
+    };
 
     const fetchProducts = async (activeFilters = filters) => {
         try {
@@ -61,6 +72,7 @@ function Products() {
 
     useEffect(() => {
         fetchProducts();
+        fetchCategories();
     }, []);
 
     const handleSubmit = async (formData) => {
@@ -75,7 +87,7 @@ function Products() {
 
             setSelectedProduct(null);
             setShowForm(false);
-            await fetchProducts(filters);
+            await Promise.all([fetchProducts(filters), fetchCategories()]);
         } catch (error) {
             console.log(error);
 
@@ -108,7 +120,7 @@ function Products() {
         try {
             setDeletingProductId(productPendingDelete.id);
             await deleteProduct(productPendingDelete.id);
-            await fetchProducts(filters);
+            await Promise.all([fetchProducts(filters), fetchCategories()]);
             toast.success("Product deleted and transaction recorded.");
             setProductPendingDelete(null);
         } catch (error) {
@@ -139,6 +151,16 @@ function Products() {
             ...filters,
             [e.target.name]: e.target.value
         });
+    };
+
+    const handleCategoryFilterChange = (e) => {
+        const updatedFilters = {
+            ...filters,
+            category: e.target.value
+        };
+
+        setFilters(updatedFilters);
+        fetchProducts(updatedFilters);
     };
 
     const handlePriceSortChange = (e) => {
@@ -178,25 +200,22 @@ function Products() {
                         onMouseLeave={() => setOpen(false)}
                     >
                         <button
-                            className={`flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white font-medium px-8 py-3 shadow-md transition-all duration-300 ${
-                                open ? "rounded-t-xl rounded-b-none" : "rounded-xl"
-                            }`}
+                            className={`flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white font-medium px-8 py-3 shadow-md transition-all duration-300 ${open ? "rounded-t-xl rounded-b-none" : "rounded-xl"
+                                }`}
                         >
                             Add Products
                             <ChevronDown
                                 size={18}
-                                className={`transition-transform duration-300 ${
-                                    open ? "rotate-180" : ""
-                                }`}
+                                className={`transition-transform duration-300 ${open ? "rotate-180" : ""
+                                    }`}
                             />
                         </button>
 
                         <div
-                            className={`absolute left-0 top-full w-full z-50 transition-all duration-300 ${
-                                open
+                            className={`absolute left-0 top-full w-full z-50 transition-all duration-300 ${open
                                     ? "opacity-100 translate-y-0 visible"
                                     : "opacity-0 -translate-y-3 invisible pointer-events-none"
-                            }`}
+                                }`}
                         >
                             <button
                                 className="flex items-center justify-center gap-4 w-full bg-white px-4 py-3 text-left border-x border-b border-gray-200 hover:bg-gray-100 duration-300 delay-100"
@@ -223,6 +242,7 @@ function Products() {
                     <ProductForm
                         onSubmit={handleSubmit}
                         selectedProduct={selectedProduct}
+                        categories={categories}
                         onClose={() => {
                             setShowForm(false);
                             setSelectedProduct(null);
@@ -235,7 +255,9 @@ function Products() {
                 products={products}
                 role={role}
                 filters={filters}
+                categories={categories}
                 onFilterChange={handleFilterChange}
+                onCategoryFilterChange={handleCategoryFilterChange}
                 onPriceSortChange={handlePriceSortChange}
                 onFilterApply={handleFilterApply}
                 onEdit={handleEdit}
