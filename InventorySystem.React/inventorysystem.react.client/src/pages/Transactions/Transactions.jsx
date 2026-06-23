@@ -133,7 +133,7 @@ const Transactions = () => {
                     onMouseLeave={() => setOpen(false)}
                 >
                     <button
-                        className={`flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white font-medium px-8 py-3 shadow-md transition-all duration-300 ${open ? "rounded-t-xl rounded-b-none" : "rounded-xl"}`}
+                        className={`flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white font-medium px-10 py-3 shadow-md transition-all duration-300 ${open ? "rounded-t-xl rounded-b-none" : "rounded-xl"}`}
                     >
                         Export Logs
                         <ChevronDown
@@ -187,22 +187,6 @@ const Transactions = () => {
                                 <p className="font-medium text-gray-800">Export to PDF</p>
                                 <p className="text-xs text-gray-500">
                                     Shareable document
-                                </p>
-                            </div>
-                        </button>
-
-                        <button
-                            onClick={printTransactions}
-                            className={`flex items-center gap-4 w-full bg-white px-4 py-3 text-left border border-gray-200 hover:bg-gray-100 rounded-b-xl shadow-lg transition-all duration-300 delay-200  ${open
-                                    ? "opacity-100 translate-y-0"
-                                    : "opacity-0 -translate-y-3 pointer-events-none"
-                                } `}
-                        >
-                            <Printer className="text-gray-600" size={20} />
-                            <div className="text-left">
-                                <p className="font-medium text-gray-800">Print Logs</p>
-                                <p className="text-xs text-gray-500">
-                                    Print current log list
                                 </p>
                             </div>
                         </button>

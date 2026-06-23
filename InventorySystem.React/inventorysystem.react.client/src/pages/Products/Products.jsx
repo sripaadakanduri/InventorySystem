@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "react-toastify";
 
 import ProductForm from "../../components/ProductForm/ProductForm";
@@ -38,6 +38,7 @@ function Products() {
     const [exchangeRates, setExchangeRates] = useState({ USD: 1.0 });
     const [selectedCurrency, setSelectedCurrency] = useState("USD");
     const [categories, setCategories] = useState([]);
+    const formRef = useRef(null);
 
     const role = localStorage.getItem("role")?.toUpperCase();
 
@@ -74,6 +75,15 @@ function Products() {
         fetchProducts();
         fetchCategories();
     }, []);
+
+    useEffect(() => {
+        if (showForm) {
+            formRef.current?.scrollIntoView({
+                behavior: "smooth",
+                block: "start"
+            });
+        }
+    }, [showForm]);
 
     const handleSubmit = async (formData) => {
         try {
@@ -144,6 +154,7 @@ function Products() {
     const handleCreate = () => {
         setSelectedProduct(null);
         setShowForm(true);
+        setOpen(false);
     };
 
     const handleFilterChange = (e) => {
@@ -238,7 +249,10 @@ function Products() {
             </div>
 
             {showForm && role === "ADMIN" && (
-                <div className="bg-white p-6 rounded-3xl border border-gray-200 shadow-xl">
+                <div
+                    ref={formRef}
+                    className="bg-white p-6 rounded-3xl border border-gray-200 shadow-xl"
+                >
                     <ProductForm
                         onSubmit={handleSubmit}
                         selectedProduct={selectedProduct}
@@ -302,7 +316,7 @@ function Products() {
             {showImportModal && (
                 <ProductImportModal
                     onClose={() => setShowImportModal(false)}
-                    onImported={() => fetchProducts(filters)}
+                    onImported={() => Promise.all([fetchProducts(filters), fetchCategories()])}
                 />
             )}
         </div>

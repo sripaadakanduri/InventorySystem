@@ -59,25 +59,6 @@ function ProductTable({
                         <th className="p-4 text-center font-semibold border-b border-gray-200">
                             <div className="flex items-center justify-center gap-2">
                                 <span>Price</span>
-
-                                <select
-                                    value={selectedCurrency}
-                                    onChange={(e) =>
-                                        setSelectedCurrency(e.target.value)
-                                    }
-                                    className="text-xs border border-gray-300 rounded px-2 py-1 focus:outline-none"
-                                >
-                                    {Object.keys(exchangeRates).map(
-                                        (currency) => (
-                                            <option
-                                                key={currency}
-                                                value={currency}
-                                            >
-                                                {currency}
-                                            </option>
-                                        )
-                                    )}
-                                </select>
                             </div>
                         </th>
 
@@ -112,7 +93,7 @@ function ProductTable({
                         </th>
 
                         <th className="p-2 px-4">
-                            <div className="flex justify-center">
+                            <div className="flex flex-col justify-center items-center gap-3">
                                 <select
                                     name="priceSort"
                                     value={filters.priceSort}
@@ -126,6 +107,25 @@ function ProductTable({
                                     <option value="highToLow">
                                         High to Low
                                     </option>
+                                </select>
+
+                                <select
+                                    value={selectedCurrency}
+                                    onChange={(e) =>
+                                        setSelectedCurrency(e.target.value)
+                                    }
+                                    className="border border-gray-300 rounded-lg px-3 py-2 text-sm font-normal focus:outline-none focus:ring-2 focus:ring-blue-400 w-32"
+                                >
+                                    {Object.keys(exchangeRates).map(
+                                        (currency) => (
+                                            <option
+                                                key={currency}
+                                                value={currency}
+                                            >
+                                                {currency}
+                                            </option>
+                                        )
+                                    )}
                                 </select>
                             </div>
                         </th>

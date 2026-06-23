@@ -391,13 +391,17 @@ function OrderForm({
                     </label>
 
                     <select
-                        value={selectedCurrency}
-                        onChange={(e) =>
-                            setSelectedCurrency(
-                                e.target.value
-                            )
-                        }
-                        className="border border-gray-300 rounded-lg px-3 py-2"
+                            value={selectedCurrency}
+                            onChange={(e) =>
+                                setSelectedCurrency(
+                                    e.target.value
+                                )
+                            }
+                            className={`border rounded-lg px-3 py-2 ${!items.some(item => item.productId)
+                                    ? "bg-gray-200 text-gray-500 cursor-not-allowed"
+                                    : "bg-white text-black"
+                                }`}
+                            disabled={!items.some(item => item.productId)}
                     >
                         {Object.keys(exchangeRates).map(
                             (currency) => (

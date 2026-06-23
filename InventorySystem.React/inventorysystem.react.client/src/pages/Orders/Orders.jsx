@@ -216,22 +216,6 @@ function Orders() {
                                 </p>
                             </div>
                         </button>
-
-                        <button
-                            onClick={printOrders}
-                            className={`flex items-center gap-4 w-full bg-white px-4 py-3 text-left border border-gray-200 hover:bg-gray-100 rounded-b-xl shadow-lg transition-all duration-300 delay-200  ${open
-                                ? "opacity-100 translate-y-0"
-                                : "opacity-0 -translate-y-3 pointer-events-none"
-                                } `}
-                        >
-                            <Printer className="text-gray-600" size={20} />
-                            <div className="text-left">
-                                <p className="font-medium text-gray-800">Print Orders</p>
-                                <p className="text-xs text-gray-500">
-                                    Print current order list
-                                </p>
-                            </div>
-                        </button>
                     </div>
                 </div>
 
