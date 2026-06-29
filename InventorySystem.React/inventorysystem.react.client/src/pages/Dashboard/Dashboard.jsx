@@ -11,10 +11,12 @@ import {
 
 import { getProducts } from "../../services/ProductService";
 import { getAllOrders } from "../../services/ordersService";
+import useAuth from "../../hooks/useAuth";
 
 export default function Dashboard() {
 
-    const role = localStorage.getItem("role");
+    const { user } = useAuth();
+    const role = user?.role;
 
     const [stats, setStats] = useState({
         totalProducts: 0,

@@ -1,8 +1,8 @@
-import { getRole } from "../services/auth";
+import useAuth from "./useAuth";
 
 const useRole = () => {
-
-    return getRole();
+    const { user } = useAuth();
+    return user?.role ?? null;
 };
 
 export default useRole;

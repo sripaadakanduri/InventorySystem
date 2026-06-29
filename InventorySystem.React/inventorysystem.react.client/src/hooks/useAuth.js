@@ -1,73 +1,41 @@
-/* eslint-disable no-useless-catch */
 import { useNavigate } from "react-router-dom";
-
-import {
-    login,
-    googleLogin,
-    register,
-    logout,
-    getRole,
-    getUsername
-} from "../services/auth";
+import { useAuthContext } from "../context/AuthContext";
+import * as authService from "../services/authService";
 
 const useAuth = () => {
-
     const navigate = useNavigate();
+    const auth = useAuthContext();
 
     const handleLogin = async (data) => {
-
-        try {
-
-            const response = await login(data);
-
-            if (response.role === "Admin") {
-                navigate("/dashboard", { replace: true });
-            } else {
-                navigate("/dashboard", { replace: true });
-            }
-
-        } catch (err) {
-            throw err;
-        }
+        await authService.login(data);
+        await auth.refreshUser();
+        navigate("/dashboard", { replace: true });
     };
 
     const handleGoogleLogin = async (idToken) => {
-        try {
-            await googleLogin(idToken);
-            navigate("/dashboard", { replace: true });
-        } catch (err) {
-            throw err;
-        }
+        await authService.googleLogin(idToken);
+        await auth.refreshUser();
+        navigate("/dashboard", { replace: true });
     };
 
     const handleRegister = async (data) => {
-
-        try {
-
-            await register(data);
-
-            navigate("/login", { replace: true });
-
-        } catch (err) {
-            throw err;
-        }
+        await authService.register(data);
+        await auth.refreshUser();
+        navigate("/dashboard", { replace: true });
     };
 
-    const handleLogout = async () => {
-
-        await logout();
-
+    const handleLogout = () => {
+        authService.logout();
+        auth.refreshUser();
         navigate("/login", { replace: true });
     };
 
     return {
+        ...auth,
         handleLogin,
         handleGoogleLogin,
         handleRegister,
-        handleLogout,
-        authenticated: Boolean(getRole() || getUsername()),
-        role: getRole(),
-        username: getUsername()
+        handleLogout
     };
 };
 

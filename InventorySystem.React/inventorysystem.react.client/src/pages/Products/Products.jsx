@@ -20,6 +20,7 @@ import {
     Upload,
     Package
 } from "lucide-react";
+import useAuth from "../../hooks/useAuth";
 
 function Products() {
     const [open, setOpen] = useState(false);
@@ -40,7 +41,8 @@ function Products() {
     const [categories, setCategories] = useState([]);
     const formRef = useRef(null);
 
-    const role = localStorage.getItem("role")?.toUpperCase();
+    const { user } = useAuth();
+    const role = user?.role?.toUpperCase();
 
     const fetchCategories = async () => {
         try {

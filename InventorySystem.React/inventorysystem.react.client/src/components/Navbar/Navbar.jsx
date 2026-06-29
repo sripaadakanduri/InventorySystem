@@ -14,10 +14,11 @@ const Navbar = () => {
 
     const {
         handleLogout,
-        role,
-        username,
+        user,
         authenticated
     } = useAuth();
+    const role = user?.role;
+    const username = user?.username ?? "";
 
     const location = useLocation();
 
@@ -91,7 +92,7 @@ const Navbar = () => {
                         <div className="text-left">
 
                             <span className="font-semibold">
-                                {username.charAt(0).toUpperCase() + username.slice(1) }
+                                {username ? username.charAt(0).toUpperCase() + username.slice(1) : "User"}
                             </span>
 
                             <p className="text-sm text-gray-400">
@@ -157,7 +158,7 @@ const Navbar = () => {
                             <div>
 
                                 <h1 className="text-lg font-semibold">
-                                    {username.charAt(0).toUpperCase() + username.slice(1)}
+                                    {username ? username.charAt(0).toUpperCase() + username.slice(1) : "User"}
                                 </h1>
 
                                 <h2 className="text-sm text-gray-400">

@@ -1,35 +1,10 @@
-import { useEffect, useState } from "react";
 import { Navigate } from "react-router-dom";
-import { isAuthenticated } from "../services/auth";
+import useAuth from "../hooks/useAuth";
 
 const PublicRoute = ({ children }) => {
-    const [state, setState] = useState({
-        loading: true,
-        authenticated: false
-    });
+    const { user, loading } = useAuth();
 
-    useEffect(() => {
-        let active = true;
-
-        const checkAuthentication = async () => {
-            const authenticated = await isAuthenticated();
-
-            if (active) {
-                setState({
-                    loading: false,
-                    authenticated
-                });
-            }
-        };
-
-        checkAuthentication();
-
-        return () => {
-            active = false;
-        };
-    }, []);
-
-    if (state.loading) {
+    if (loading) {
         return (
             <div className="min-h-screen flex items-center justify-center text-gray-600">
                 Loading...
@@ -37,7 +12,7 @@ const PublicRoute = ({ children }) => {
         );
     }
 
-    if (state.authenticated) {
+    if (user) {
         return <Navigate to="/dashboard" replace />;
     }
 
