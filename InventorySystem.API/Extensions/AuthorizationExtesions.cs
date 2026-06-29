@@ -10,35 +10,23 @@ namespace InventorySystem.API.Extensions
             this IServiceCollection services,
             IConfiguration configuration)
         {
-            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+            services
+                .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options =>
                 {
-                    options.TokenValidationParameters =
-                        new TokenValidationParameters
-                        {
-                            ValidateIssuer = true,
-                            ValidateAudience = true,
-                            ValidateLifetime = true,
-                            ValidateIssuerSigningKey = true,
-
-                            ValidIssuer = configuration["JWT:Issuer"],
-                            ValidAudience = configuration["JWT:Audience"],
-
-                            IssuerSigningKey =
-                                new SymmetricSecurityKey(
-                                    Encoding.UTF8.GetBytes(
-                                        configuration["JWT:Key"]!
-                                    )
-                                )
-                        };
-
-                    options.Events = new JwtBearerEvents
+                    options.TokenValidationParameters = new TokenValidationParameters
                     {
-                        OnMessageReceived = context =>
-                        {
-                            context.Token = context.Request.Cookies["AuthToken"];
-                            return Task.CompletedTask;
-                        }
+                        ValidateIssuer = true,
+                        ValidateAudience = true,
+                        ValidateLifetime = true,
+                        ValidateIssuerSigningKey = true,
+
+                        ValidIssuer = configuration["JWT:Issuer"],
+                        ValidAudience = configuration["JWT:Audience"],
+
+                        IssuerSigningKey = new SymmetricSecurityKey(
+                            Encoding.UTF8.GetBytes(configuration["JWT:Key"]!)
+                        )
                     };
                 });
 
