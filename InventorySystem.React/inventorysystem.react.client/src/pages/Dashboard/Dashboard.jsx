@@ -392,7 +392,7 @@ export default function Dashboard() {
 
             </section>
 
-            <div className="flex items-center justify-between p-5">
+            <div className="flex items-center justify-between mb-2">
                 <h1 className="font-bold text-xl">View Analytics</h1>
                 <button
                     onClick={() => setOpen(!open)}

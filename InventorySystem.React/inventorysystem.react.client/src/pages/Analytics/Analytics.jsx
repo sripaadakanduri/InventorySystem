@@ -96,23 +96,9 @@ export default function Analytics() {
 
     return (
 
-        <div className="p-8 bg-slate-50 min-h-screen">
+        <div className="bg-slate-50 max-w-7xl mb-5">
 
-            <div className="mb-8">
-
-                <h1 className="text-3xl font-bold">
-
-                    Inventory Analytics
-
-                </h1>
-
-                <p className="text-gray-500 mt-2">
-
-                    Visual insights about your inventory.
-
-                </p>
-
-            </div>
+            <div className="border border-gray-300 mb-5"></div>
 
             <AnalyticsCards
 
