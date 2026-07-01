@@ -12,6 +12,7 @@ import Products from "./pages/Products/Products";
 import Orders from "./pages/Orders/Orders";
 import Transactions from "./pages/Transactions/Transactions";
 import UsersManagement from "./pages/UsersManagement/UsersManagement";
+import Analytics from "./pages/Analytics/Analytics";
 
 function App() {
     return (
@@ -83,6 +84,14 @@ function App() {
                     element={
                         <ProtectedRoute role="Admin">
                             <UsersManagement />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/analytics"
+                    element={
+                        <ProtectedRoute>
+                            <Analytics />
                         </ProtectedRoute>
                     }
                 />

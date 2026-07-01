@@ -6,15 +6,16 @@ import {
     Package,
     ShoppingCart,
     Users,
-    ClipboardList
+    ClipboardList,
 } from "lucide-react";
 
 import { getProducts } from "../../services/ProductService";
 import { getAllOrders } from "../../services/ordersService";
 import useAuth from "../../hooks/useAuth";
+import Analytics from "../Analytics/Analytics";
 
 export default function Dashboard() {
-
+    const [open, setOpen] = useState(false);
     const { user } = useAuth();
     const role = user?.role;
 
@@ -390,6 +391,43 @@ export default function Dashboard() {
                 </div>
 
             </section>
+
+            <div className="flex items-center justify-between p-5">
+                <h1 className="font-bold text-xl">View Analytics</h1>
+                <button
+                    onClick={() => setOpen(!open)}
+                    className="w-10 h-10 flex items-center justify-center border border-gray-500 rounded-full text-balck hover:bg-black hover:text-white transition-all duration-300"
+                >
+                    <svg
+                        className={`w-6 h-6 transform transition-transform duration-300 ${open ? "rotate-180" : ""
+                            }`}
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                    >
+                        <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M19 9l-7 7-7-7"
+                        />
+                    </svg>
+                </button>
+            </div>
+            <div
+                className={`
+                    overflow-hidden
+                    transition-all
+                    duration-700
+                    ease-in-out
+                    ${open
+                        ? "max-h-[5000px] opacity-100 mt-8"
+                        : "max-h-0 opacity-0"
+                    }
+                `}
+                        >
+                 <Analytics />
+            </div>
 
             {/* FOOTER */}
             <footer
