@@ -18,7 +18,7 @@ namespace InventorySystem.Service.Services
             _unitOfWork = unitOfWork;
         }
 
-   
+
         public async Task<OrderDto> CreateOrderAsync(CreateOrderDto dto, int userId)
         {
             using var transaction = await _unitOfWork.BeginTransactionAsync();
@@ -29,14 +29,18 @@ namespace InventorySystem.Service.Services
                 {
                     UserId = userId,
                     Status = OrderStatus.Pending,
-                    CreatedAt = DateTime.UtcNow
+                    CreatedAt = DateTime.UtcNow,
+                    Currency = dto.Currency,
+                    ExchangeRate = dto.ExchangeRate
                 };
 
+                decimal baseTotalAmount = 0;
                 decimal totalAmount = 0;
 
                 foreach (var item in dto.Items)
                 {
                     var product = await _context.Products.FirstOrDefaultAsync(p => p.Id == item.ProductId);
+
                     if (product == null)
                         throw new Exception($"Product {item.ProductId} not found");
 
@@ -47,18 +51,26 @@ namespace InventorySystem.Service.Services
                     product.StockQuantity -= item.Quantity;
                     product.UpdatedAt = DateTime.UtcNow;
 
-                    decimal totalPrice = product.Price * item.Quantity;
-                    totalAmount += totalPrice;
+                    decimal baseUnitPrice = product.Price;
+                    decimal unitPrice = baseUnitPrice * dto.ExchangeRate;
 
-                    var orderItem = new OrderItem
+                    decimal totalPrice = unitPrice * item.Quantity;
+                    decimal baseTotalPrice = baseUnitPrice * item.Quantity;
+
+                    totalAmount += totalPrice;
+                    baseTotalAmount += baseTotalPrice;
+
+                    order.OrderItems.Add(new OrderItem
                     {
                         ProductId = product.Id,
                         Quantity = item.Quantity,
-                        UnitPrice = product.Price,
-                        TotalPrice = totalPrice
-                    };
 
-                    order.OrderItems.Add(orderItem);
+                        UnitPrice = unitPrice,
+                        BaseUnitPrice = baseUnitPrice,
+
+                        TotalPrice = totalPrice,
+                        BaseTotalPrice = baseTotalPrice
+                    });
 
                     var productExists = await _context.Products.AnyAsync(p => p.Id == product.Id);
                     var userExists = await _context.Users.AnyAsync(u => u.Id == userId);
@@ -78,15 +90,16 @@ namespace InventorySystem.Service.Services
                 }
 
                 order.TotalAmount = totalAmount;
+                order.BaseTotalAmount = baseTotalAmount;
                 order.Status = OrderStatus.Confirmed;
-                order.Currency = dto.Currency;
-                order.ExchangeRate = dto.ExchangeRate;
 
                 await _context.Orders.AddAsync(order);
+
                 await _unitOfWork.SaveChangesAsync();
                 await transaction.CommitAsync();
 
-                return await GetOrderByIdAsync(order.Id) ?? throw new Exception("Order creation failed");
+                return await GetOrderByIdAsync(order.Id)
+                       ?? throw new Exception("Order creation failed");
             }
             catch
             {
@@ -233,7 +246,7 @@ namespace InventorySystem.Service.Services
             }
         }
 
- 
+
         public async Task<OrderDto> UpdateOrderAsync(int orderId, CreateOrderDto dto)
         {
             using var transaction = await _unitOfWork.BeginTransactionAsync();
@@ -246,13 +259,16 @@ namespace InventorySystem.Service.Services
                     .Include(o => o.User)
                     .FirstOrDefaultAsync(o => o.Id == orderId);
 
-                if (order == null) throw new Exception("Order not found");
+                if (order == null)
+                    throw new Exception("Order not found");
 
+                // Restore previous stock
                 foreach (var oldItem in order.OrderItems)
                 {
                     if (oldItem.Product != null)
                     {
                         oldItem.Product.StockQuantity += oldItem.Quantity;
+                        oldItem.Product.UpdatedAt = DateTime.UtcNow;
 
                         var productExists = await _context.Products.AnyAsync(p => p.Id == oldItem.ProductId);
                         var userExists = await _context.Users.AnyAsync(u => u.Id == order.UserId);
@@ -274,26 +290,44 @@ namespace InventorySystem.Service.Services
 
                 _context.OrderItems.RemoveRange(order.OrderItems);
 
+                decimal baseTotalAmount = 0;
                 decimal totalAmount = 0;
+
                 var newOrderItems = new List<OrderItem>();
 
                 foreach (var item in dto.Items)
                 {
                     var product = await _context.Products.FindAsync(item.ProductId);
-                    if (product == null) throw new Exception($"Product {item.ProductId} not found");
-                    if (product.StockQuantity < item.Quantity) throw new Exception($"Insufficient stock for {product.Name}");
+
+                    if (product == null)
+                        throw new Exception($"Product {item.ProductId} not found");
+
+                    if (product.StockQuantity < item.Quantity)
+                        throw new Exception($"Insufficient stock for {product.Name}");
 
                     product.StockQuantity -= item.Quantity;
+                    product.UpdatedAt = DateTime.UtcNow;
 
-                    totalAmount += product.Price * item.Quantity;
+                    decimal baseUnitPrice = product.Price;
+                    decimal unitPrice = baseUnitPrice * dto.ExchangeRate;
+
+                    decimal totalPrice = unitPrice * item.Quantity;
+                    decimal baseTotalPrice = baseUnitPrice * item.Quantity;
+
+                    totalAmount += totalPrice;
+                    baseTotalAmount += baseTotalPrice;
 
                     newOrderItems.Add(new OrderItem
                     {
                         OrderId = orderId,
                         ProductId = product.Id,
                         Quantity = item.Quantity,
-                        UnitPrice = product.Price,
-                        TotalPrice = product.Price * item.Quantity
+
+                        UnitPrice = unitPrice,
+                        BaseUnitPrice = baseUnitPrice,
+
+                        TotalPrice = totalPrice,
+                        BaseTotalPrice = baseTotalPrice
                     });
 
                     var productExists = await _context.Products.AnyAsync(p => p.Id == product.Id);
@@ -316,15 +350,17 @@ namespace InventorySystem.Service.Services
                 await _context.OrderItems.AddRangeAsync(newOrderItems);
 
                 order.TotalAmount = totalAmount;
-                order.Status = OrderStatus.Updated;
-                order.UpdatedAt = DateTime.UtcNow;
+                order.BaseTotalAmount = baseTotalAmount;
                 order.Currency = dto.Currency;
                 order.ExchangeRate = dto.ExchangeRate;
+                order.Status = OrderStatus.Updated;
+                order.UpdatedAt = DateTime.UtcNow;
 
                 await _unitOfWork.SaveChangesAsync();
                 await transaction.CommitAsync();
 
-                return MapOrderToDto(order);
+                return await GetOrderByIdAsync(order.Id)
+                       ?? throw new Exception("Order update failed");
             }
             catch
             {
@@ -332,7 +368,6 @@ namespace InventorySystem.Service.Services
                 throw;
             }
         }
-
         private static OrderDto MapOrderToDto(Order order)
         {
             return new OrderDto
@@ -340,18 +375,29 @@ namespace InventorySystem.Service.Services
                 Id = order.Id,
                 Username = order.User?.Username ?? "",
                 Status = order.Status,
+
                 TotalAmount = order.TotalAmount,
+                BaseTotalAmount = order.BaseTotalAmount,
+
                 Currency = order.Currency,
                 ExchangeRate = order.ExchangeRate,
+
                 TotalQuantity = order.OrderItems.Sum(x => x.Quantity),
+
                 CreatedAt = order.CreatedAt,
+
                 Items = order.OrderItems.Select(x => new OrderItemDto
                 {
                     ProductId = x.ProductId,
                     ProductName = x.Product?.Name ?? "",
+
                     Quantity = x.Quantity,
+
                     UnitPrice = x.UnitPrice,
-                    TotalPrice = x.TotalPrice
+                    BaseUnitPrice = x.BaseUnitPrice,
+
+                    TotalPrice = x.TotalPrice,
+                    BaseTotalPrice = x.BaseTotalPrice
                 }).ToList()
             };
         }

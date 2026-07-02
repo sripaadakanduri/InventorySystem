@@ -171,7 +171,7 @@ const Navbar = () => {
 
                         <div className="my-3 border border-gray-200"></div>
 
-                        <div classNam="flex flex-col gap-y-3">
+                        <div >
                         <Link
                             to="/dashboard"
                             className={`

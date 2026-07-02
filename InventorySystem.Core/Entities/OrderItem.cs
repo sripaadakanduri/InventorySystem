@@ -10,9 +10,17 @@
 
         public int Quantity { get; set; }
 
+        // Customer currency unit price
         public decimal UnitPrice { get; set; }
 
+        // Base currency unit price
+        public decimal BaseUnitPrice { get; set; }
+
+        // Customer currency totala
         public decimal TotalPrice { get; set; }
+
+        // Base currency total
+        public decimal BaseTotalPrice { get; set; }
 
         public Order? Order { get; set; }
 

@@ -63,5 +63,17 @@ namespace InventorySystem.Service.Services
 
             return true;
         }
+
+        public async Task<RegisterDto?> GetUserAsync(string username)
+        {
+            return await _context.Users
+                .Where(u => u.Username == username)
+                .Select(u => new RegisterDto
+                {
+                    Username = u.Username,
+                    Role = u.Role
+                })
+                .FirstOrDefaultAsync();
+        }
     }
 }

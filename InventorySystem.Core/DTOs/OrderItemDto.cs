@@ -11,5 +11,9 @@
         public decimal UnitPrice { get; set; }
 
         public decimal TotalPrice { get; set; }
+
+        public decimal BaseUnitPrice { get; set; }
+
+        public decimal BaseTotalPrice { get; set; }
     }
 }

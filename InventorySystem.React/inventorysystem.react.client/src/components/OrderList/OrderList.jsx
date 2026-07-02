@@ -67,6 +67,8 @@ function OrderList({
         setSelectedOrder(order);
     };
 
+    const formatMoney = (value) => Number(value || 0).toFixed(2);
+
     return (
         <div className="w-full overflow-x-auto rounded-3xl border border-gray-200 shadow-lg bg-white">
             <table className="w-full border-separate border-spacing-0 rounded-3xl">
@@ -162,8 +164,7 @@ function OrderList({
                                 </td>
 
                                 <td className="p-4 font-medium text-center">
-                                    {(parseFloat(order.totalAmount) *
-                                        (order.exchangeRate || 1)).toFixed(2)}{" "}
+                                    {formatMoney(order.totalAmount)}{" "}
                                     {order.currency || "USD"}
                                 </td>
 
@@ -247,10 +248,11 @@ function OrderList({
                                 </thead>
 
                                 <tbody>
-                                    {selectedOrder.items.map((item, idx) => {
+                                    {(selectedOrder.items || []).map((item, idx) => {
                                         const prod = products.find(
                                             (p) => p.id === item.productId
                                         );
+                                        const currency = selectedOrder.currency || "USD";
 
                                         return (
                                             <tr
@@ -264,11 +266,8 @@ function OrderList({
                                                 </td>
 
                                                 <td className="p-4 text-gray-700">
-                                                    {(
-                                                        parseFloat(item.unitPrice) *
-                                                        (selectedOrder.exchangeRate || 1)
-                                                    ).toFixed(2)}{" "}
-                                                    {selectedOrder.currency || "USD"}
+                                                    {formatMoney(item.unitPrice)}{" "}
+                                                    {currency}
                                                 </td>
 
                                                 <td className="p-4">
@@ -276,11 +275,8 @@ function OrderList({
                                                 </td>
 
                                                 <td className="p-4 font-medium">
-                                                    {(
-                                                        parseFloat(item.totalPrice) *
-                                                        (selectedOrder.exchangeRate || 1)
-                                                    ).toFixed(2)}{" "}
-                                                    {selectedOrder.currency || "USD"}
+                                                    {formatMoney(item.totalPrice)}{" "}
+                                                    {currency}
                                                 </td>
                                             </tr>
                                         );

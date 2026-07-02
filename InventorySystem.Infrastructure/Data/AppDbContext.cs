@@ -49,6 +49,7 @@ namespace InventorySystem.Service.Data
             {
                 entity.HasKey(o => o.Id);
                 entity.Property(o => o.TotalAmount).HasColumnType("decimal(18,2)");
+                entity.Property(o => o.BaseTotalAmount).HasColumnType("decimal(18,2)");
                 entity.Property(o => o.CreatedAt).HasDefaultValueSql("GETUTCDATE()");
                 entity.HasOne(o => o.User)
                       .WithMany(u => u.Orders)
@@ -61,7 +62,9 @@ namespace InventorySystem.Service.Data
             {
                 entity.HasKey(oi => oi.Id);
                 entity.Property(oi => oi.UnitPrice).HasColumnType("decimal(18,2)");
+                entity.Property(oi => oi.BaseUnitPrice).HasColumnType("decimal(18,2)");
                 entity.Property(oi => oi.TotalPrice).HasColumnType("decimal(18,2)");
+                entity.Property(oi => oi.BaseTotalPrice).HasColumnType("decimal(18,2)");
                 entity.HasOne(oi => oi.Order)
                       .WithMany(o => o.OrderItems)
                       .HasForeignKey(oi => oi.OrderId)

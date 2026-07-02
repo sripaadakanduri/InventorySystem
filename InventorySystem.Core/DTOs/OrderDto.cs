@@ -11,6 +11,7 @@ namespace InventorySystem.Core.DTOs
         public OrderStatus Status { get; set; }
 
         public decimal TotalAmount { get; set; }
+        public decimal BaseTotalAmount { get; set; }
 
         public string Currency { get; set; } = "USD";
         public decimal ExchangeRate { get; set; } = 1.0m;

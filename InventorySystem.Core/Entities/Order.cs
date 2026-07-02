@@ -14,8 +14,11 @@ namespace InventorySystem.Core.Entities
         public OrderStatus Status { get; set; }
             = OrderStatus.Pending;
 
+        // Customer currency total
         public decimal TotalAmount { get; set; }
 
+        // Base currency total
+        public decimal BaseTotalAmount { get; set; }
         public string Currency { get; set; } = "USD";
         public decimal ExchangeRate { get; set; } = 1.0m;
 

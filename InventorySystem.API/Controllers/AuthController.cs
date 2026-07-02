@@ -1,5 +1,6 @@
 ﻿using InventorySystem.Core.DTOs;
 using InventorySystem.Service.Interfaces;
+using InventorySystem.Service.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -11,10 +12,13 @@ namespace InventorySystem.API.Controllers
     public class AuthController : ControllerBase
     {
         private readonly IAuthService _service;
+        private readonly IUserService _userService;
 
-        public AuthController(IAuthService service)
+        public AuthController(IAuthService service, IUserService userService)
         {
             _service = service;
+            _userService = userService;
+
         }
 
         [HttpPost("register")]
@@ -79,12 +83,19 @@ namespace InventorySystem.API.Controllers
 
         [Authorize]
         [HttpGet("me")]
-        public IActionResult Me()
+        public async Task<IActionResult> Me()
         {
+            var username = User.Identity?.Name;
+
+            if (string.IsNullOrEmpty(username))
+                return Unauthorized();
+
+            var user = await _userService.GetUserAsync(username);
+
             return Ok(new
             {
-                Username = User.Identity?.Name,
-                Role = User.FindFirstValue(ClaimTypes.Role)
+                Username = user.Username,
+                Role = user.Role
             });
         }
 

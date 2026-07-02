@@ -14,7 +14,13 @@ namespace InventorySystem.Service.Configurations
             builder.Property(x => x.UnitPrice)
                 .HasColumnType("decimal(18,2)");
 
+            builder.Property(x => x.BaseUnitPrice)
+                .HasColumnType("decimal(18,2)");
+
             builder.Property(x => x.TotalPrice)
+                .HasColumnType("decimal(18,2)");
+
+            builder.Property(x => x.BaseTotalPrice)
                 .HasColumnType("decimal(18,2)");
 
             builder.HasOne(x => x.Product)

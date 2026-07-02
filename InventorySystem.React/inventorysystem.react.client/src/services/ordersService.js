@@ -9,8 +9,12 @@ export const createOrder = async (orderData) => {
 };
 
 export const getAllOrders = async (filters = {}) => {
+    const params = Object.fromEntries(
+        Object.entries(filters).filter(([, value]) => value !== "")
+    );
+
     const response = await api.get(ORDER_BASE_URL, {
-        params: filters
+        params
     });
 
     return response.data;
