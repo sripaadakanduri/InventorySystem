@@ -67,6 +67,60 @@ export const getInventoryValueByCategory = (products = []) => {
     }));
 };
 
+
+export const getTopSellingProducts = (orders = [], products = []) => {
+
+    const map = {};
+
+    orders.forEach(order => {
+        (order.items || []).forEach(item => {
+            map[item.productId] = (map[item.productId] || 0) + item.quantity;
+            // If you want to count orders instead of quantity, use:
+            // map[item.productId] = (map[item.productId] || 0) + 1;
+        });
+    });
+
+    return Object.entries(map)
+        .map(([productId, value]) => {
+            const product = products.find(
+                p => p.id === Number(productId)
+            );
+
+            return {
+                name: product ? product.name : `Product #${productId}`,
+                value
+            };
+        })
+        .sort((a, b) => b.value - a.value)
+        .slice(0, 10);
+};
+
+export const orderByMonth = (orders = []) => {
+
+    const monthNames = [
+        "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+        "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+    ];
+
+    const monthCounts = Array(12).fill(0);
+
+    orders.forEach(order => {
+
+        const date = new Date(order.createdAt);
+
+        if (!isNaN(date)) {
+            const monthIndex = date.getMonth(); // 0 = Jan, 1 = Feb, ...
+            monthCounts[monthIndex]++;
+        }
+
+    });
+
+    return monthNames.map((month, index) => ({
+        month,
+        orders: monthCounts[index]
+    }));
+};
+
 export const getDashboardStats = (products = []) => {
 
     const totalProducts = products.length;

@@ -2,45 +2,54 @@ import { useEffect, useMemo, useState } from "react";
 import { Package, Boxes, IndianRupee, Shapes } from "lucide-react";
 
 import { getProducts } from "../../services/ProductService";
+import { getAllOrders } from "../../services/ordersService";
+
 
 import AnalyticsCards from "../../components/Analytics/AnalyticsCards";
 import CategoryPieChart from "../../components/Analytics/CategoryPieChart";
 import ProductsBarChart from "../../components/Analytics/ProductsBarChart";
 import InventoryValueChart from "../../components/Analytics/InventoryValueChart";
 import LowStockChart from "../../components/Analytics/LowStockChart";
+import MostOrderdProducts from "../../components/Analytics/MostOrderdProducts";
+import AreaForMonthlyOrders from "../../components/Analytics/AreaForMonthlyOrders";
+
+
 
 import {
     getDashboardStats,
     getCategoryDistribution,
     getProductsPerCategory,
     getInventoryValueByCategory,
-    getLowStockProducts
+    getLowStockProducts,
+    getTopSellingProducts,
+    orderByMonth
 } from "../../utils/analyticsUtils";
 
 export default function Analytics() {
 
     const [products, setProducts] = useState([]);
+    const [orders, setOrders] = useState([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
 
-        const loadProducts = async () => {
+        const loadData = async () => {
 
             try {
 
-                const data = await getProducts();
-                console.log("First Product:", data[0]);
-                setProducts(data);
+                const [productsData, ordersData] = await Promise.all([
+                    getProducts(),
+                    getAllOrders()
+                ]);
 
-            }
+                setProducts(productsData);
+                setOrders(ordersData);
 
-            catch (err) {
+            } catch (err) {
 
                 console.error(err);
 
-            }
-
-            finally {
+            } finally {
 
                 setLoading(false);
 
@@ -48,7 +57,7 @@ export default function Analytics() {
 
         };
 
-        loadProducts();
+        loadData();
 
     }, []);
 
@@ -75,6 +84,16 @@ export default function Analytics() {
     const lowStock = useMemo(
         () => getLowStockProducts(products),
         [products]
+    );
+   
+    const mostOrdered = useMemo(
+        () => getTopSellingProducts(orders, products),
+        [orders, products]
+    );
+
+    const OrdersByMonth = useMemo(
+        () => orderByMonth(orders, products),
+        [orders, products]
     );
 
     if (loading) {
@@ -125,7 +144,7 @@ export default function Analytics() {
                     {
                         title: "Inventory Value",
                         value:
-                            "₹" +
+                            "$ " +
                             stats.inventoryValue.toLocaleString(),
                         icon: IndianRupee
                     }
@@ -140,6 +159,10 @@ export default function Analytics() {
                     data={categoryData}
                 />
 
+                <AreaForMonthlyOrders
+                    data={OrdersByMonth}
+                />
+
                 <ProductsBarChart
                     data={categoryBar}
                 />
@@ -150,7 +173,10 @@ export default function Analytics() {
                 <LowStockChart
                     data={lowStock}
                 />
-
+                <MostOrderdProducts
+                    data={mostOrdered}
+                />
+                
             </div>
 
         </div>

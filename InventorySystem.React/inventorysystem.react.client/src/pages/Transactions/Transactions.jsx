@@ -30,11 +30,15 @@ const Transactions = () => {
     });
 
     const [currentPage, setCurrentPage] = useState(1);
-    const pageSize = 10;
+    const [pageSize, setPageSize] = useState(10);
 
     const indexOfLastItem = currentPage * pageSize;
     const indexOfFirstItem = indexOfLastItem - pageSize;
-    const currentTransactions = transactions.slice(indexOfFirstItem, indexOfLastItem);
+
+    const currentTransactions = transactions.slice(
+        indexOfFirstItem,
+        indexOfLastItem
+    );
 
     const fetchTransactions = async (activeFilters = filters) => {
         try {
@@ -308,6 +312,7 @@ const Transactions = () => {
                         totalItems={transactions.length}
                         pageSize={pageSize}
                         onPageChange={setCurrentPage}
+                        onPageSizeChange={setPageSize}
                     />
                 </div>
             </div>

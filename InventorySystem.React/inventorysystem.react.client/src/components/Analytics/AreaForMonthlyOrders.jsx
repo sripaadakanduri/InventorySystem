@@ -1,15 +1,13 @@
 import {
     ResponsiveContainer,
-    BarChart,
-    Bar,
-    CartesianGrid,
-    Tooltip,
+    AreaChart,
+    Area,
     XAxis,
-    YAxis
+    YAxis,
+    Tooltip
 } from "recharts";
 import { useState, useRef, useEffect } from "react";
-
-export default function LowStockChart({ data }) {
+export default function OrdersByMonthChart({ data }) {
     const [expanded, setExpanded] = useState(false);
     const cardRef = useRef(null);
 
@@ -41,45 +39,34 @@ export default function LowStockChart({ data }) {
                         ? "fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 scale-130 z-50 w-[700px] duration-500"
                         : "relative scale-100 duration-500"
                 }`}
-            >
-            <h2 className="text-xl font-semibold mb-6">
-                Low Stock Products
+            >            <h2 className="text-xl font-semibold mb-6">
+                Orders by Month
             </h2>
-
-            <ResponsiveContainer width="100%" height={400}>
-                <BarChart
+            <ResponsiveContainer width="100%" height={450} className="group-hover:scale-103 transition-transform duration-300">
+                <AreaChart
                     data={data}
-                    layout="vertical"
                     margin={{
                         top: 10,
                         right: 30,
-                        left: 30,
-                        bottom: 10
+                        left: 0,
+                        bottom: 0
                     }}
                 >
-                    <XAxis
-                        type="number"
-                        allowDecimals={false}
+
+                    <XAxis dataKey="month" />
+
+                    <YAxis />
+
+                    <Tooltip formatter={(value) => [`${value}`, "Orders"]} />
+
+                    <Area
+                        type="monotone"
+                        dataKey="orders"
+                        stroke="#3b82f6"
+                        fill="#93c5fd"
                     />
-
-                    <YAxis
-                        type="category"
-                        dataKey="name"
-                        width={140}
-                    />
-
-                    <Tooltip />
-
-                    <Bar
-                        dataKey="quantity"
-                        fill="#ef4444"
-                        barSize={22}
-                        radius={[0, 6, 6, 0]}
-
-                    />
-                </BarChart>
+                </AreaChart>
             </ResponsiveContainer>
-
         </div>
         </>
     );

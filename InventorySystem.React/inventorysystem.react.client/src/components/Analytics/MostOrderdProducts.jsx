@@ -2,14 +2,12 @@ import {
     ResponsiveContainer,
     BarChart,
     Bar,
-    CartesianGrid,
     Tooltip,
     XAxis,
     YAxis
 } from "recharts";
 import { useState, useRef, useEffect } from "react";
-
-export default function LowStockChart({ data }) {
+export default function MostOrderedProducts({ data }) {
     const [expanded, setExpanded] = useState(false);
     const cardRef = useRef(null);
 
@@ -27,7 +25,7 @@ export default function LowStockChart({ data }) {
         };
     }, []);
     return (
-        <>
+<>
             {expanded && (
                 <div className="fixed inset-0 bg-black/60 z-40" />
             )}
@@ -42,14 +40,14 @@ export default function LowStockChart({ data }) {
                         : "relative scale-100 duration-500"
                 }`}
             >
-            <h2 className="text-xl font-semibold mb-6">
-                Low Stock Products
+            <h2 className="text-xl font-semibold mb-6 ">
+                Top 10 Most Ordered Products
             </h2>
 
-            <ResponsiveContainer width="100%" height={400}>
+            <ResponsiveContainer width="100%" height={400} >
+
                 <BarChart
                     data={data}
-                    layout="vertical"
                     margin={{
                         top: 10,
                         right: 30,
@@ -57,30 +55,24 @@ export default function LowStockChart({ data }) {
                         bottom: 10
                     }}
                 >
-                    <XAxis
-                        type="number"
-                        allowDecimals={false}
-                    />
 
-                    <YAxis
-                        type="category"
-                        dataKey="name"
-                        width={140}
-                    />
+                    <XAxis dataKey="name" />
 
-                    <Tooltip />
+                    <YAxis />
+
+                    <Tooltip formatter={(value) => `${value} Orders`} />
 
                     <Bar
-                        dataKey="quantity"
-                        fill="#ef4444"
-                        barSize={22}
-                        radius={[0, 6, 6, 0]}
-
+                        dataKey="value"
+                        fill="#FFAE6E"
+                        radius={[6, 6, 0, 0]}
                     />
+
                 </BarChart>
+
             </ResponsiveContainer>
 
         </div>
-        </>
+</>
     );
 }

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
 
@@ -15,6 +15,7 @@ import useAuth from "../../hooks/useAuth";
 import Analytics from "../Analytics/Analytics";
 
 export default function Dashboard() {
+    const analyticsRef = useRef(null);
     const [open, setOpen] = useState(false);
     const { user } = useAuth();
     const role = user?.role;
@@ -392,11 +393,27 @@ export default function Dashboard() {
 
             </section>
 
-            <div className="flex items-center justify-between mb-2">
-                <h1 className="font-bold text-xl">View Analytics</h1>
+                <div onClick={() => {
+                    const nextState = !open;
+                    setOpen(nextState);
+
+                    if (nextState) {
+                        setTimeout(() => {
+                            analyticsRef.current?.scrollIntoView({
+                                behavior: "smooth",
+                                block: "start",
+                            });
+                        }, 300);
+                    }
+                }}
+                className=" group flex items-center justify-between mb-2">
+                <div ref={analyticsRef}
+                     className="flex flex-col gap-1">
+                    <h1 className="font-bold text-xl">View Analytics</h1>
+                    <p className="font-semibold text-sm">Use the charts to analyze</p>
+                </div>
                 <button
-                    onClick={() => setOpen(!open)}
-                    className="w-10 h-10 flex items-center justify-center border border-gray-500 rounded-full text-balck hover:bg-black hover:text-white transition-all duration-300"
+                    className="w-10 h-10 flex items-center justify-center border border-gray-500 rounded-full text-balck group-hover:bg-black group-hover:text-white transition-all duration-300"
                 >
                     <svg
                         className={`w-6 h-6 transform transition-transform duration-300 ${open ? "rotate-180" : ""
