@@ -56,17 +56,10 @@ namespace InventorySystem.Service.Repositories
                     );
                 }
 
-                if (filter.MinStock.HasValue)
+                if (filter.Stock.HasValue)
                 {
                     query = query.Where(p =>
-                        p.StockQuantity >= filter.MinStock.Value
-                    );
-                }
-
-                if (filter.MaxStock.HasValue)
-                {
-                    query = query.Where(p =>
-                        p.StockQuantity <= filter.MaxStock.Value
+                        p.StockQuantity <= filter.Stock.Value
                     );
                 }
 

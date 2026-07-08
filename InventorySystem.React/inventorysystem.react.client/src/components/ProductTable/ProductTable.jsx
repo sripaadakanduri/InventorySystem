@@ -15,6 +15,7 @@ function ProductTable({
     onDelete,
     deletingProductId,
     isLoading,
+    onStockFilterChange,
     exchangeRates,
     selectedCurrency,
     setSelectedCurrency
@@ -54,14 +55,6 @@ function ProductTable({
         indexOfFirstProduct,
         indexOfLastProduct
     );
-
-    const currencySymbols = {
-        USD: "$",
-        EUR: "€",
-        GBP: "£",
-        INR: "₹",
-        JPY: "¥"
-    };
 
     return (
         <div className="w-full overflow-x-auto rounded-3xl border border-gray-200 shadow-lg bg-white mt-6">
@@ -164,7 +157,19 @@ function ProductTable({
                             </div>
                         </th>
 
-                        <th className="p-2 px-4"></th>
+                        <th className="p-2 px-4">
+                            <div className="flex justify-center">
+                                <input
+                                    type="text"
+                                    name="stock"
+                                    placeholder="Filter Stcok..."
+                                    value={filters.stock}
+                                    onChange={onStockFilterChange}
+                                    onKeyDown={handleFilterKeyDown}
+                                    className="border border-gray-300 rounded-lg px-3 py-2 text-sm font-normal focus:outline-none focus:ring-2 focus:ring-blue-400 w-32"
+                                />
+                            </div>
+                        </th>
 
                         {role === "ADMIN" && <th className="p-2 px-4"></th>}
                     </tr>

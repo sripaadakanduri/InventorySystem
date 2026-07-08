@@ -10,7 +10,7 @@ namespace InventorySystem.Core.DTOs
 
         public decimal? MaxPrice { get; set; }
 
-        public int? MinStock { get; set; }
+        public int? Stock { get; set; }
 
         public int? MaxStock { get; set; }
 

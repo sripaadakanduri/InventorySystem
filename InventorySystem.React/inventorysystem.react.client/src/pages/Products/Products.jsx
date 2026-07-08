@@ -33,7 +33,8 @@ function Products() {
     const [filters, setFilters] = useState({
         name: "",
         priceSort: "",
-        category: ""
+        category: "",
+        stock:""
     });
     const [showImportModal, setShowImportModal] = useState(false);
     const [exchangeRates, setExchangeRates] = useState({ USD: 1.0 });
@@ -185,7 +186,16 @@ function Products() {
         setFilters(updatedFilters);
         fetchProducts(updatedFilters);
     };
+    const handleStockFilterChange = (e) => {
+        const { name, value } = e.target;
 
+        setFilters(prev => ({
+            ...prev,
+            [name]: name === "stock"
+                ? (value === "" ? "" : Number(value))
+                : value
+        }));
+    };
     const handleFilterApply = () => {
         fetchProducts(filters);
     };
@@ -276,6 +286,7 @@ function Products() {
                 onCategoryFilterChange={handleCategoryFilterChange}
                 onPriceSortChange={handlePriceSortChange}
                 onFilterApply={handleFilterApply}
+                onStockFilterChange={handleStockFilterChange}
                 onEdit={handleEdit}
                 onDelete={handleDeleteRequest}
                 deletingProductId={deletingProductId}

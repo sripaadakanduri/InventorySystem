@@ -195,83 +195,101 @@ namespace InventorySystem.Service.Services
         {
             var validProducts = new List<Product>();
             var failedProducts = new List<FailedDto>();
-            var importProductKeys = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-
-            using var reader = new StreamReader(file.OpenReadStream());
+            var importKeys = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
             var dbProducts = await _unitOfWork.Products.GetAllAsync();
+
             var existingCategories = new HashSet<string>(
-                dbProducts.Select(p => p.Category?.Trim() ?? string.Empty))
-                .Where(c => !string.IsNullOrEmpty(c));
+                dbProducts
+                    .Select(x => x.Category?.Trim())
+                    .Where(x => !string.IsNullOrWhiteSpace(x))!,
+                StringComparer.OrdinalIgnoreCase);
 
             var config = new CsvConfiguration(CultureInfo.InvariantCulture)
             {
                 HeaderValidated = null,
-                MissingFieldFound = null
+                MissingFieldFound = null,
+                BadDataFound = null,
+                TrimOptions = TrimOptions.Trim
             };
 
+            using var reader = new StreamReader(file.OpenReadStream());
             using var csv = new CsvReader(reader, config);
-            var records = csv.GetRecords<BaseDto>().ToList();
-            foreach(var record in records)
+
+            while (await csv.ReadAsync())
             {
+                BaseDto record;
+
+                try
+                {
+                    record = csv.GetRecord<BaseDto>();
+                }
+                catch (Exception ex)
+                {
+                    failedProducts.Add(new FailedDto
+                    {
+                        ErrorMessage = ex.Message
+                    });
+
+                    continue;
+                }
+
                 var errors = new List<string>();
-                var name = record.Name?.Trim() ?? string.Empty;
-                var category = record.Category?.Trim() ?? string.Empty;
+
+                var name = record.Name?.Trim() ?? "";
+                var category = record.Category?.Trim() ?? "";
 
                 if (string.IsNullOrWhiteSpace(name))
                     errors.Add("Name is required");
+
                 if (record.Price <= 0)
                     errors.Add("Price must be greater than 0");
+
                 if (record.StockQuantity <= 0)
-                    errors.Add("quantity must be greater than 0");
+                    errors.Add("Stock must be greater than 0");
+
                 if (string.IsNullOrWhiteSpace(category))
                     errors.Add("Category is required");
+
                 if (!existingCategories.Contains(category))
-                {
-                    errors.Add("category not foound");
-                }
+                    errors.Add("Category not found");
 
-                var existingProduct =
-                    await _unitOfWork.Products.GetByNameAndCategoryAsync(
-                        name,
-                        category
-                    );
+                var duplicate = await _unitOfWork.Products
+                    .GetByNameAndCategoryAsync(name, category);
 
-                if (existingProduct != null)
+                if (duplicate != null)
                     errors.Add("Product already exists");
 
-                var importKey = $"{name}|{category}";
+                var key = $"{name}|{category}";
 
-                if (!string.IsNullOrWhiteSpace(name) &&
-                    !string.IsNullOrWhiteSpace(category) &&
-                    !importProductKeys.Add(importKey))
-                {
+                if (!importKeys.Add(key))
                     errors.Add("Duplicate product in import file");
-                }
 
                 if (errors.Any())
                 {
                     failedProducts.Add(new FailedDto
                     {
                         Name = name,
-                        Price = record.Price,
-                        StockQuantity = record.StockQuantity,
                         Category = category,
-                        ErrorMessage = string.Join(",", errors)
-
-                    });
-                }
-                else
-                {
-                    validProducts.Add(new Product
-                    {
-                        Name = name,
                         Price = record.Price,
                         StockQuantity = record.StockQuantity,
-                        Category = category
+                        ErrorMessage = string.Join(", ", errors)
                     });
+
+                    continue;
                 }
+
+                validProducts.Add(new Product
+                {
+                    Name = name,
+                    Category = category,
+                    Price = record.Price,
+                    StockQuantity = record.StockQuantity,
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow
+                });
             }
+
             if (validProducts.Any())
             {
                 await _unitOfWork.Products.AddRangeAsync(validProducts);
@@ -284,15 +302,12 @@ namespace InventorySystem.Service.Services
                         userId,
                         product.StockQuantity,
                         product.StockQuantity,
-                        "Product Imported"
-                    );
+                        "Product Imported");
                 }
             }
 
             if (!failedProducts.Any())
-            {
                 return Array.Empty<byte>();
-            }
 
             return GenerateFailedCsv(failedProducts);
         }
