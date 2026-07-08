@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import transactionService from '../../services/transactionService';
 import Pagination from '../../components/Pagination/Pagination';
 import { toast } from 'react-toastify';
@@ -8,13 +8,11 @@ import {
     FileSpreadsheet,
     FileText,
     File,
-    Printer
 } from 'lucide-react';
 import {
     exportTransactionsToCSV,
     exportTransactionsToExcel,
     exportTransactionsToPDF,
-    printTransactions
 } from '../../components/transactionExportUtils';
 
 const Transactions = () => {

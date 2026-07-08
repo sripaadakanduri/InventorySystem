@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import api from "../../services/api";
 import Pagination from "../Pagination/Pagination";
-
+import { getAllCurrencySymbols } from '../../services/CurrencySymbolService';
 function OrderList({
     orders,
     onCancelOrder,
@@ -10,14 +10,12 @@ function OrderList({
     onFilterChange,
     onFilterApply,
     onInstantFilterChange,
-    exchangeRates,
-    selectedCurrency,
-    setSelectedCurrency
 }) {
     const [selectedOrder, setSelectedOrder] = useState(null);
     const [products, setProducts] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
     const [pageSize, setPageSize] = useState(10);
+    const [symbols, setSymbols] = useState({});
 
     useEffect(() => {
         const fetchProducts = async () => {
@@ -28,13 +26,23 @@ function OrderList({
                 console.error(err);
             }
         };
-
+        const fetchSymbols = async () => {
+            try {
+                const data = await getAllCurrencySymbols();
+                setSymbols(data);
+            }
+            catch (error) {
+                console.log(error);
+            }
+        };
         fetchProducts();
+        fetchSymbols();
     }, []);
 
     useEffect(() => {
         setCurrentPage(1);
     }, [orders]);
+    
 
     const handleFilterKeyDown = (e) => {
         if (e.key === "Enter") {
@@ -165,7 +173,7 @@ function OrderList({
 
                                 <td className="p-4 font-medium text-center">
                                     {formatMoney(order.totalAmount)}{" "}
-                                    {order.currency || "USD"}
+                                    {symbols[order.currency]|| "$"}
                                 </td>
 
                                 <td className="p-4 text-center">

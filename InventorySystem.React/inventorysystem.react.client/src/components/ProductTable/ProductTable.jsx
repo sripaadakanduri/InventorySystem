@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import Pagination from "../Pagination/Pagination";
 import { Pencil, Trash2 } from "lucide-react";
-
+import {getCurrencySymbol} from "../../services/CurrencySymbolService"
 function ProductTable({
     products,
     role,
@@ -21,11 +21,27 @@ function ProductTable({
 }) {
     const [currentPage, setCurrentPage] = useState(1);
     const [pageSize, setPageSize] = useState(10);
+    const [symbol,setSymbol]= useState();
 
     useEffect(() => {
         setCurrentPage(1);
     }, [products]);
 
+    useEffect(() => {
+        if(selectedCurrency){
+            handleSymbol(selectedCurrency);
+        }
+    },[selectedCurrency])
+
+    const handleSymbol = async (code) => {
+        try {
+            const sym = await getCurrencySymbol(code);
+            setSymbol(sym.symbol);
+        }
+        catch (error) {
+            console.log(error);
+        }
+    };
     const handleFilterKeyDown = (e) => {
         if (e.key === "Enter") {
             onFilterApply();
@@ -175,7 +191,7 @@ function ProductTable({
                                 </td>
 
                                 <td className="p-4 text-gray-700 text-center">
-                                    {currencySymbols[selectedCurrency] || ""}
+                                    {symbol || ""}
                                     {(
                                         parseFloat(product.price) *
                                         (exchangeRates[selectedCurrency] || 1)

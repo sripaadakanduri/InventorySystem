@@ -2,7 +2,7 @@ import { useEffect, useState, useRef } from "react";
 import { toast } from "react-toastify";
 import { createOrder, updateOrder } from "../../services/ordersService";
 import api from "../../services/api";
-
+import { getCurrencySymbol } from '../../services/CurrencySymbolService';
 import {
     Plus,
     Minus,
@@ -123,6 +123,7 @@ function OrderForm({
     setSelectedCurrency
 }) {
     const [products, setProducts] = useState([]);
+    const [currencySymbol, setCurrencySymbol]=useState();
     const [items, setItems] = useState([
         {
             productId: "",
@@ -172,6 +173,21 @@ function OrderForm({
             }
         ]);
     };
+    const handleCurrencySymbol = async (code) => {
+        try {
+            const data = await getCurrencySymbol(code);
+            setCurrencySymbol(data.symbol);
+        } catch (err) {
+            console.error(err);
+            setCurrencySymbol("");
+        }
+    };
+
+    useEffect(() => {
+        if (selectedCurrency) {
+            handleCurrencySymbol(selectedCurrency);
+        }
+    }, [selectedCurrency]);
 
     const handleRemoveItem = (index) => {
         setItems(items.filter((_, i) => i !== index));
@@ -305,14 +321,9 @@ function OrderForm({
                                     {selectedProduct ? (
                                         <span className="bg-gray-100 text-gray-700 text-sm font-medium px-4 py-3 rounded-lg w-full text-center border border-gray-200">
                                             {(
-                                                parseFloat(
-                                                    selectedProduct.price
-                                                ) *
-                                                (exchangeRates[
-                                                    selectedCurrency
-                                                ] || 1)
-                                            ).toFixed(2)}{" "}
-                                            {selectedCurrency}
+                                                parseFloat(selectedProduct.price) *
+                                                (exchangeRates[selectedCurrency] || 1)
+                                            ).toFixed(2)} {currencySymbol}
                                         </span>
                                     ) : (
                                         <span className="w-full text-center text-gray-400">
@@ -392,11 +403,9 @@ function OrderForm({
 
                     <select
                             value={selectedCurrency}
-                            onChange={(e) =>
-                                setSelectedCurrency(
-                                    e.target.value
-                                )
-                            }
+                            onChange={(e) => {
+                                setSelectedCurrency(e.target.value);
+                            }}
                             className={`border rounded-lg px-3 py-2 ${!items.some(item => item.productId)
                                     ? "bg-gray-200 text-gray-500 cursor-not-allowed"
                                     : "bg-white text-black"

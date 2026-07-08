@@ -5,9 +5,6 @@ import {
     BarChart,
 
     Bar,
-
-    CartesianGrid,
-
     Tooltip,
 
     XAxis,

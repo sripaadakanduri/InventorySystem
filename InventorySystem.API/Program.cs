@@ -27,7 +27,7 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddMemoryCache();
 //builder.Services.AddHttpClient();
 builder.Services.AddHttpClient<IExchangeRateService, ExchangeRateService>();
-
+builder.Services.AddHttpClient<ICurrencySymbolService, CurrencySymbolService>();
 var allowedOrigins = builder.Configuration
     .GetSection("AllowedOrigins")
     .Get<string[]>();

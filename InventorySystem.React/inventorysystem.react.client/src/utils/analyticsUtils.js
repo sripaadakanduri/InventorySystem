@@ -39,14 +39,6 @@ export const getLowStockProducts = (products = []) => {
         .sort((a, b) => a.quantity - b.quantity);
 };
 
-export const getInventoryValue = (products = []) => {
-
-    return products.map(product => ({
-        name: product.name,
-        value: product.price * product.stockQuantity
-    }));
-};
-
 export const getInventoryValueByCategory = (products = []) => {
 
     const map = {};

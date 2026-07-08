@@ -10,14 +10,12 @@ import {
     exportToCSV,
     exportToExcel,
     exportToPDF,
-    printOrders
 } from "../../components/orderExportUtils";
 import {
     ChevronDown,
     FileSpreadsheet,
     FileText,
     File,
-    Printer,
 } from "lucide-react";
 function Orders() {
     const [orders, setOrders] = useState([]);
