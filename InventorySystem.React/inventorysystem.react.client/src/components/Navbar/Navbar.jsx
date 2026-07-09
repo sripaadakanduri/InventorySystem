@@ -1,5 +1,6 @@
 ﻿import { Link, useLocation, useNavigate } from "react-router-dom";
 import useAuth from "../../hooks/useAuth";
+import { useState } from "react";
 
 import {
     Home,
@@ -7,8 +8,10 @@ import {
     Package,
     Users,
     CreditCard,
-    LogOut
+    LogOut,
+    SlidersHorizontal
 } from "lucide-react";
+import SettingsPopup from "./SettingsPopup";
 
 const Navbar = () => {
 
@@ -23,6 +26,7 @@ const Navbar = () => {
     const location = useLocation();
 
     const navigate = useNavigate();
+    const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
     if (!authenticated) return null;
 
@@ -146,13 +150,12 @@ const Navbar = () => {
                             <div
                                 className="
                                     mt-2 flex h-12 w-12 items-center justify-center
-                                    rounded-full bg-purple-500
-                                    text-lg font-bold text-white 
+                                    rounded-full
+                                    cursor-pointer transition hover:bg-gray-100
                                 "
+                                onClick={() => setIsSettingsOpen(true)}
                             >
-                                {username
-                                    ? username[0].toUpperCase()
-                                    : "U"}
+                                <SlidersHorizontal size={25} />
                             </div>
 
                             <div>
@@ -318,6 +321,10 @@ const Navbar = () => {
                 </div>
 
             </div>
+            <SettingsPopup
+                isOpen={isSettingsOpen}
+                onClose={() => setIsSettingsOpen(false)}
+            />
 
         </nav>
     );

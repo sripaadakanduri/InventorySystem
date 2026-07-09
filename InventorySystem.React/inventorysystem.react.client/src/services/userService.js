@@ -29,3 +29,21 @@ export const createUser = async (userData) => {
     return response.data;
 
 };
+
+export const updateProfile = async (profileData) => {
+    const response = await api.put("/user-management/profile", profileData);
+
+    return response.data;
+};
+
+export const getProfile = async () => {
+    const response = await api.get("/user-management/profile");
+
+    return response.data;
+};
+
+export const requestOtp = async () => {
+    const response = await api.post("/user-management/request-otp");
+
+    return response.data;
+};

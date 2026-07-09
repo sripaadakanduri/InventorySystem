@@ -19,6 +19,11 @@ namespace InventorySystem.Service.Auth
 
         public string GenerateToken(User user)
         {
+            var jwtKey = _configuration["Jwt:Key"];
+
+            if (string.IsNullOrWhiteSpace(jwtKey))
+                throw new InvalidOperationException("Jwt:Key is missing or empty.");
+
             var claims = new[]
             {
                 new Claim(
@@ -44,9 +49,7 @@ namespace InventorySystem.Service.Auth
 
 
             var key = new SymmetricSecurityKey(
-                Encoding.UTF8.GetBytes(
-                    _configuration["Jwt:Key"]!
-                )
+                Encoding.UTF8.GetBytes(jwtKey)
             );
 
 

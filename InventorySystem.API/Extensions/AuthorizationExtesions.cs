@@ -10,6 +10,11 @@ namespace InventorySystem.API.Extensions
             this IServiceCollection services,
             IConfiguration configuration)
         {
+            var jwtKey = configuration["Jwt:Key"];
+
+            if (string.IsNullOrWhiteSpace(jwtKey))
+                throw new InvalidOperationException("Jwt:Key is missing or empty.");
+
             services
                 .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options =>
@@ -21,11 +26,11 @@ namespace InventorySystem.API.Extensions
                         ValidateLifetime = true,
                         ValidateIssuerSigningKey = true,
 
-                        ValidIssuer = configuration["JWT:Issuer"],
-                        ValidAudience = configuration["JWT:Audience"],
+                        ValidIssuer = configuration["Jwt:Issuer"],
+                        ValidAudience = configuration["Jwt:Audience"],
 
                         IssuerSigningKey = new SymmetricSecurityKey(
-                            Encoding.UTF8.GetBytes(configuration["JWT:Key"]!)
+                            Encoding.UTF8.GetBytes(jwtKey)
                         )
                     };
                 });

@@ -9,6 +9,10 @@ namespace InventorySystem.Service.Interfaces
 
         Task<bool> UpdateUserRoleAsync(int userId, string role);
 
-        Task<RegisterDto> GetUserAsync(string username);
+        Task<RegisterDto?> GetUserAsync(string username);
+
+        Task<bool> UpdateProfileAsync(int userId, UpdateProfileDto dto);
+
+        Task<UserDto?> GetProfileAsync(int userId);
     }
 }

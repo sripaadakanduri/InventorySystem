@@ -1,4 +1,5 @@
 using InventorySystem.API.Extensions;
+using InventorySystem.Core.Configurations;
 using InventorySystem.Service.Interfaces;
 using InventorySystem.Service.Auth;
 using InventorySystem.Service.Data;
@@ -12,6 +13,8 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+builder.Services.Configure<EmailSettings>(
+    builder.Configuration.GetSection("EmailSettings"));
 
 builder.Services.AddScoped<UserRepository>();
 builder.Services.AddScoped<IAuthService, AuthService>();
@@ -23,6 +26,8 @@ builder.Services.AddAuthorization();
 builder.Services.AddScoped<IOrderService, OrderServices>();
 builder.Services.AddScoped<IInventoryTransactionService, InventoryTransactionService>();
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IOtpService, OtpService>();
+builder.Services.AddScoped<IEmailService, EmailService>();
 
 builder.Services.AddMemoryCache();
 //builder.Services.AddHttpClient();
@@ -31,6 +36,7 @@ builder.Services.AddHttpClient<ICurrencySymbolService, CurrencySymbolService>();
 var allowedOrigins = builder.Configuration
     .GetSection("AllowedOrigins")
     .Get<string[]>();
+
 
 allowedOrigins = allowedOrigins?.Length > 0
     ? allowedOrigins
