@@ -279,6 +279,17 @@ const SettingsPopup = ({ isOpen, onClose }) => {
                         />
                     </div>
 
+                    <div className="flex justify-start pt-2">
+                        <label className="flex items-center gap-2 cursor-pointer whitespace-nowrap">
+                            <input
+                                type="checkbox"
+                                checked={changePassword}
+                                onChange={(e) => setChangePassword(e.target.checked)}
+                                className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                            />
+                            <span className="text-sm font-medium text-gray-700">Change Password</span>
+                        </label>
+                    </div>
                     
                     {changePassword && (
                         <>
@@ -504,17 +515,6 @@ const SettingsPopup = ({ isOpen, onClose }) => {
                             </div>
                         </>
                     )}
-                    <div className="flex justify-end">
-                        <label className="flex items-center gap-2 cursor-pointer whitespace-nowrap">
-                            <input
-                                type="checkbox"
-                                checked={changePassword}
-                                onChange={(e) => setChangePassword(e.target.checked)}
-                                className="h-4 w-4"
-                            />
-                            <span>Change Password</span>
-                        </label>
-                    </div>
                     <div className="flex justify-end gap-3 pt-4">
                         <button
                             type="button"

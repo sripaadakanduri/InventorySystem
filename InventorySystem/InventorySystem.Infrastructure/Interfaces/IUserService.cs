@@ -1,4 +1,4 @@
-﻿using InventorySystem.Core.DTOs;
+using InventorySystem.Core.DTOs;
 using InventorySystem.Core.DTOs.Users;
 
 namespace InventorySystem.Service.Interfaces
@@ -14,5 +14,6 @@ namespace InventorySystem.Service.Interfaces
         Task<bool> UpdateProfileAsync(int userId, UpdateProfileDto dto);
 
         Task<UserDto?> GetProfileAsync(int userId);
+        Task ResetPasswordByEmailAsync(string email, string newPassword);
     }
 }

@@ -1,4 +1,4 @@
-﻿using InventorySystem.Core.DTOs.Users;
+using InventorySystem.Core.DTOs.Users;
 using InventorySystem.Service.Interfaces;
 using InventorySystem.Service.Data;
 using Microsoft.EntityFrameworkCore;
@@ -163,6 +163,16 @@ namespace InventorySystem.Service.Services
                     Role = u.Role
                 })
                 .FirstOrDefaultAsync();
+        }
+
+        public async Task ResetPasswordByEmailAsync(string email, string newPassword)
+        {
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
+            if (user == null)
+                throw new Exception("User not found.");
+
+            user.PasswordHash = PasswordHasher.Hash(newPassword);
+            await _context.SaveChangesAsync();
         }
     }
 }
