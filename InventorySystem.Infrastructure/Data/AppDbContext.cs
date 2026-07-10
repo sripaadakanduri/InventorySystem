@@ -48,6 +48,9 @@ namespace InventorySystem.Service.Data
             modelBuilder.Entity<Order>(entity =>
             {
                 entity.HasKey(o => o.Id);
+                entity.Property(o => o.OrderNumber)
+                      .HasMaxLength(20)
+                      .IsRequired();
                 entity.Property(o => o.TotalAmount).HasColumnType("decimal(18,2)");
                 entity.Property(o => o.BaseTotalAmount).HasColumnType("decimal(18,2)");
                 entity.Property(o => o.CreatedAt).HasDefaultValueSql("GETUTCDATE()");

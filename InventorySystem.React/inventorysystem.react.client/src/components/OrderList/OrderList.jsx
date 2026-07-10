@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import api from "../../services/api";
 import Pagination from "../Pagination/Pagination";
 import { getAllCurrencySymbols } from '../../services/CurrencySymbolService';
+import { formatApiDate } from "../../utils/dateUtils";
 function OrderList({
     orders,
     onCancelOrder,
@@ -42,7 +43,7 @@ function OrderList({
     useEffect(() => {
         setCurrentPage(1);
     }, [orders]);
-    
+
 
     const handleFilterKeyDown = (e) => {
         if (e.key === "Enter") {
@@ -86,6 +87,9 @@ function OrderList({
                             User
                         </th>
                         <th className="p-4 text-center font-semibold border-b border-gray-200">
+                            Order No
+                        </th>
+                        <th className="p-4 text-center font-semibold border-b border-gray-200">
                             Total
                         </th>
                         <th className="p-4 text-center font-semibold border-b border-gray-200">
@@ -115,7 +119,7 @@ function OrderList({
                         </th>
 
                         <th className="p-2 px-4"></th>
-
+                        <th className="p-2 px-4"></th>
                         <th className="p-2 px-4"></th>
 
                         <th className="p-2 px-4">
@@ -170,10 +174,12 @@ function OrderList({
                                     {order.username.charAt(0).toUpperCase() +
                                         order.username.slice(1)}
                                 </td>
-
+                                <td className="p-4 text-center">
+                                    {order.orderNumber}
+                                </td>
                                 <td className="p-4 font-medium text-center">
                                     {formatMoney(order.totalAmount)}{" "}
-                                    {symbols[order.currency]|| "$"}
+                                    {symbols[order.currency] || "$"}
                                 </td>
 
                                 <td className="p-4 text-center">
@@ -183,14 +189,14 @@ function OrderList({
                                 <td className="p-4 text-center">
                                     <span
                                         className={`px-3 py-1 rounded-full text-sm font-medium ${order.status === 1
-                                                ? "bg-yellow-100 text-yellow-700"
-                                                : order.status === 2
-                                                    ? "bg-green-50 text-green-700"
-                                                    : order.status === 3
-                                                        ? "bg-red-100 text-red-700"
-                                                        : order.status === 4
-                                                            ? "bg-gray-200 text-gray-700"
-                                                            : "bg-blue-50 text-blue-700"
+                                            ? "bg-yellow-100 text-yellow-700"
+                                            : order.status === 2
+                                                ? "bg-green-50 text-green-700"
+                                                : order.status === 3
+                                                    ? "bg-red-100 text-red-700"
+                                                    : order.status === 4
+                                                        ? "bg-gray-200 text-gray-700"
+                                                        : "bg-blue-50 text-blue-700"
                                             }`}
                                     >
                                         {getStatusText(order.status)}
@@ -198,7 +204,7 @@ function OrderList({
                                 </td>
 
                                 <td className="p-4 text-gray-600 text-center">
-                                    {new Date(order.createdAt).toLocaleString()}
+                                    {formatApiDate(order.createdAt)}
                                 </td>
                             </tr>
                         ))

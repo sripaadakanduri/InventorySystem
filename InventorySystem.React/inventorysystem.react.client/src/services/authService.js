@@ -45,3 +45,13 @@ export const googleLogin = async (idToken) => {
 export const logout = () => {
     clearToken();
 };
+
+export const requestForgotPasswordOtp = async (email) => {
+    const res = await API.post("/Auth/forgot-password-otp", { email });
+    return res.data;
+};
+
+export const resetPassword = async (data) => {
+    const res = await API.post("/Auth/forgot-password-reset", data);
+    return res.data;
+};

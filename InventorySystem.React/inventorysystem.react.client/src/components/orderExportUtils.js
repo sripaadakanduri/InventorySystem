@@ -22,23 +22,23 @@ const getStatusText = (status) => {
 
 const buildExportData = (orders, products) => {
     return orders.map((order) => {
-        const productList = order.items
-            .map((item) => {
-                const product = products.find(
-                    (p) => p.id === item.productId
-                );
+        const items = order.items.map((item) => {
+            const product = products.find(
+                (p) => p.id === item.productId
+            );
 
-                const productName = product
-                    ? product.name
-                    : `Product #${item.productId}`;
-
-                return `${productName} (${item.quantity})`;
-            })
-            .join(", ");
+            return {
+                name: product?.name || `Product #${item.productId}`,
+                unitPrice: item.unitPrice,
+                quantity: item.quantity,
+                total: item.unitPrice * item.quantity
+            };
+        });
 
         return {
+            orderNumber: order.orderNumber,
             username: order.username,
-            products: productList,
+            items,
             orderTotal: order.totalAmount,
             status: getStatusText(order.status),
             createdAt: new Date(order.createdAt).toLocaleString()
@@ -46,23 +46,57 @@ const buildExportData = (orders, products) => {
     });
 };
 
+
+const formatProducts = (items) => {
+    if (items.length === 1) {
+        const item = items[0];
+
+        return `${item.name}
+Unit Price : $${item.unitPrice}
+Quantity   : ${item.quantity}
+Total      : $${item.total}`;
+    }
+
+    const lines = [
+        "Product\t\tPrice\tQty\tTotal"
+    ];
+
+    items.forEach((item) => {
+        lines.push(
+            `${item.name}\t$${item.unitPrice}\t${item.quantity}\t$${item.total}`
+        );
+    });
+
+    return lines.join("\n");
+};
+
+const formatProductsForCSV = (items) => {
+    return items
+        .map((item) =>
+            `${item.name} (Price: $${item.unitPrice.toFixed(2)}, Qty: ${item.quantity}, Total: $${item.total.toFixed(2)})`
+        )
+        .join(" | ");
+};
+
 export const exportToCSV = (orders, products) => {
     const data = buildExportData(orders, products);
 
     const headers = [
-        "User",
-        "Products",
-        "Order Total",
-        "Status",
-        "Created At"
+    "Order Number",
+    "User",
+    "Products",
+    "Order Total",
+    "Status",
+    "Created At"
     ];
 
     const rows = data.map((row) => [
+        row.orderNumber,
         row.username,
-        row.products,
-        row.orderTotal,
+        `"${formatProductsForCSV(row.items)}"`,
+        row.orderTotal.toFixed(2),
         row.status,
-        row.createdAt
+        `"${row.createdAt}"`
     ]);
 
     const csvContent = [
@@ -83,15 +117,51 @@ export const exportToCSV = (orders, products) => {
 export const exportToExcel = (orders, products) => {
     const data = buildExportData(orders, products);
 
-    const worksheet = XLSX.utils.json_to_sheet(
-        data.map((row) => ({
-            User: row.username,
-            Products: row.products,
-            "Order Total": row.orderTotal,
-            Status: row.status,
-            "Created At": row.createdAt
+    const worksheetData = data.map((row) => ({
+        "Order Number": row.orderNumber,
+        User: row.username,
+
+        Products: [
+            "┌─────────────────────────────────────────────────────────────┐",
+            "│ Product                 Price      Qty        Total         │",
+            "├─────────────────────────────────────────────────────────────┤",
+
+            ...row.items.map((item) => {
+                const name = item.name.padEnd(22).substring(0, 22);
+                const price = `$${item.unitPrice.toFixed(2)}`
+                    .padStart(10);
+                const qty = String(item.quantity).padStart(6);
+                const total = `$${item.total.toFixed(2)}`
+                    .padStart(12);
+
+                return `│ ${name}${price}${qty}${total} │`;
+            }),
+
+            "└─────────────────────────────────────────────────────────────┘"
+        ].join("\n"),
+
+        "Order Total": row.orderTotal,
+        Status: row.status,
+        "Created At": row.createdAt
+    }));
+
+    const worksheet = XLSX.utils.json_to_sheet(worksheetData);
+
+    worksheet["!cols"] = [
+        { wch: 22 }, // Order Number
+        { wch: 20 }, // User
+        { wch: 70 }, // Products
+        { wch: 18 }, // Order Total
+        { wch: 15 }, // Status
+        { wch: 25 }  // Created At
+    ];
+
+    worksheet["!rows"] = [
+        { hpt: 22 }, // header
+        ...data.map((row) => ({
+            hpt: Math.max(40, 22 + row.items.length * 18)
         }))
-    );
+    ];
 
     const workbook = XLSX.utils.book_new();
 
@@ -101,20 +171,14 @@ export const exportToExcel = (orders, products) => {
         "Orders"
     );
 
-    const excelBuffer = XLSX.write(
-        workbook,
-        {
-            bookType: "xlsx",
-            type: "array"
-        }
-    );
+    const excelBuffer = XLSX.write(workbook, {
+        bookType: "xlsx",
+        type: "array"
+    });
 
-    const blob = new Blob(
-        [excelBuffer],
-        {
-            type: "application/octet-stream"
-        }
-    );
+    const blob = new Blob([excelBuffer], {
+        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    });
 
     saveAs(blob, "Orders.xlsx");
 };
@@ -131,6 +195,7 @@ export const exportToPDF = (orders, products) => {
         startY: 25,
 
         head: [[
+            "Order Number",
             "User",
             "Products",
             "Order Total",
@@ -139,19 +204,125 @@ export const exportToPDF = (orders, products) => {
         ]],
 
         body: data.map((row) => [
+            row.orderNumber,
             row.username,
-            row.products,
-            `$${row.orderTotal}`,
+            "", // Products cell will be drawn manually
+            `$${row.orderTotal.toFixed(2)}`,
             row.status,
             row.createdAt
         ]),
 
         styles: {
-            fontSize: 8
+            fontSize: 8,
+            valign: "top",
+            cellPadding: 2
         },
 
         headStyles: {
-            fillColor: [41, 128, 185]
+            fillColor: [41, 128, 185],
+            textColor: 255,
+            fontStyle: "bold"
+        },
+
+        columnStyles: {
+            2: {
+                cellWidth: 95
+            }
+        },
+
+        didParseCell: function (hookData) {
+
+            if (
+                hookData.section === "body" &&
+                hookData.column.index === 2
+            ) {
+
+                const items = data[hookData.row.index].items;
+
+                // Header + one row per product
+                const rowHeight = 6;
+                hookData.cell.styles.minCellHeight =
+                    (items.length + 1) * rowHeight + 4;
+            }
+        },
+
+        didDrawCell: function (hookData) {
+
+            if (
+                hookData.section !== "body" ||
+                hookData.column.index !== 2
+            ) {
+                return;
+            }
+
+            const items = data[hookData.row.index].items;
+
+            const x = hookData.cell.x + 1;
+            const y = hookData.cell.y + 1;
+            const w = hookData.cell.width - 2;
+
+            const h = 6;
+
+            const col1 = w * 0.48;
+            const col2 = w * 0.18;
+            const col3 = w * 0.12;
+            const col4 = w * 0.22;
+
+            doc.setFontSize(6);
+
+            // Header background
+            doc.setFillColor(230, 230, 230);
+            doc.rect(x, y, w, h, "F");
+
+            // Outer border
+            doc.rect(x, y, w, h * (items.length + 1));
+
+            // Vertical lines
+            doc.line(x + col1, y, x + col1, y + h * (items.length + 1));
+            doc.line(x + col1 + col2, y, x + col1 + col2, y + h * (items.length + 1));
+            doc.line(x + col1 + col2 + col3, y, x + col1 + col2 + col3, y + h * (items.length + 1));
+
+            // Header text
+            doc.setFont(undefined, "bold");
+
+            doc.text("Product", x + 2, y + 4);
+            doc.text("Price", x + col1 + 2, y + 4);
+            doc.text("Qty", x + col1 + col2 + 2, y + 4);
+            doc.text("Total", x + col1 + col2 + col3 + 2, y + 4);
+
+            doc.setFont(undefined, "normal");
+
+            items.forEach((item, index) => {
+
+                const rowY = y + h * (index + 1);
+
+                // Horizontal line
+                doc.line(x, rowY, x + w, rowY);
+
+                doc.text(
+                    doc.splitTextToSize(item.name, col1 - 4),
+                    x + 2,
+                    rowY + 4
+                );
+
+                doc.text(
+                    `$${item.unitPrice.toFixed(2)}`,
+                    x + col1 + 2,
+                    rowY + 4
+                );
+
+                doc.text(
+                    String(item.quantity),
+                    x + col1 + col2 + 2,
+                    rowY + 4
+                );
+
+                doc.text(
+                    `$${item.total.toFixed(2)}`,
+                    x + col1 + col2 + col3 + 2,
+                    rowY + 4
+                );
+            });
         }
     });
 

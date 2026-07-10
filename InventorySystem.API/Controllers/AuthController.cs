@@ -1,4 +1,4 @@
-﻿using InventorySystem.Core.DTOs;
+using InventorySystem.Core.DTOs;
 using InventorySystem.Service.Interfaces;
 using InventorySystem.Service.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -13,12 +13,13 @@ namespace InventorySystem.API.Controllers
     {
         private readonly IAuthService _service;
         private readonly IUserService _userService;
+        private readonly IOtpService _otpService;
 
-        public AuthController(IAuthService service, IUserService userService)
+        public AuthController(IAuthService service, IUserService userService, IOtpService otpService)
         {
             _service = service;
             _userService = userService;
-
+            _otpService = otpService;
         }
 
         [HttpPost("register")]
@@ -102,7 +103,39 @@ namespace InventorySystem.API.Controllers
         [HttpPost("logout")]
         public IActionResult Logout()
         {
-            return Ok();
+            return Ok(new { message = "Logged out successfully" });
+        }
+
+        [HttpPost("forgot-password-otp")]
+        public async Task<IActionResult> ForgotPasswordOtp([FromBody] ForgotPasswordDto dto)
+        {
+            try
+            {
+                await _otpService.SendOtpByEmailAsync(dto.Email);
+                return Ok(new { message = "OTP has been sent to your email." });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        [HttpPost("forgot-password-reset")]
+        public async Task<IActionResult> ForgotPasswordReset([FromBody] ResetPasswordDto dto)
+        {
+            try
+            {
+                var isValid = await _otpService.ValidateOtpByEmailAsync(dto.Email, dto.Otp);
+                if (!isValid)
+                    return BadRequest(new { message = "Invalid or expired OTP." });
+
+                await _userService.ResetPasswordByEmailAsync(dto.Email, dto.NewPassword);
+                return Ok(new { message = "Password has been successfully reset." });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
         }
     }
 }

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import transactionService from '../../services/transactionService';
 import Pagination from '../../components/Pagination/Pagination';
 import { toast } from 'react-toastify';
+import { formatApiDate } from '../../utils/dateUtils';
 import {
     Activity,
     ChevronDown,
@@ -292,7 +293,7 @@ const Transactions = () => {
                                             {t.actionType}
                                         </span>
                                     </td>
-                                    <td className="p-4 text-center text-gray-500 text-sm">{new Date(t.createdAt).toLocaleString()}</td>
+                                    <td className="p-4 text-center text-gray-500 text-sm">{formatApiDate(t.createdAt)}</td>
                                 </tr>
                             ))
                         ) : (

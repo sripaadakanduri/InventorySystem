@@ -1,4 +1,4 @@
-﻿using InventorySystem.Core.DTOs;
+using InventorySystem.Core.DTOs;
 using InventorySystem.Core.Entities;
 using InventorySystem.Common.Enums;
 using InventorySystem.Service.Interfaces;
@@ -28,6 +28,7 @@ namespace InventorySystem.Service.Services
                 var order = new Order
                 {
                     UserId = userId,
+                    OrderNumber=GenerateOrderNumber(),
                     Status = OrderStatus.Pending,
                     CreatedAt = DateTime.UtcNow,
                     Currency = dto.Currency,
@@ -373,6 +374,7 @@ namespace InventorySystem.Service.Services
             return new OrderDto
             {
                 Id = order.Id,
+                OrderNumber = order.OrderNumber,
                 Username = order.User?.Username ?? "",
                 Status = order.Status,
 
@@ -400,6 +402,10 @@ namespace InventorySystem.Service.Services
                     BaseTotalPrice = x.BaseTotalPrice
                 }).ToList()
             };
+        }
+        private string GenerateOrderNumber()
+        {
+            return $"ORD-{DateTime.UtcNow:yyyyMMdd}-{Guid.NewGuid().ToString("N")[..6].ToUpper()}";
         }
     }
 }

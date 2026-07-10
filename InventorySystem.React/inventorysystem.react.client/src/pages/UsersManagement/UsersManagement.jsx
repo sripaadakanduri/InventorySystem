@@ -3,6 +3,7 @@ import { toast } from "react-toastify";
 import { getUsers, updateUserRole, createUser } from "../../services/userService";
 import Pagination from "../../components/Pagination/Pagination";
 import { Users, Shield, ShieldOff, Plus, X } from "lucide-react";
+import UserHoverCard from "./UserHoverCard";
 
 const UsersManagement = () => {
     const [users, setUsers] = useState([]);
@@ -175,7 +176,11 @@ const UsersManagement = () => {
                         ) : currentUsers.length > 0 ? (
                             currentUsers.map((user) => (
                                 <tr key={user.id} className="border-b border-gray-200 hover:bg-indigo-50 transition duration-150 cursor-pointer hover:translate-0.5 transform">
-                                    <td className="p-4 text-center font-medium text-gray-900">{user.username.charAt(0).toUpperCase() + user.username.slice(1)}</td>
+                                    <td className="p-4 text-center font-medium text-gray-900">
+                                        <UserHoverCard user={user}>
+                                            {user.username.charAt(0).toUpperCase() + user.username.slice(1)}
+                                        </UserHoverCard>
+                                    </td>
                                     <td className="p-4 text-center text-gray-600">{user.email}</td>
                                     <td className="p-4 text-center">
                                         <span className={`px-3 py-1 rounded-full text-sm font-medium border ${user.role === "Admin" ? 'bg-purple-50 text-purple-700 border-purple-200' : 'bg-gray-100 text-gray-700 border-gray-200'}`}>

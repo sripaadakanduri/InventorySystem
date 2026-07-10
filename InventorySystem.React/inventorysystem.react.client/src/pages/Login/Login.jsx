@@ -5,6 +5,7 @@ import useAuth from "../../hooks/useAuth";
 import { Eye, EyeOff, Lock, User } from "lucide-react";
 
 import { GoogleLogin } from "@react-oauth/google";
+import ForgotPassword from "../../components/ForgotPassword";
 
 const Login = () => {
     const { handleLogin, handleGoogleLogin } = useAuth();
@@ -14,6 +15,8 @@ const Login = () => {
     });
     const [loading, setLoading] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
+
+    const [isForget, setIsForget] = useState(false);
 
     const handleChange = (e) => {
         setFormData({
@@ -43,7 +46,7 @@ const Login = () => {
             await handleGoogleLogin(credentialResponse.credential);
             toast.success("Login successful!");
         } catch (err) {
-            toast.error("Google login failed."+err);
+            toast.error("Google login failed." + err);
         } finally {
             setLoading(false);
         }
@@ -102,6 +105,12 @@ const Login = () => {
                         </div>
                     </div>
 
+                    <div className="flex justify-end mt-1 mb-4">
+                        <span onClick={() => setIsForget(true)} className="text-sm text-blue-500 hover:text-blue-700 cursor-pointer font-medium transition-colors">
+                            Forgot password?
+                        </span>
+                    </div>
+
                     <button
                         type="submit"
                         disabled={loading}
@@ -147,6 +156,9 @@ const Login = () => {
                     </p>
                 </form>
             </div>
+            {
+                isForget && <ForgotPassword isOpen={isForget} onClose={() => setIsForget(false)} />
+            }
         </div>
     );
 };

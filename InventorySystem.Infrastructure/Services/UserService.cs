@@ -1,4 +1,4 @@
-﻿using InventorySystem.Core.DTOs.Users;
+using InventorySystem.Core.DTOs.Users;
 using InventorySystem.Service.Interfaces;
 using InventorySystem.Service.Data;
 using Microsoft.EntityFrameworkCore;
@@ -23,7 +23,7 @@ namespace InventorySystem.Service.Services
             _otpService = otpService;
         }
 
-        public async Task<List<UserDto>> GetAllUsersAsync(UserFilterDto? filter = null)
+        public async Task<List<UserDisplay>> GetAllUsersAsync(UserFilterDto? filter = null)
         {
             var query = _context.Users.AsQueryable();
 
@@ -45,15 +45,27 @@ namespace InventorySystem.Service.Services
                 );
             }
 
-            return await query
-                .Select(u => new UserDto
+            var rawUsers = await query
+                .Select(u => new 
                 {
-                    Id = u.Id,
-                    Username = u.Username,
-                    Email = u.Email,
-                    Role = u.Role
+                    u.Id,
+                    u.Username,
+                    u.Email,
+                    u.Role,
+                    u.CreatedAt,
+                    u.LastLoginAt
                 })
                 .ToListAsync();
+
+            return rawUsers.Select(u => new UserDisplay
+            {
+                Id = u.Id,
+                Username = u.Username,
+                Email = u.Email,
+                Role = u.Role,
+                CreatedAt = u.CreatedAt.ToString("o"),
+                LastLoginAt = u.LastLoginAt.HasValue ? u.LastLoginAt.Value.ToString("o") : string.Empty
+            }).ToList();
         }
 
         public async Task<bool> UpdateUserRoleAsync(int userId, string role)
@@ -163,6 +175,16 @@ namespace InventorySystem.Service.Services
                     Role = u.Role
                 })
                 .FirstOrDefaultAsync();
+        }
+
+        public async Task ResetPasswordByEmailAsync(string email, string newPassword)
+        {
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
+            if (user == null)
+                throw new Exception("User not found.");
+
+            user.PasswordHash = PasswordHasher.Hash(newPassword);
+            await _context.SaveChangesAsync();
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿using InventorySystem.Service.Data;
+using InventorySystem.Service.Data;
 using InventorySystem.Service.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
@@ -53,6 +53,39 @@ namespace InventorySystem.Service.Services
                 return Task.FromResult(false);
 
             _cache.Remove($"OTP_{userId}");
+
+            return Task.FromResult(true);
+        }
+
+        public async Task SendOtpByEmailAsync(string email)
+        {
+            var user = await _context.Users.FirstOrDefaultAsync(x => x.Email == email);
+
+            if (user == null)
+                throw new Exception("User not found.");
+
+            var otp = RandomNumberGenerator.GetInt32(1000, 10000).ToString();
+            
+            _cache.Set(
+                $"OTP_{email.ToLower()}",
+                otp,
+                TimeSpan.FromMinutes(5));
+
+            await _emailService.SendEmailAsync(
+                user.Email,
+                "Password Reset OTP",
+                $"Your OTP for password reset is {otp}. It expires in 5 minutes.");
+        }
+
+        public Task<bool> ValidateOtpByEmailAsync(string email, string otp)
+        {
+            if (!_cache.TryGetValue($"OTP_{email.ToLower()}", out string? storedOtp))
+                return Task.FromResult(false);
+
+            if (storedOtp != otp)
+                return Task.FromResult(false);
+
+            _cache.Remove($"OTP_{email.ToLower()}");
 
             return Task.FromResult(true);
         }

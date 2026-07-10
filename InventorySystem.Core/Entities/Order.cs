@@ -5,6 +5,7 @@ namespace InventorySystem.Core.Entities
     public class Order
     {
         public int Id { get; set; }
+        public string OrderNumber { get; set; } = string.Empty;
 
         // Foreign Key
         public int UserId { get; set; }
