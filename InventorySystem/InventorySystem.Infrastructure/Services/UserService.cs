@@ -1,4 +1,4 @@
-using InventorySystem.Core.DTOs.Users;
+﻿using InventorySystem.Core.DTOs.Users;
 using InventorySystem.Service.Interfaces;
 using InventorySystem.Service.Data;
 using Microsoft.EntityFrameworkCore;

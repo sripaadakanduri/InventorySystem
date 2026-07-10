@@ -1,4 +1,4 @@
-using InventorySystem.Core.DTOs;
+﻿using InventorySystem.Core.DTOs;
 using InventorySystem.Core.DTOs.Users;
 
 namespace InventorySystem.Service.Interfaces
