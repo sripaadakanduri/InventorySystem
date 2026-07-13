@@ -10,7 +10,7 @@ namespace InventorySystem.Service.Services
     public class EmailService : IEmailService
     {
         private readonly EmailSettings _settings;
-
+        
         public EmailService(IOptions<EmailSettings> options)
         {
             _settings = options.Value;

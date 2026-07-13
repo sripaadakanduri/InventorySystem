@@ -9,9 +9,7 @@ import {
     Users,
     CreditCard,
     LogOut,
-    SlidersHorizontal
 } from "lucide-react";
-import SettingsPopup from "./SettingsPopup";
 
 const Navbar = () => {
 
@@ -146,17 +144,19 @@ const Navbar = () => {
                     >
 
                         <div className="flex gap-6 justify-center items-center">
-
                             <div
                                 className="
                                     mt-2 flex h-12 w-12 items-center justify-center
-                                    rounded-full
-                                    cursor-pointer transition hover:bg-gray-100
+                                    rounded-full bg-purple-500
+                                    text-lg font-bold text-white 
                                 "
-                                onClick={() => setIsSettingsOpen(true)}
                             >
-                                <SlidersHorizontal size={25} />
+                                {username
+                                    ? username[0].toUpperCase()
+                                    : "U"}
                             </div>
+
+                            
 
                             <div>
 
@@ -321,10 +321,6 @@ const Navbar = () => {
                 </div>
 
             </div>
-            <SettingsPopup
-                isOpen={isSettingsOpen}
-                onClose={() => setIsSettingsOpen(false)}
-            />
 
         </nav>
     );

@@ -105,12 +105,6 @@ const Login = () => {
                         </div>
                     </div>
 
-                    <div className="flex justify-end mt-1 mb-4">
-                        <span onClick={() => setIsForget(true)} className="text-sm text-blue-500 hover:text-blue-700 cursor-pointer font-medium transition-colors">
-                            Forgot password?
-                        </span>
-                    </div>
-
                     <button
                         type="submit"
                         disabled={loading}
