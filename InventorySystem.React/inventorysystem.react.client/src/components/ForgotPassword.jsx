@@ -124,8 +124,7 @@ const ForgotPassword = ({ isOpen, onClose }) => {
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm transition-all duration-300">
-            <div className="w-full max-w-lg overflow-hidden rounded-xl bg-white shadow-2xl">
-                <div className="flex items-center justify-between border-b bg-gray-50 px-6 py-4">
+            <div className="w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-xl bg-white shadow-2xl">                <div className="flex items-center justify-between border-b bg-gray-50 px-6 py-4">
                     <h2 className="text-xl font-semibold text-gray-800">Forgot Password</h2>
                     <button
                         onClick={onClose}

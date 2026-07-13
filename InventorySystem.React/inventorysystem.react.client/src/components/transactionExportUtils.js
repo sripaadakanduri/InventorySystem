@@ -84,6 +84,15 @@ export const exportTransactionsToExcel = (transactions) => {
         }))
     );
 
+    worksheet["!cols"] = [
+        { wch: 20 },
+        { wch: 30 },
+        { wch: 12 },
+        { wch: 12 },
+        { wch: 18 },
+        { wch: 25 }
+    ];
+
     const workbook = XLSX.utils.book_new();
 
     XLSX.utils.book_append_sheet(
@@ -114,11 +123,8 @@ export const exportTransactionsToPDF = (transactions) => {
     const data = buildExportData(transactions);
     const doc = new jsPDF("landscape");
 
-    doc.setFontSize(18);
-    doc.text("Audit Logs Report", 14, 15);
-
     autoTable(doc, {
-        startY: 25,
+        startY: 10,
 
         head: [[
             "Username",

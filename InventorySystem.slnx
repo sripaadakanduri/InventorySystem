@@ -1,6 +1,7 @@
 <Solution>
   <Folder Name="/Solution Items/">
     <File Path=".gitignore" />
+    <File Path=".gitigonre" />
   </Folder>
   <Project Path="InventorySystem.API/InventorySystem.API.csproj" Id="d7ee6dc4-111b-45a7-8c2a-79508c5af2e5" />
   <Project Path="InventorySystem.Common/InventorySystem.Common.csproj" Id="6a3a1b0a-0f42-47ec-8a65-4e0319d1ba4d" />

@@ -67,7 +67,7 @@ namespace InventorySystem.Service.Auth
 
                 claims: claims,
 
-                expires: DateTime.UtcNow.AddHours(5),
+                expires: DateTime.UtcNow.AddHours(2),
 
                 signingCredentials: credentials
             );

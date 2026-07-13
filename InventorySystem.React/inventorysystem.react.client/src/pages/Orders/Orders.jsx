@@ -30,7 +30,8 @@ function Orders() {
         user: "",
         status: "",
         startDate: "",
-        endDate: ""
+        endDate: "",
+        orderNumber:"",
     });
 
     const fetchOrders = async (activeFilters = filters) => {

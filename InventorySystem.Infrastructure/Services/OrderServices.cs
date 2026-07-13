@@ -28,7 +28,7 @@ namespace InventorySystem.Service.Services
                 var order = new Order
                 {
                     UserId = userId,
-                    OrderNumber=GenerateOrderNumber(),
+                    OrderNumber = await GenerateOrderNumberAsync(),
                     Status = OrderStatus.Pending,
                     CreatedAt = DateTime.UtcNow,
                     Currency = dto.Currency,
@@ -159,6 +159,14 @@ namespace InventorySystem.Service.Services
                     query = query.Where(o =>
                         o.User != null &&
                         o.User.Username.ToLower().Contains(username)
+                    );
+                }
+                if (!string.IsNullOrWhiteSpace(filter.OrderNumber))
+                {
+                    var orderNumber = filter.OrderNumber.Trim().ToLower();
+
+                    query = query.Where(o =>
+                        o.OrderNumber.ToLower().Contains(orderNumber)
                     );
                 }
 
@@ -403,9 +411,21 @@ namespace InventorySystem.Service.Services
                 }).ToList()
             };
         }
-        private string GenerateOrderNumber()
+        private async Task<string> GenerateOrderNumberAsync()
         {
-            return $"ORD-{DateTime.UtcNow:yyyyMMdd}-{Guid.NewGuid().ToString("N")[..6].ToUpper()}";
+            string orderNumber;
+            bool exists;
+
+            do
+            {
+                orderNumber = $"ORD-{DateTime.UtcNow:yyyyMMdd}-{Random.Shared.Next(1000, 9999)}";
+
+                exists = await _context.Orders
+                    .AnyAsync(o => o.OrderNumber == orderNumber);
+
+            } while (exists);
+
+            return orderNumber;
         }
     }
 }

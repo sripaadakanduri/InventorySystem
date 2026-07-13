@@ -64,5 +64,17 @@ namespace InventorySystem.API.Controllers
                 message = "OTP has been sent to your email."
             });
         }
+        [HttpPost("request-otp-byMail")]
+        [AllowAnonymous]
+        public async Task<IActionResult> RequestPasswordResetOtp([FromForm] string email)
+        {
+            await _otpService.SendOtpByEmailAsync(email);
+
+            return Ok(new
+            {
+                message = "OTP has been sent to your email."
+            });
+        }
     }
+
 }
