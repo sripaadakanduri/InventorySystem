@@ -1,4 +1,4 @@
-﻿using InventorySystem.Common.Enums;
+using InventorySystem.Common.Enums;
 using InventorySystem.Core.DTOs;
 using InventorySystem.Core.DTOs.Users;
 using InventorySystem.Service.Data;
@@ -177,7 +177,8 @@ namespace InventorySystem.Service.Services
                     Id = u.Id,
                     Username = u.Username,
                     Email = u.Email,
-                    Role = u.Role
+                    Role = u.Role,
+                    NotificationSchedule = u.NotificationSchedule
                 })
                 .FirstOrDefaultAsync();
         }

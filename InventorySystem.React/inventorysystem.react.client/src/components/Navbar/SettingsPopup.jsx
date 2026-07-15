@@ -16,7 +16,8 @@ const SettingsPopup = ({ isOpen, onClose }) => {
         otp: "",
         newPassword: "",
         confirmPassword: "",
-        notificationSchedule:"N"
+        notificationSchedule: "N",
+        role: "User"
     };
 
     const [loading, setLoading] = useState(false);
@@ -29,6 +30,7 @@ const SettingsPopup = ({ isOpen, onClose }) => {
 
     const [weekDay, setWeekDay] = useState(null);
     const [monthDate, setMonthDate] = useState(1);
+    const [yearYear, setYearYear] = useState(new Date().getFullYear());
     const [yearMonth, setYearMonth] = useState(1);
     const [yearDate, setYearDate] = useState(1);
 
@@ -98,7 +100,34 @@ const SettingsPopup = ({ isOpen, onClose }) => {
                     otp: "",
                     newPassword: "",
                     confirmPassword: "",
+                    notificationSchedule: data?.notificationSchedule || "N",
+                    role: data?.role || "User"
                 });
+
+                if (data?.role === "Admin") {
+                    setNotifications(true);
+                    setSelectedOpt("Daily");
+                } else if (data?.notificationSchedule && data.notificationSchedule !== "N") {
+                    setNotifications(true);
+                    if (data.notificationSchedule === "D") {
+                        setSelectedOpt("Daily");
+                    } else if (data.notificationSchedule.startsWith("W-")) {
+                        setSelectedOpt("Weekly");
+                        setWeekDay(parseInt(data.notificationSchedule.split("-")[1], 10));
+                    } else if (data.notificationSchedule.startsWith("M-")) {
+                        setSelectedOpt("Monthly");
+                        setMonthDate(parseInt(data.notificationSchedule.split("-")[1], 10));
+                    } else if (data.notificationSchedule.startsWith("Y-")) {
+                        setSelectedOpt("Yearly");
+                        const parts = data.notificationSchedule.split("-");
+                        setYearMonth(parseInt(parts[1], 10));
+                        setYearDate(parseInt(parts[2], 10));
+                        setYearYear(new Date().getFullYear());
+                    }
+                } else {
+                    setNotifications(false);
+                    setSelectedOpt(null);
+                }
 
                 setChangePassword(false);
                 setIsOtp(false);
@@ -162,6 +191,21 @@ const SettingsPopup = ({ isOpen, onClose }) => {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
+        if (!form.username.trim()) {
+            toast.error("Username cannot be empty.");
+            return;
+        }
+
+        const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+        if (!form.email.trim()) {
+            toast.error("Email cannot be empty.");
+            return;
+        }
+        if (!emailRegex.test(form.email.trim())) {
+            toast.error("Please enter a valid email address (e.g., user@example.com).");
+            return;
+        }
+
         if (
             changePassword &&
             form.newPassword !== form.confirmPassword
@@ -173,7 +217,7 @@ const SettingsPopup = ({ isOpen, onClose }) => {
         const payload = {
             username: form.username.trim(),
             email: form.email.trim(),
-            notificationSchedule: form.notificationSchedule
+            notificationSchedule: form.role === "Admin" ? "D" : form.notificationSchedule
         };
 
         if (changePassword) {
@@ -226,7 +270,7 @@ const SettingsPopup = ({ isOpen, onClose }) => {
             await updateProfile(payload);
             await refreshUser();
 
-            alert("Profile updated successfully.");
+            toast.success("Profile updated successfully.");
             onClose();
         } catch (err) {
             toast.error(err.response?.data || "Failed to update profile.");
@@ -272,7 +316,8 @@ const SettingsPopup = ({ isOpen, onClose }) => {
                             name="username"
                             value={form.username}
                             onChange={handleChange}
-                            className="w-full rounded-md border border-gray-200 px-3 py-2 outline-none focus:ring-2 focus:ring-blue-200"
+                            disabled
+                            className="w-full rounded-md border border-gray-200 px-3 py-2 outline-none focus:ring-2 focus:ring-blue-200 bg-gray-100 text-gray-500 cursor-not-allowed"
                         />
                     </div>
 
@@ -320,7 +365,10 @@ const SettingsPopup = ({ isOpen, onClose }) => {
                                             updateSchedule(selectedOpt.toLowerCase());
                                         }
                                     }}
-                                    className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                                    disabled={form.role === "Admin"}
+                                    className={`h-4 w-4 rounded border-gray-300 focus:ring-blue-500 ${
+                                        form.role === "Admin" ? "text-gray-400 cursor-not-allowed" : "text-blue-600"
+                                    }`}
                                 />
                                 <span className="text-sm font-medium text-gray-700">Get Notifications</span>
                             </label>
@@ -334,10 +382,18 @@ const SettingsPopup = ({ isOpen, onClose }) => {
                                                     type="button"
                                                     key={option}
                                                     onClick={() => setSelectedOpt(option)}
-                                                    className={`rounded-full px-4 py-2 text-sm font-medium transition-all duration-200 ${selectedOpt === option
+                                                    disabled={form.role === "Admin"}
+                                                    className={`rounded-full px-4 py-2 text-sm font-medium transition-all duration-200 ${
+                                                        selectedOpt === option
                                                             ? "bg-blue-600 text-white shadow"
-                                                            : "text-gray-600 hover:bg-gray-200"
-                                                        }`}
+                                                            : "text-gray-600"
+                                                    } ${
+                                                        form.role === "Admin" && selectedOpt !== option
+                                                            ? "opacity-50 cursor-not-allowed"
+                                                            : form.role === "Admin"
+                                                                ? "cursor-not-allowed"
+                                                                : "hover:bg-gray-200"
+                                                    }`}
                                                 >
                                                     {option}
                                                 </button>
@@ -399,50 +455,25 @@ const SettingsPopup = ({ isOpen, onClose }) => {
                             {
                                 selectedOpt === "Yearly" && (
                                     <div className="flex justify-end mt-3 gap-3">
-                                        <select
-                                            value={yearMonth}
+                                        <input
+                                            type="date"
+                                            value={`${yearYear}-${String(yearMonth).padStart(2, "0")}-${String(yearDate).padStart(2, "0")}`}
                                             onChange={(e) => {
-                                                const month = Number(e.target.value);
-                                                setYearMonth(month);
-                                                updateSchedule("yearly", month, yearDate);
+                                                const selectedDate = e.target.value;
+                                                if (selectedDate) {
+                                                    const [yearStr, monthStr, dateStr] = selectedDate.split("-");
+                                                    const year = Number(yearStr);
+                                                    const month = Number(monthStr);
+                                                    const date = Number(dateStr);
+                                                    
+                                                    setYearYear(year);
+                                                    setYearMonth(month);
+                                                    setYearDate(date);
+                                                    updateSchedule("yearly", month, date);
+                                                }
                                             }}
-                                            className="border rounded-lg px-3 py-2"
-                                        >
-                                            {[
-                                                "January",
-                                                "February",
-                                                "March",
-                                                "April",
-                                                "May",
-                                                "June",
-                                                "July",
-                                                "August",
-                                                "September",
-                                                "October",
-                                                "November",
-                                                "December",
-                                            ].map((month, index) => (
-                                                <option key={index + 1} value={index + 1}>
-                                                    {month}
-                                                </option>
-                                            ))}
-                                        </select>
-
-                                        <select
-                                            value={yearDate}
-                                            onChange={(e) => {
-                                                const date = Number(e.target.value);
-                                                setYearDate(date);
-                                                updateSchedule("yearly", yearMonth, date);
-                                            }}
-                                            className="border rounded-lg px-3 py-2"
-                                        >
-                                            {Array.from({ length: 31 }, (_, i) => (
-                                                <option key={i + 1} value={i + 1}>
-                                                    {i + 1}
-                                                </option>
-                                            ))}
-                                        </select>
+                                            className="border rounded-lg px-3 py-2 w-full sm:w-auto text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                        />
                                     </div>
                                 )
                             }

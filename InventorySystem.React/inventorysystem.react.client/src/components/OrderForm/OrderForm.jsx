@@ -316,6 +316,37 @@ function OrderForm({
                 onSubmit={handleSubmit}
                 className="space-y-6 mt-5"
             >
+                {/* Currency Selection */}
+                <div className="flex items-center gap-4">
+                    <label
+                        htmlFor="currency"
+                        className="text-lg font-semibold text-slate-700 whitespace-nowrap"
+                    >
+                        Select Currency
+                    </label>
+
+                    <select
+                        id="currency"
+                        value={selectedCurrency}
+                        onChange={(e) => setSelectedCurrency(e.target.value)}
+                        disabled={!hasSelectedProducts}
+                        className={`w-64 rounded-lg border border-gray-300 px-4 py-2 text-base focus:outline-none focus:ring-2 focus:ring-blue-500 ${!hasSelectedProducts
+                                ? "cursor-not-allowed bg-gray-100 text-gray-500"
+                                : "bg-white"
+                            }`}
+                    >
+                        {Object.entries(currencies).map(([code, currency]) => {
+                            const display = getCurrencyDisplay(currency, code);
+
+                            return (
+                                <option key={code} value={code}>
+                                    {display.code} - {display.name}
+                                </option>
+                            );
+                        })}
+                    </select>
+                </div>
+
                 <div className="space-y-3">
                     <div className="hidden md:flex gap-4">
                         <div className="flex-1 text-sm font-semibold text-gray-700">
@@ -323,11 +354,15 @@ function OrderForm({
                         </div>
 
                         <div className="w-32 text-sm font-semibold text-gray-700 text-center">
-                            Price
+                            Unit Price
                         </div>
 
                         <div className="w-32 text-sm font-semibold text-gray-700">
                             Quantity
+                        </div>
+
+                        <div className="w-32 text-sm font-semibold text-gray-700 text-center">
+                            Total Price
                         </div>
 
                         <div className="w-32 text-sm font-semibold text-gray-700 text-center">
@@ -402,6 +437,22 @@ function OrderForm({
 
                                 <div className="w-full md:w-32 flex justify-center">
                                     {selectedProduct ? (
+                                        <span className="bg-gray-100 text-gray-700 text-sm font-medium px-4 py-3 rounded-lg w-full text-center border border-gray-200">
+                                            {(
+                                                parseFloat(selectedProduct.price) *
+                                                (exchangeRates[selectedCurrency] || 1) *
+                                                (item.quantity || 1)
+                                            ).toFixed(2)} {currencySymbol}
+                                        </span>
+                                    ) : (
+                                        <span className="w-full text-center text-gray-400">
+                                            --
+                                        </span>
+                                    )}
+                                </div>
+
+                                <div className="w-full md:w-32 flex justify-center">
+                                    {selectedProduct ? (
                                         <span className="bg-blue-100 text-blue-700 text-sm font-medium px-4 py-3 rounded-lg w-full text-center border border-blue-200">
                                             Stock: {availableQuantity}
                                         </span>
@@ -427,7 +478,7 @@ function OrderForm({
                                         </button>
                                     )}
 
-                                    {index === items.length - 1 && (
+                                    {index === items.length - 1 ? (
                                         <button
                                             type="button"
                                             onClick={handleAddItem}
@@ -435,6 +486,8 @@ function OrderForm({
                                         >
                                             <Plus className="w-5 h-5" />
                                         </button>
+                                    ) : (
+                                        <div className="w-[44px]"></div>
                                     )}
                                 </div>
                             </div>
@@ -442,45 +495,26 @@ function OrderForm({
                     })}
                 </div>
 
-                <div className="flex flex-col lg:flex-row gap-6 pt-4">
-                    {/* Currency Card */}
-                    <div className="space-y-2">
-                        <label
-                            htmlFor="currency"
-                            className="block text-lg font-semibold text-slate-700"
-                        >
-                            Select Currency
-                        </label>
-
-                        <select
-                            id="currency"
-                            value={selectedCurrency}
-                            onChange={(e) => setSelectedCurrency(e.target.value)}
-                            disabled={!hasSelectedProducts}
-                            className={`w-full max-w-sm rounded-lg border border-gray-300 px-4 py-2 text-base focus:outline-none focus:ring-2 focus:ring-blue-500 ${!hasSelectedProducts
-                                    ? "cursor-not-allowed bg-gray-100 text-gray-500"
-                                    : "bg-white"
-                                }`}
-                        >
-                            {Object.entries(currencies).map(([code, currency]) => {
-                                const display = getCurrencyDisplay(currency, code);
-
-                                return (
-                                    <option key={code} value={code}>
-                                        {display.code} - {display.name}
-                                    </option>
-                                );
-                            })}
-                        </select>
-                    </div>
+                <div className="flex flex-col items-end gap-5 pt-5 mt-4 border-t border-gray-200">
+                    {/* Grand Total */}
+                    {hasSelectedProducts && (
+                        <div className="flex items-center gap-3 text-lg">
+                            <span className="font-semibold text-gray-600">Grand Total:</span>
+                            <span className="font-bold text-gray-900 bg-gray-50 px-3 py-1.5 rounded-lg border border-gray-200 shadow-sm">
+                                {new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(
+                                    orderBaseTotal * (exchangeRates[selectedCurrency] || 1)
+                                )} {currencySymbol}
+                            </span>
+                        </div>
+                    )}
 
                     {/* Buttons */}
-                    <div className="flex gap-3 items-start self-start">
+                    <div className="flex gap-3 items-center">
                         {orderToEdit && (
                             <button
                                 type="button"
                                 onClick={onCancelEdit}
-                                className="rounded-xl bg-red-500 px-8 py-1 font-semibold text-white shadow-lg hover:bg-red-600"
+                                className="rounded-lg bg-red-500 px-6 py-2.5 text-sm font-semibold text-white shadow-md hover:bg-red-600 transition"
                             >
                                 Cancel Edit
                             </button>
@@ -489,7 +523,7 @@ function OrderForm({
                         <button
                             type="submit"
                             disabled={loading}
-                            className="min-w-[220px] rounded-2xl bg-green-500 px-10 py-4 text-xl font-semibold text-white shadow-lg transition hover:bg-green-600 disabled:cursor-not-allowed disabled:opacity-70"
+                            className="min-w-[160px] rounded-lg bg-green-500 px-8 py-3 text-base font-semibold text-white shadow-md transition hover:bg-green-600 disabled:cursor-not-allowed disabled:opacity-70"
                         >
                             {loading
                                 ? "Processing..."

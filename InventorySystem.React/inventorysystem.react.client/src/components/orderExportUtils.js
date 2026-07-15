@@ -1,4 +1,5 @@
 import * as XLSX from "xlsx";
+import ExcelJS from "exceljs";
 import { saveAs } from "file-saver";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
@@ -20,17 +21,25 @@ const getStatusText = (status) => {
     }
 };
 
+const formatMoney = (value, currency) => {
+    const formattedNumber = new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(value);
+    return `${formattedNumber} ${currency}`;
+};
+
 const buildExportData = (orders, products = []) => {
     return orders.map((order) => {
+        const currency = order.currency || 'USD';
         const items = (order.items || []).map((item) => {
             const product = products.find((p) => p.id === item.productId);
-            const total = item.totalPrice ?? item.unitPrice * item.quantity;
+            const totalBase = item.totalPrice ?? (item.unitPrice * item.quantity);
+            const unitPriceBase = item.unitPrice;
 
             return {
                 name: product?.name || `Product #${item.productId}`,
-                unitPrice: item.unitPrice,
+                unitPrice: unitPriceBase,
                 quantity: item.quantity,
-                total
+                total: totalBase,
+                currency: currency
             };
         });
 
@@ -39,6 +48,7 @@ const buildExportData = (orders, products = []) => {
             username: order.username,
             items,
             orderTotal: order.totalAmount,
+            currency: currency,
             status: getStatusText(order.status),
             createdAt: new Date(order.createdAt).toLocaleString()
         };
@@ -48,7 +58,7 @@ const buildExportData = (orders, products = []) => {
 const formatProductsForCSV = (items) => {
     return items
         .map((item) =>
-            `${item.name} (Price: $${item.unitPrice.toFixed(2)}, Qty: ${item.quantity}, Total: $${item.total.toFixed(2)})`
+            `${item.name} (Price: ${formatMoney(item.unitPrice, item.currency)}, Qty: ${item.quantity}, Total: ${formatMoney(item.total, item.currency)})`
         )
         .join(" | ");
 };
@@ -69,7 +79,7 @@ export const exportToCSV = (orders, products) => {
         row.orderNumber,
         row.username,
         `"${formatProductsForCSV(row.items)}"`,
-        row.orderTotal.toFixed(2),
+        `"${formatMoney(row.orderTotal, row.currency)}"`,
         row.status,
         `"${row.createdAt}"`
     ]);
@@ -88,191 +98,97 @@ export const exportToCSV = (orders, products) => {
 
     saveAs(blob, "Orders.csv");
 };
-export const exportToExcel = (orders, products) => {
+export const exportToExcel = async (orders, products) => {
     const data = buildExportData(orders, products);
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet("Orders");
 
-    const worksheetData = [[
-        "Order Number",
-        "User",
-        "Product",
-        "Price",
-        "Qty",
-        "Total",
-        "Order Total",
-        "Status",
-        "Created At"
-    ]];
+    worksheet.columns = [
+        { header: "Order Number", key: "orderNumber", width: 24 },
+        { header: "User", key: "username", width: 20 },
+        { header: "Product", key: "product", width: 35 },
+        { header: "Price", key: "price", width: 18 },
+        { header: "Qty", key: "quantity", width: 10 },
+        { header: "Total", key: "total", width: 18 },
+        { header: "Order Total", key: "orderTotal", width: 20 },
+        { header: "Status", key: "status", width: 15 },
+        { header: "Created At", key: "createdAt", width: 22 }
+    ];
 
-    const merges = [];
-    const rowHeights = [{ hpt: 24 }];
+    const headerRow = worksheet.getRow(1);
+    headerRow.eachCell(cell => {
+        cell.font = { bold: true, color: { argb: "FFFFFFFF" }, size: 12 };
+        cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FF2980B9" } };
+        cell.alignment = { horizontal: "center", vertical: "middle" };
+        cell.border = {
+            top: { style: "thin" }, bottom: { style: "thin" },
+            left: { style: "thin" }, right: { style: "thin" }
+        };
+    });
+    headerRow.height = 24;
 
-    let excelRow = 1;
+    let currentRowNumber = 2;
 
     data.forEach(order => {
-        const startRow = excelRow;
+        const startRow = currentRowNumber;
 
         if (order.items.length === 0) {
-            worksheetData.push([
-                order.orderNumber,
-                order.username,
-                "No Products",
-                "",
-                "",
-                "",
-                order.orderTotal,
-                order.status,
-                order.createdAt
-            ]);
-
-            rowHeights.push({ hpt: 22 });
-            excelRow++;
+            const row = worksheet.addRow({
+                orderNumber: order.orderNumber,
+                username: order.username,
+                product: "No Products",
+                orderTotal: formatMoney(order.orderTotal, order.currency),
+                status: order.status,
+                createdAt: order.createdAt
+            });
+            row.height = 22;
+            currentRowNumber++;
         } else {
             order.items.forEach((item, index) => {
-                worksheetData.push([
-                    index === 0 ? order.orderNumber : "",
-                    index === 0 ? order.username : "",
-                    item.name,
-                    item.unitPrice,
-                    item.quantity,
-                    item.total,
-                    index === 0 ? order.orderTotal : "",
-                    index === 0 ? order.status : "",
-                    index === 0 ? order.createdAt : ""
-                ]);
-
-                rowHeights.push({ hpt: 22 });
-                excelRow++;
+                const row = worksheet.addRow({
+                    orderNumber: index === 0 ? order.orderNumber : "",
+                    username: index === 0 ? order.username : "",
+                    product: item.name,
+                    price: formatMoney(item.unitPrice, item.currency),
+                    quantity: item.quantity,
+                    total: formatMoney(item.total, item.currency),
+                    orderTotal: index === 0 ? formatMoney(order.orderTotal, order.currency) : "",
+                    status: index === 0 ? order.status : "",
+                    createdAt: index === 0 ? order.createdAt : ""
+                });
+                row.height = 22;
+                currentRowNumber++;
             });
         }
 
-        const endRow = excelRow - 1;
+        const endRow = currentRowNumber - 1;
 
         if (endRow > startRow) {
-            [0, 1, 6, 7, 8].forEach(col => {
-                merges.push({
-                    s: { r: startRow, c: col },
-                    e: { r: endRow, c: col }
-                });
+            [1, 2, 7, 8, 9].forEach(col => {
+                worksheet.mergeCells(startRow, col, endRow, col);
+            });
+        }
+
+        for (let i = startRow; i <= endRow; i++) {
+            const row = worksheet.getRow(i);
+            row.eachCell({ includeEmpty: true }, (cell, colNumber) => {
+                let horizontal = "left";
+                if (colNumber === 5) horizontal = "center"; 
+                if (colNumber === 4 || colNumber === 6) horizontal = "right"; 
+                if ([1, 2, 7, 8, 9].includes(colNumber)) horizontal = "center";
+
+                cell.alignment = { horizontal, vertical: "middle", wrapText: true };
+                cell.border = {
+                    top: { style: "thin" }, bottom: { style: "thin" },
+                    left: { style: "thin" }, right: { style: "thin" }
+                };
+                cell.font = { size: 11 };
             });
         }
     });
 
-    const worksheet = XLSX.utils.aoa_to_sheet(worksheetData);
-
-    worksheet["!merges"] = merges;
-    worksheet["!rows"] = rowHeights;
-
-    worksheet["!cols"] = [
-        { wch: 24 }, // Order Number
-        { wch: 20 }, // User
-        { wch: 35 }, // Product
-        { wch: 12 }, // Price
-        { wch: 8 },  // Qty
-        { wch: 12 }, // Total
-        { wch: 15 }, // Order Total
-        { wch: 15 }, // Status
-        { wch: 22 }  // Created At
-    ];
-    const range = XLSX.utils.decode_range(worksheet["!ref"]);
-
-    for (let R = range.s.r; R <= range.e.r; R++) {
-        for (let C = range.s.c; C <= range.e.c; C++) {
-
-            const cellRef = XLSX.utils.encode_cell({ r: R, c: C });
-
-            if (!worksheet[cellRef]) continue;
-
-            // Header row
-            if (R === 0) {
-
-                worksheet[cellRef].s = {
-                    font: {
-                        bold: true,
-                        color: { rgb: "FFFFFF" },
-                        sz: 12
-                    },
-                    fill: {
-                        fgColor: {
-                            rgb: "2980B9"
-                        }
-                    },
-                    alignment: {
-                        horizontal: "center",
-                        vertical: "center"
-                    },
-                    border: {
-                        top: { style: "thin" },
-                        bottom: { style: "thin" },
-                        left: { style: "thin" },
-                        right: { style: "thin" }
-                    }
-                };
-
-            } else {
-
-                // Default alignment
-                let horizontal = "left";
-
-                // Quantity
-                if (C === 4) {
-                    horizontal = "center";
-                }
-
-                // Currency columns
-                if ([3, 5].includes(C)) {
-                    horizontal = "right";
-                }
-
-                // Order-level merged columns
-                if ([0, 1, 6, 7, 8].includes(C)) {
-                    horizontal = "center";
-                }
-
-                worksheet[cellRef].s = {
-                    font: {
-                        sz: 11
-                    },
-                    alignment: {
-                        horizontal,
-                        vertical: "center",
-                        wrapText: true
-                    },
-                    border: {
-                        top: { style: "thin" },
-                        bottom: { style: "thin" },
-                        left: { style: "thin" },
-                        right: { style: "thin" }
-                    }
-                };
-
-                // Currency formatting
-                if ([3, 5, 6].includes(C)) {
-                    worksheet[cellRef].z = "$#,##0.00";
-                }
-            }
-        }
-    }
-    const workbook = XLSX.utils.book_new();
-
-    XLSX.utils.book_append_sheet(
-        workbook,
-        worksheet,
-        "Orders"
-    );
-
-    const excelBuffer = XLSX.write(workbook, {
-        bookType: "xlsx",
-        type: "array",
-        cellStyles: true
-    });
-
-    const blob = new Blob(
-        [excelBuffer],
-        {
-            type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-        }
-    );
-
+    const buffer = await workbook.xlsx.writeBuffer();
+    const blob = new Blob([buffer], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
     saveAs(blob, "Orders.xlsx");
 };
 
@@ -291,7 +207,7 @@ export const exportToPDF = (orders, products) => {
             order.orderNumber,
             order.username,
             "",
-            `$${order.orderTotal.toFixed(2)}`,
+            formatMoney(order.orderTotal, order.currency),
             order.status,
             order.createdAt
         ]
@@ -550,7 +466,7 @@ export const exportToPDF = (orders, products) => {
 
                 // Price
                 doc.text(
-                    `$${item.unitPrice.toFixed(2)}`,
+                    formatMoney(item.unitPrice, item.currency),
                     x + productWidth + priceWidth - 2,
                     yy + 5,
                     {
@@ -570,7 +486,7 @@ export const exportToPDF = (orders, products) => {
 
                 // Total
                 doc.text(
-                    `$${item.total.toFixed(2)}`,
+                    formatMoney(item.total, item.currency),
                     x + w - 2,
                     yy + 5,
                     {
