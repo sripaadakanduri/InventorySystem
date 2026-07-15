@@ -1,9 +1,10 @@
-﻿using InventorySystem.Core.DTOs.Users;
-using InventorySystem.Service.Interfaces;
-using InventorySystem.Service.Data;
-using Microsoft.EntityFrameworkCore;
+﻿using InventorySystem.Common.Enums;
 using InventorySystem.Core.DTOs;
+using InventorySystem.Core.DTOs.Users;
+using InventorySystem.Service.Data;
 using InventorySystem.Service.Helpers;
+using InventorySystem.Service.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
 namespace InventorySystem.Service.Services
 {
@@ -76,7 +77,7 @@ namespace InventorySystem.Service.Services
                 return false;
 
             user.Role = role;
-
+            user.NotificationSchedule = role == UserRoles.Admin ? "D" : "N";
             await _unitOfWork.SaveChangesAsync();
 
             return true;
@@ -124,7 +125,12 @@ namespace InventorySystem.Service.Services
 
                 user.Email = dto.Email;
             }
-
+            if (!string.IsNullOrWhiteSpace(dto.NotificationSchedule))
+            {
+                user.NotificationSchedule = user.Role == UserRoles.Admin
+                    ? "D"
+                    : dto.NotificationSchedule;
+            }
             if (!string.IsNullOrWhiteSpace(dto.NewPassword))
             {
                 var hasOldPassword = !string.IsNullOrWhiteSpace(dto.OldPassword);
@@ -157,7 +163,6 @@ namespace InventorySystem.Service.Services
 
                 user.PasswordHash = PasswordHasher.Hash(dto.NewPassword);
             }
-
             await _unitOfWork.SaveChangesAsync();
 
             return true;

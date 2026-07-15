@@ -40,6 +40,7 @@ namespace InventorySystem.Service.Data
                 entity.Property(u => u.Email).IsRequired().HasMaxLength(150);
                 entity.Property(u => u.PasswordHash).IsRequired();
                 entity.Property(u => u.Role).HasMaxLength(50);
+                entity.Property(u => u.NotificationSchedule).HasMaxLength(20).HasDefaultValue("N");
                 entity.HasIndex(u => u.Email).IsUnique();
                 entity.HasIndex(u => u.Username).IsUnique();
             });

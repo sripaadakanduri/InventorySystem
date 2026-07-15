@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import Pagination from "../Pagination/Pagination";
 import { Pencil, Trash2 } from "lucide-react";
-import {getCurrencySymbol} from "../../services/CurrencySymbolService"
+import { getCurrencySymbol } from "../../services/CurrencySymbolService"
+import api from "../../services/api";
 function ProductTable({
     products,
     role,
@@ -23,7 +24,15 @@ function ProductTable({
     const [currentPage, setCurrentPage] = useState(1);
     const [pageSize, setPageSize] = useState(10);
     const [symbol,setSymbol]= useState();
+    const [currencies, setCurrencies]=useState();
 
+    useEffect(() => {
+        const fetchCurrencies = async () => {
+            const response = await api.get("/currency/symbols");
+            setCurrencies(response.data);
+        };
+        fetchCurrencies();
+    })
     useEffect(() => {
         setCurrentPage(1);
     }, [products]);
@@ -125,16 +134,11 @@ function ProductTable({
                                     }
                                     className="border border-gray-300 rounded-lg px-3 py-2 text-sm font-normal focus:outline-none focus:ring-2 focus:ring-blue-400 w-32"
                                 >
-                                    {Object.keys(exchangeRates).map(
-                                        (currency) => (
-                                            <option
-                                                key={currency}
-                                                value={currency}
-                                            >
-                                                {currency}
-                                            </option>
-                                        )
-                                    )}
+                                    {Object.entries(currencies ?? {}).map(([code, currency]) => (
+                                        <option key={code} value={code}>
+                                            {currency.code} - {currency.name}
+                                        </option>
+                                    ))}
                                 </select>
                             </div>
                         </th>
@@ -160,7 +164,7 @@ function ProductTable({
                         <th className="p-2 px-4">
                             <div className="flex justify-center">
                                 <input
-                                    type="text"
+                                    type="number"
                                     name="stock"
                                     placeholder="Filter Stcok..."
                                     value={filters.stock}

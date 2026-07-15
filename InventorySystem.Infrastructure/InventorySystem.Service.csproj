@@ -33,4 +33,8 @@
 		<ProjectReference Include="..\InventorySystem.Common\InventorySystem.Common.csproj" />
 	</ItemGroup>
 
+	<ItemGroup>
+		<Content Include="EmailPages\**\*.html" CopyToOutputDirectory="PreserveNewest" />
+	</ItemGroup>
+
 </Project>

@@ -8,7 +8,26 @@ import {
     Minus,
     PackagePlus,
     ChevronDown,
+    ArrowRight,
 } from "lucide-react";
+
+const BASE_CURRENCY = "USD";
+
+const getCurrencyDisplay = (currency, code) => {
+    if (!currency) {
+        return { code, name: code, symbol: code };
+    }
+
+    if (typeof currency === "string") {
+        return { code, name: currency, symbol: currency };
+    }
+
+    return {
+        code: currency.code || code,
+        name: currency.name || code,
+        symbol: currency.symbol || currency.code || code,
+    };
+};
 
 const SearchableProductSelect = ({ value, onChange, products }) => {
     const [isOpen, setIsOpen] = useState(false);
@@ -123,7 +142,10 @@ function OrderForm({
     setSelectedCurrency
 }) {
     const [products, setProducts] = useState([]);
-    const [currencySymbol, setCurrencySymbol]=useState();
+    const [currencySymbol, setCurrencySymbol] = useState();
+    const [currencies, setCurrencies] = useState({});
+
+
     const [items, setItems] = useState([
         {
             productId: "",
@@ -153,7 +175,14 @@ function OrderForm({
 
     useEffect(() => {
         fetchProducts();
+        fetchCurrencies();
     }, []);
+
+
+    const fetchCurrencies = async () => {
+        const response = await api.get("/currency/symbols");
+        setCurrencies(response.data);
+    };
 
     const fetchProducts = async () => {
         try {
@@ -198,6 +227,25 @@ function OrderForm({
         updatedItems[index][field] = value;
         setItems(updatedItems);
     };
+
+    const formatMoney = (value) => Number(value || 0).toFixed(2);
+
+    const orderBaseTotal = items.reduce((total, item) => {
+        const product = products.find((p) => p.id === Number(item.productId));
+        const quantity = Number(item.quantity) || 0;
+        return total + (Number(product?.price) || 0) * quantity;
+    }, 0);
+
+    const selectedCurrencyInfo = getCurrencyDisplay(
+        currencies[selectedCurrency],
+        selectedCurrency
+    );
+    const baseCurrencyInfo = getCurrencyDisplay(
+        currencies[BASE_CURRENCY],
+        BASE_CURRENCY
+    );
+    const selectedRate = exchangeRates[selectedCurrency] || 1;
+    const hasSelectedProducts = items.some((item) => item.productId);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -394,58 +442,112 @@ function OrderForm({
                     })}
                 </div>
 
+                <div className="flex flex-col lg:flex-row gap-6 pt-4">
+                    {/* Currency Card */}
+                    <div className="relative">
+                        <div className="grid lg:grid-cols-2">
+                            {/* From */}
+                            <div className="relative rounded-l-2xl rounded-r-2xl lg:rounded-r-none border-1 border-gray-200 bg-white px-10 py-2">
+                                <span className="absolute -top-3 left-6 bg-white px-2 text-md font-medium text-slate-700">
+                                    from
+                                </span>
 
-                <div className="flex flex-wrap gap-4 justify-end pt-4">
-                    <div className="flex items-center gap-3">
-                    <label className="font-medium">
-                        Currency:
-                    </label>
+                                <div className="flex items-center justify-between gap-6">
+                                    <div className="text-2xl font-semibold text-slate-00 whitespace-nowrap">
+                                        {baseCurrencyInfo.symbol}
+                                        {formatMoney(orderBaseTotal)}
+                                    </div>
 
-                    <select
-                            value={selectedCurrency}
-                            onChange={(e) => {
-                                setSelectedCurrency(e.target.value);
-                            }}
-                            className={`border rounded-lg px-3 py-2 ${!items.some(item => item.productId)
-                                    ? "bg-gray-200 text-gray-500 cursor-not-allowed"
-                                    : "bg-white text-black"
-                                }`}
-                            disabled={!items.some(item => item.productId)}
-                    >
-                        {Object.keys(exchangeRates).map(
-                            (currency) => (
-                                <option
-                                    key={currency}
-                                    value={currency}
-                                >
-                                    {currency}
-                                </option>
-                            )
+                                    <div className="max-w-[280px] rounded-xl border border-gray-200 bg-gray-100 px-5 py-3 font-semibold text-slate-700">
+                                        <span className="font-bold">
+                                            {BASE_CURRENCY}
+                                        </span>
+
+                                        <span className="ml-2 text-slate-500">
+                                            - {"US Dollar"}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* To */}
+                            <div className="relative rounded-r-2xl rounded-l-2xl lg:rounded-l-none border border-gray-200 bg-white px-10 py-2">
+                                <span className="absolute -top-3 left-6 bg-white px-2 text-md font-medium text-slate-700">
+                                    To
+                                </span>
+
+                                <div className="flex items-center justify-between gap-6">
+                                    <div className="text-2xl font-semibold text-slate-700 whitespace-nowrap">
+                                        {selectedCurrencyInfo.symbol}
+                                        {formatMoney(orderBaseTotal * selectedRate)}
+                                    </div>
+
+                                    <select
+                                        value={selectedCurrency}
+                                        onChange={(e) =>
+                                            setSelectedCurrency(e.target.value)
+                                        }
+                                        disabled={!hasSelectedProducts}
+                                        className={`max-w-[280px] rounded-xl border-none px-4 py-3 text-lg font-semibold transition
+                                            ${!hasSelectedProducts
+                                                ? "cursor-not-allowed bg-gray-100 text-gray-500"
+                                                : "bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                                            }`}
+                                    >
+                                        {Object.entries(currencies).map(
+                                            ([code, currency]) => {
+                                                const display =
+                                                    getCurrencyDisplay(
+                                                        currency,
+                                                        code
+                                                    );
+
+                                                return (
+                                                    <option
+                                                        key={code}
+                                                        value={code}
+                                                    >
+                                                        {display.code} -{" "}
+                                                        {display.name}
+                                                    </option>
+                                                );
+                                            }
+                                        )}
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Swap Icon */}
+                        <div className="absolute left-1/2 top-1/2 z-10 hidden h-14 w-14 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-gray-200 bg-white shadow-lg lg:flex">
+                            <ArrowRight className="h-6 w-6 text-slate-600" />
+                        </div>
+                    </div>
+
+                    {/* Buttons */}
+                    <div className="flex gap-3 items-start self-start">
+                        {orderToEdit && (
+                            <button
+                                type="button"
+                                onClick={onCancelEdit}
+                                className="rounded-xl bg-red-500 px-8 py-1 font-semibold text-white shadow-lg hover:bg-red-600"
+                            >
+                                Cancel Edit
+                            </button>
                         )}
-                    </select>
-                </div>
-                
-                    {orderToEdit && (
-                        <button
-                            type="button"
-                            onClick={onCancelEdit}
-                            className="bg-red-500 hover:bg-red-600 text-white px-8 py-3 rounded-xl font-semibold shadow-lg"
-                        >
-                            Cancel Edit
-                        </button>
-                    )}
 
-                    <button
-                        type="submit"
-                        disabled={loading}
-                        className="bg-green-500 hover:bg-green-600 text-white px-8 py-3 rounded-xl font-semibold shadow-lg"
-                    >
-                        {loading
-                            ? "Processing..."
-                            : orderToEdit
-                                ? "Update Order"
-                                : "Place Order"}
-                    </button>
+                        <button
+                            type="submit"
+                            disabled={loading}
+                            className="min-w-[220px] rounded-2xl bg-green-500 px-10 py-4 text-xl font-semibold text-white shadow-lg transition hover:bg-green-600 disabled:cursor-not-allowed disabled:opacity-70"
+                        >
+                            {loading
+                                ? "Processing..."
+                                : orderToEdit
+                                    ? "Update Order"
+                                    : "Place Order"}
+                        </button>
+                    </div>
                 </div>
             </form>
         </div>

@@ -1,4 +1,5 @@
-﻿using InventorySystem.Service.Interfaces;
+﻿using InventorySystem.Service.DTOs.CurrencyInfoDtos;
+using InventorySystem.Service.Interfaces;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using System.Net.Http.Headers;
@@ -24,9 +25,9 @@ namespace InventorySystem.Service.Services
             _configuration = configuration;
         }
 
-        public async Task<Dictionary<string, string>> GetCurrencySymbolsAsync()
+        public async Task<Dictionary<string, CurrencyInfo>> GetCurrencySymbolsAsync()
         {
-            if (_cache.TryGetValue(CacheKey, out Dictionary<string, string>? cached))
+            if (_cache.TryGetValue(CacheKey, out Dictionary<string, CurrencyInfo>? cached))
             {
                 return cached!;
             }
@@ -34,10 +35,14 @@ namespace InventorySystem.Service.Services
             var apiKey = _configuration["RestCountries:ApiKey"];
 
             _httpClient.DefaultRequestHeaders.Clear();
-            _httpClient.DefaultRequestHeaders.Authorization =
-                new AuthenticationHeaderValue("Bearer", apiKey);
 
-            var symbols = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            if (!string.IsNullOrWhiteSpace(apiKey))
+            {
+                _httpClient.DefaultRequestHeaders.Authorization =
+                    new AuthenticationHeaderValue("Bearer", apiKey);
+            }
+
+            var currencies = new Dictionary<string, CurrencyInfo>(StringComparer.OrdinalIgnoreCase);
 
             const int limit = 100;
             int offset = 0;
@@ -63,7 +68,7 @@ namespace InventorySystem.Service.Services
                 {
                     foreach (var country in result.Data.Objects)
                     {
-                        if (country.Currencies == null)
+                        if (country.Currencies == null || country.Currencies.Count == 0)
                             continue;
 
                         foreach (var currency in country.Currencies)
@@ -71,11 +76,17 @@ namespace InventorySystem.Service.Services
                             if (string.IsNullOrWhiteSpace(currency.Code))
                                 continue;
 
-                            symbols.TryAdd(
+                            currencies.TryAdd(
                                 currency.Code,
-                                string.IsNullOrWhiteSpace(currency.Symbol)
-                                    ? currency.Code
-                                    : currency.Symbol);
+                                new CurrencyInfo
+                                {
+                                    Code = currency.Code,
+                                    Name = currency.Name,
+                                    Symbol = string.IsNullOrWhiteSpace(currency.Symbol)
+                                        ? currency.Code
+                                        : currency.Symbol,
+                                    CountryOfficialName = country.Names?.Common ?? string.Empty
+                                });
                         }
                     }
                 }
@@ -84,53 +95,44 @@ namespace InventorySystem.Service.Services
                 offset += limit;
             }
 
-            _cache.Set(CacheKey, symbols, TimeSpan.FromHours(24));
+            _cache.Set(
+                CacheKey,
+                currencies,
+                new MemoryCacheEntryOptions
+                {
+                    AbsoluteExpirationRelativeToNow = TimeSpan.FromHours(24)
+                });
 
-            return symbols;
+            return currencies;
         }
 
         public async Task<string?> GetSymbolAsync(string currencyCode)
         {
-            var symbols = await GetCurrencySymbolsAsync();
+            if (string.IsNullOrWhiteSpace(currencyCode))
+                return null;
 
-            return symbols.TryGetValue(currencyCode.ToUpperInvariant(), out var symbol)
-                ? symbol
+            var currencies = await GetCurrencySymbolsAsync();
+
+            return currencies.TryGetValue(
+                currencyCode.ToUpperInvariant(),
+                out var currency)
+                ? currency.Symbol
                 : null;
         }
 
-        // ==========================================================
-        // DTOs
-        // ==========================================================
-
-        private class ApiResponse
+        public async Task<string?> GetCountryNameAsync(string currencyCode)
         {
-            public ApiData? Data { get; set; }
+            if (string.IsNullOrWhiteSpace(currencyCode))
+                return null;
+
+            var currencies = await GetCurrencySymbolsAsync();
+
+            return currencies.TryGetValue(
+                currencyCode.ToUpperInvariant(),
+                out var currency)
+                ? currency.Name
+                : null;
         }
 
-        private class ApiData
-        {
-            public List<CountryResponse>? Objects { get; set; }
-
-            public Meta? Meta { get; set; }
-        }
-
-        private class Meta
-        {
-            public bool More { get; set; }
-        }
-
-        private class CountryResponse
-        {
-            public List<CurrencyInfo>? Currencies { get; set; }
-        }
-
-        private class CurrencyInfo
-        {
-            public string Code { get; set; } = string.Empty;
-
-            public string Name { get; set; } = string.Empty;
-
-            public string? Symbol { get; set; }
-        }
     }
 }

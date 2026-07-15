@@ -31,7 +31,8 @@ namespace InventorySystem.API.Extensions
 
                         IssuerSigningKey = new SymmetricSecurityKey(
                             Encoding.UTF8.GetBytes(jwtKey)
-                        )
+                        ),
+                        ClockSkew = TimeSpan.Zero
                     };
                 });
 

@@ -11,5 +11,7 @@
 
         public string? Otp { get; set; }
 
+        public string NotificationSchedule { get; set; } = "N";
+
     }
 }

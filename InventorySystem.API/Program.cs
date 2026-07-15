@@ -1,10 +1,13 @@
+using Hangfire;
 using InventorySystem.API.Extensions;
 using InventorySystem.Core.Configurations;
-using InventorySystem.Service.Interfaces;
 using InventorySystem.Service.Auth;
 using InventorySystem.Service.Data;
+using InventorySystem.Service.Interfaces;
 using InventorySystem.Service.Repositories;
 using InventorySystem.Service.Services;
+using InventorySystem.Service.Services.EmailServices;
+using InventorySystem.Service.Services.Jobs;
 using Microsoft.EntityFrameworkCore;
 
 
@@ -14,7 +17,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 builder.Services.Configure<EmailSettings>(
-    builder.Configuration.GetSection("EmailSettings"));
+    builder.Configuration.GetSection("SmtpEmailSettings"));
 
 builder.Services.AddScoped<UserRepository>();
 builder.Services.AddScoped<IAuthService, AuthService>();
@@ -27,7 +30,24 @@ builder.Services.AddScoped<IOrderService, OrderServices>();
 builder.Services.AddScoped<IInventoryTransactionService, InventoryTransactionService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IOtpService, OtpService>();
-builder.Services.AddScoped<IEmailService, EmailService>();
+builder.Services.AddScoped<IEmailService, SmtpEmailService>();
+
+
+
+builder.Services.AddHangfire(config =>
+    config.UseSqlServerStorage(
+        builder.Configuration.GetConnectionString("DefaultConnection")));
+
+builder.Services.AddHangfireServer();
+
+builder.Services.AddScoped<IAdminLowStockNotificationService,
+    DailyAdminEmailService>();
+builder.Services.AddScoped<IUserLowStockNotificationService,
+    DailyUsersEmailService>();
+builder.Services.AddScoped<EmailJob>();
+
+
+
 
 builder.Services.AddMemoryCache();
 //builder.Services.AddHttpClient();
@@ -61,6 +81,31 @@ builder.Services.AddOpenApi();
 builder.Services.AddApplicationServices();
 
 var app = builder.Build();
+// Every day at 6:00 PM
+var indiaTimeZone = TimeZoneInfo.FindSystemTimeZoneById("India Standard Time");
+
+using (var scope = app.Services.CreateScope())
+{
+    var recurringJobs = scope.ServiceProvider.GetRequiredService<IRecurringJobManager>();
+
+    recurringJobs.AddOrUpdate<EmailJob>(
+        "daily-low-stock",
+        x => x.AdminExecute(),
+        "40 12 * * *",
+        new RecurringJobOptions
+        {
+            TimeZone = indiaTimeZone
+        });
+
+    recurringJobs.AddOrUpdate<EmailJob>(
+    "daily-user-email",
+    x => x.UserDailyExecute(),
+    "24 14 * * *",
+    new RecurringJobOptions
+    {
+        TimeZone = indiaTimeZone
+    });
+}
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -71,7 +116,8 @@ if (app.Environment.IsDevelopment())
 }
 app.UseCors("AllowReact");
 app.UseHttpsRedirection();
-
+app.UseHangfireDashboard();
+app.MapHangfireDashboard();
 app.UseAuthentication();
 app.UseAuthorization();
 

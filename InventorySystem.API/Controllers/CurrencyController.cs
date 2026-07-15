@@ -43,5 +43,23 @@ namespace InventorySystem.API.Controllers
 
             return Ok(symbols);
         }
+
+        [HttpGet("Name")]
+        public async Task<IActionResult> GetCountryName(string currencyCode)
+        {
+            var countryName = await _currencySymbolService.GetCountryNameAsync(currencyCode);
+            if (string.IsNullOrEmpty(countryName))
+            {
+                return NotFound(new
+                {
+                    Message = $"Country name not found for currency code '{currencyCode}'."
+                });
+            }
+            return Ok(new
+            {
+                CurrencyCode = currencyCode.ToUpper(),
+                CountryName = countryName
+            });
+        }
     }
 }

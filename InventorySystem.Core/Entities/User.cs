@@ -12,6 +12,8 @@
 
         public string Role { get; set; } = "User";
 
+        public string NotificationSchedule { get; set; } = "N";
+
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
         public DateTime? LastLoginAt { get; set; }

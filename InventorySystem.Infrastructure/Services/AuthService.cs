@@ -39,12 +39,14 @@ namespace InventorySystem.Service.Services
                 throw new InvalidOperationException("An account with this email address already exists.");
             }
 
+            var role = string.IsNullOrEmpty(dto.Role) ? "User" : dto.Role;
             var user = new User
             {
                 Username = dto.Username,
                 Email = dto.Email,
                 PasswordHash = PasswordHasher.Hash(dto.Password),
-                Role = string.IsNullOrEmpty(dto.Role) ? "User" : dto.Role
+                Role = string.IsNullOrEmpty(dto.Role) ? "User" : dto.Role,
+                NotificationSchedule = role == "Admin" ? "D" : "N"
             };
             await _repo.AddAsync(user);
             await _unitOfWork.SaveChangesAsync();

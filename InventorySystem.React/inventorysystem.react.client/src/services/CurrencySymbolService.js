@@ -19,3 +19,14 @@ export const getAllCurrencySymbols =async ()=>{
         throw error;
     }
 }
+
+export const getCurrencyName = async (code) => {
+    try {
+        const response = await api.get(`/Currency/Name/${code}`);
+        return response.data;
+    }
+    catch (error) {
+        console.error(error);
+        throw error;
+    }
+};

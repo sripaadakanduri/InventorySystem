@@ -10,6 +10,7 @@ namespace InventorySystem.Service.Services
         private readonly AppDbContext _context;
         private readonly IMemoryCache _cache;
         private readonly IEmailService _emailService;
+        private const string OtpTemplatePath = "EmailPages/OtpEmailTemplate.html";
 
         public OtpService(
             AppDbContext context,
@@ -23,25 +24,30 @@ namespace InventorySystem.Service.Services
 
         public async Task SendOtpAsync(int userId)
         {
-            Console.WriteLine("Finding user");
+            Console.WriteLine("Finding user...");
+
             var user = await _context.Users.FirstOrDefaultAsync(x => x.Id == userId);
 
             if (user == null)
                 throw new Exception("User not found.");
-            Console.WriteLine("Generating OTP");
+
+            Console.WriteLine("Generating OTP...");
 
             var otp = RandomNumberGenerator.GetInt32(1000, 10000).ToString();
-            Console.WriteLine("Saving cache");
+
             _cache.Set(
                 $"OTP_{userId}",
                 otp,
                 TimeSpan.FromMinutes(5));
 
+            var body = await BuildOtpEmailBodyAsync(user.Username, otp);
+
             await _emailService.SendEmailAsync(
                 user.Email,
                 "Password Change OTP",
-                $"Your OTP is {otp}. It expires in 5 minutes.");
-            Console.WriteLine("Email sent");
+                body);
+
+            Console.WriteLine("Email sent successfully.");
         }
 
         public Task<bool> ValidateOtpAsync(int userId, string otp)
@@ -71,12 +77,14 @@ namespace InventorySystem.Service.Services
                 otp,
                 TimeSpan.FromMinutes(5));
 
+            var body = await BuildOtpEmailBodyAsync(user.Username, otp);
+
             await _emailService.SendEmailAsync(
                 user.Email,
                 "Password Reset OTP",
-                $"Your OTP for password reset is {otp}. It expires in 5 minutes.");
+                body);
         }
-
+        
         public Task<bool> ValidateOtpByEmailAsync(string email, string otp)
         {
             if (!_cache.TryGetValue($"OTP_{email.ToLower()}", out string? storedOtp))
@@ -88,6 +96,22 @@ namespace InventorySystem.Service.Services
             _cache.Remove($"OTP_{email.ToLower()}");
 
             return Task.FromResult(true);
+        }
+
+        private static async Task<string> BuildOtpEmailBodyAsync(string name, string otp)
+        {
+            var templatePath = Path.Combine(
+                AppContext.BaseDirectory,
+                OtpTemplatePath.Replace('/', Path.DirectorySeparatorChar));
+
+            if (!File.Exists(templatePath))
+                throw new FileNotFoundException($"Email template not found: {templatePath}");
+
+            var template = await File.ReadAllTextAsync(templatePath);
+
+            return template
+                .Replace("{{NAME}}", name)
+                .Replace("{{OTP}}", otp);
         }
     }
 }

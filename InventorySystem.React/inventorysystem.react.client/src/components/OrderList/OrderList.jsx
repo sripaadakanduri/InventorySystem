@@ -3,6 +3,19 @@ import api from "../../services/api";
 import Pagination from "../Pagination/Pagination";
 import { getAllCurrencySymbols } from '../../services/CurrencySymbolService';
 import { formatApiDate } from "../../utils/dateUtils";
+
+const getCurrencySymbolText = (currency) => {
+    if (!currency) {
+        return "$";
+    }
+
+    if (typeof currency === "string") {
+        return currency;
+    }
+
+    return currency.symbol || currency.code || "$";
+};
+
 function OrderList({
     orders,
     onCancelOrder,
@@ -191,7 +204,7 @@ function OrderList({
                                 </td>
                                 <td className="p-4 font-medium text-center">
                                     {formatMoney(order.totalAmount)}{" "}
-                                    {symbols[order.currency] || "$"}
+                                    {getCurrencySymbolText(symbols[order.currency])}
                                 </td>
 
                                 <td className="p-4 text-center">

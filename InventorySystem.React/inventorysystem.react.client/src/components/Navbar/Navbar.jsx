@@ -145,18 +145,6 @@ const Navbar = () => {
                     >
 
                         <div className="flex gap-6 justify-center items-center">
-                            <div
-                                className="
-                                    mt-2 flex h-12 w-12 items-center justify-center
-                                    rounded-full
-                                    cursor-pointer transition hover:bg-gray-100
-                                "
-                                onClick={() => setIsSettingsOpen(true)}
-                            >
-                                <SlidersHorizontal size={25} />
-                            </div>
-
-                            
 
                             <div>
 
@@ -168,6 +156,17 @@ const Navbar = () => {
                                     {role}
                                 </h2>
 
+                            </div>
+
+                            <div
+                                className="
+                                    mt-2 flex h-12 w-12 items-center justify-center
+                                    rounded-full
+                                    cursor-pointer transition hover:bg-gray-100
+                                "
+                                onClick={() => setIsSettingsOpen(true)}
+                            >
+                                <SlidersHorizontal size={25} />
                             </div>
 
                         </div>

@@ -1,6 +1,13 @@
-﻿public interface ICurrencySymbolService
-{
-    Task<Dictionary<string, string>> GetCurrencySymbolsAsync();
+﻿using InventorySystem.Service.DTOs.CurrencyInfoDtos;
 
-    Task<string?> GetSymbolAsync(string currencyCode);
+namespace InventorySystem.Service.Interfaces
+{
+    public interface ICurrencySymbolService
+    {
+        Task<Dictionary<string, CurrencyInfo>> GetCurrencySymbolsAsync();
+
+        Task<string?> GetSymbolAsync(string currencyCode);
+
+        Task<string?> GetCountryNameAsync(string currencyCode);
+    }
 }

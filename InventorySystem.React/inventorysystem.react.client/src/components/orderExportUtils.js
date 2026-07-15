@@ -178,10 +178,7 @@ export const exportToExcel = (orders, products) => {
     for (let R = range.s.r; R <= range.e.r; R++) {
         for (let C = range.s.c; C <= range.e.c; C++) {
 
-            const cellRef = XLSX.utils.encode_cell(
-                r: R,
-                c: C
-            });
+            const cellRef = XLSX.utils.encode_cell({ r: R, c: C });
 
             if (!worksheet[cellRef]) continue;
 
@@ -299,16 +296,19 @@ export const exportToPDF = (orders, products) => {
             order.createdAt
         ]
     }));
+    doc.setFontSize(18);
+    doc.setFont("helvetica", "bold");
+    doc.text("Orders Report", 5, 6);
 
     autoTable(doc, {
-        startY: 8,
+        startY: 12,
         pageBreak: "auto",
         rowPageBreak: "avoid",
 
         margin: {
             left: 5,
             right: 5,
-            top: 8,
+            top: 16,
             bottom: 15
         },
 
@@ -347,30 +347,24 @@ export const exportToPDF = (orders, products) => {
 
         columnStyles: {
             // Fits comfortably on A4 Landscape
-
             0: {
                 cellWidth: 42
             },
-
             1: {
                 cellWidth: 30
             },
-
             2: {
-                cellWidth: 92
+                cellWidth: 110
             },
-
             3: {
-                cellWidth: 28,
+                cellWidth: 32,
                 halign: "right",
                 fontStyle: "bold"
             },
-
             4: {
                 cellWidth: 25,
                 halign: "center"
             },
-
             5: {
                 cellWidth: 50,
                 halign: "center",
@@ -408,7 +402,7 @@ export const exportToPDF = (orders, products) => {
                 Math.max(order.raw.items.length, 1);
 
             hookData.cell.styles.minCellHeight =
-                14 + (itemCount * 8);
+                14 + (itemCount * 9);
 
         },
 
@@ -428,9 +422,9 @@ export const exportToPDF = (orders, products) => {
 
             const items = order.raw.items;
 
-            const x = hookData.cell.x + 1;
-            const y = hookData.cell.y + 1;
-            const w = hookData.cell.width - 2;
+            const x = hookData.cell.x;
+            const y = hookData.cell.y ;
+            const w = hookData.cell.width ;
 
             const headerHeight = 8;
             const rowHeight = 8;
@@ -441,8 +435,8 @@ export const exportToPDF = (orders, products) => {
 
             // Nested table widths
             const productWidth = 38;
-            const priceWidth = 22;
-            const qtyWidth = 12;
+            const priceWidth = 26;
+            const qtyWidth = 16;
             const totalWidth =
                 w - productWidth - priceWidth - qtyWidth;
 
@@ -450,23 +444,12 @@ export const exportToPDF = (orders, products) => {
             doc.setDrawColor(195);
 
             // Outer border
-            doc.rect(
-                x,
-                y,
-                w,
-                totalHeight
-            );
+            doc.rect(x,y,w,totalHeight);
 
             // Header background
             doc.setFillColor(227, 239, 249);
 
-            doc.rect(
-                x,
-                y,
-                w,
-                headerHeight,
-                "F"
-            );
+            doc.rect(x,y,w,headerHeight,"F");
 
             doc.setFontSize(8);
             doc.setTextColor(55);
@@ -555,8 +538,12 @@ export const exportToPDF = (orders, products) => {
 
                 // Product Name
                 doc.setFontSize(8);
-                doc.text(
+                const productLines = doc.splitTextToSize(
                     item.name,
+                    productWidth -2
+                );
+                doc.text(
+                    productLines,
                     x + 2,
                     yy + 5
                 );
