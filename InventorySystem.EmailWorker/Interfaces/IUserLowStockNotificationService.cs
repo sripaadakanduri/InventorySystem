@@ -1,4 +1,4 @@
-﻿namespace InventorySystem.Service.Interfaces
+﻿namespace InventorySystem.EmailWorker.Interfaces
 {
     public interface IUserLowStockNotificationService
     {

@@ -6,8 +6,6 @@ using InventorySystem.Service.Data;
 using InventorySystem.Service.Interfaces;
 using InventorySystem.Service.Repositories;
 using InventorySystem.Service.Services;
-using InventorySystem.Service.Services.EmailServices;
-using InventorySystem.Service.Services.Jobs;
 using Microsoft.EntityFrameworkCore;
 
 
@@ -39,12 +37,6 @@ builder.Services.AddHangfire(config =>
         builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddHangfireServer();
-
-builder.Services.AddScoped<IAdminLowStockNotificationService,
-    DailyAdminEmailService>();
-builder.Services.AddScoped<IUserLowStockNotificationService,
-    DailyUsersEmailService>();
-builder.Services.AddScoped<EmailJob>();
 
 
 
@@ -81,31 +73,6 @@ builder.Services.AddOpenApi();
 builder.Services.AddApplicationServices();
 
 var app = builder.Build();
-// Every day at 6:00 PM
-var indiaTimeZone = TimeZoneInfo.FindSystemTimeZoneById("India Standard Time");
-
-using (var scope = app.Services.CreateScope())
-{
-    var recurringJobs = scope.ServiceProvider.GetRequiredService<IRecurringJobManager>();
-
-    recurringJobs.AddOrUpdate<EmailJob>(
-        "daily-low-stock",
-        x => x.AdminExecute(),
-        "40 12 * * *",
-        new RecurringJobOptions
-        {
-            TimeZone = indiaTimeZone
-        });
-
-    recurringJobs.AddOrUpdate<EmailJob>(
-    "daily-user-email",
-    x => x.UserDailyExecute(),
-    "24 14 * * *",
-    new RecurringJobOptions
-    {
-        TimeZone = indiaTimeZone
-    });
-}
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

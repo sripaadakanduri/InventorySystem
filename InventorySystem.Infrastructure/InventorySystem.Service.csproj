@@ -7,6 +7,15 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+	  <Content Include="EmailPages\LowStockReportTemplate.html">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </Content>
+	  <Content Include="EmailPages\OtpEmailTemplate.html">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </Content>
+	</ItemGroup>
+
+	<ItemGroup>
 		<PackageReference Include="CsvHelper" Version="33.1.0" />
 		<PackageReference Include="Google.Apis.Auth" Version="1.75.0" />
 		<PackageReference Include="MailKit" Version="4.17.0" />
@@ -31,10 +40,6 @@
 	<ItemGroup>
 		<ProjectReference Include="..\InventorySystem.Core\InventorySystem.Core.csproj" />
 		<ProjectReference Include="..\InventorySystem.Common\InventorySystem.Common.csproj" />
-	</ItemGroup>
-
-	<ItemGroup>
-		<Content Include="EmailPages\**\*.html" CopyToOutputDirectory="PreserveNewest" />
 	</ItemGroup>
 
 </Project>

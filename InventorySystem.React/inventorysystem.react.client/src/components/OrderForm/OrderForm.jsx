@@ -444,84 +444,34 @@ function OrderForm({
 
                 <div className="flex flex-col lg:flex-row gap-6 pt-4">
                     {/* Currency Card */}
-                    <div className="relative">
-                        <div className="grid lg:grid-cols-2">
-                            {/* From */}
-                            <div className="relative rounded-l-2xl rounded-r-2xl lg:rounded-r-none border-1 border-gray-200 bg-white px-10 py-2">
-                                <span className="absolute -top-3 left-6 bg-white px-2 text-md font-medium text-slate-700">
-                                    from
-                                </span>
+                    <div className="space-y-2">
+                        <label
+                            htmlFor="currency"
+                            className="block text-lg font-semibold text-slate-700"
+                        >
+                            Select Currency
+                        </label>
 
-                                <div className="flex items-center justify-between gap-6">
-                                    <div className="text-2xl font-semibold text-slate-00 whitespace-nowrap">
-                                        {baseCurrencyInfo.symbol}
-                                        {formatMoney(orderBaseTotal)}
-                                    </div>
+                        <select
+                            id="currency"
+                            value={selectedCurrency}
+                            onChange={(e) => setSelectedCurrency(e.target.value)}
+                            disabled={!hasSelectedProducts}
+                            className={`w-full max-w-sm rounded-lg border border-gray-300 px-4 py-2 text-base focus:outline-none focus:ring-2 focus:ring-blue-500 ${!hasSelectedProducts
+                                    ? "cursor-not-allowed bg-gray-100 text-gray-500"
+                                    : "bg-white"
+                                }`}
+                        >
+                            {Object.entries(currencies).map(([code, currency]) => {
+                                const display = getCurrencyDisplay(currency, code);
 
-                                    <div className="max-w-[280px] rounded-xl border border-gray-200 bg-gray-100 px-5 py-3 font-semibold text-slate-700">
-                                        <span className="font-bold">
-                                            {BASE_CURRENCY}
-                                        </span>
-
-                                        <span className="ml-2 text-slate-500">
-                                            - {"US Dollar"}
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* To */}
-                            <div className="relative rounded-r-2xl rounded-l-2xl lg:rounded-l-none border border-gray-200 bg-white px-10 py-2">
-                                <span className="absolute -top-3 left-6 bg-white px-2 text-md font-medium text-slate-700">
-                                    To
-                                </span>
-
-                                <div className="flex items-center justify-between gap-6">
-                                    <div className="text-2xl font-semibold text-slate-700 whitespace-nowrap">
-                                        {selectedCurrencyInfo.symbol}
-                                        {formatMoney(orderBaseTotal * selectedRate)}
-                                    </div>
-
-                                    <select
-                                        value={selectedCurrency}
-                                        onChange={(e) =>
-                                            setSelectedCurrency(e.target.value)
-                                        }
-                                        disabled={!hasSelectedProducts}
-                                        className={`max-w-[280px] rounded-xl border-none px-4 py-3 text-lg font-semibold transition
-                                            ${!hasSelectedProducts
-                                                ? "cursor-not-allowed bg-gray-100 text-gray-500"
-                                                : "bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
-                                            }`}
-                                    >
-                                        {Object.entries(currencies).map(
-                                            ([code, currency]) => {
-                                                const display =
-                                                    getCurrencyDisplay(
-                                                        currency,
-                                                        code
-                                                    );
-
-                                                return (
-                                                    <option
-                                                        key={code}
-                                                        value={code}
-                                                    >
-                                                        {display.code} -{" "}
-                                                        {display.name}
-                                                    </option>
-                                                );
-                                            }
-                                        )}
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Swap Icon */}
-                        <div className="absolute left-1/2 top-1/2 z-10 hidden h-14 w-14 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-gray-200 bg-white shadow-lg lg:flex">
-                            <ArrowRight className="h-6 w-6 text-slate-600" />
-                        </div>
+                                return (
+                                    <option key={code} value={code}>
+                                        {display.code} - {display.name}
+                                    </option>
+                                );
+                            })}
+                        </select>
                     </div>
 
                     {/* Buttons */}

@@ -1,0 +1,57 @@
+﻿using InventorySystem.EmailWorker.Interfaces;
+using InventorySystem.Service.Data;
+using InventorySystem.Service.Interfaces;
+using Microsoft.EntityFrameworkCore;
+
+namespace InventorySystem.EmailWorker.Services.Notifications
+{
+    public class DailyUsersEmailService
+        : BaseLowStockNotificationService,
+          IUserLowStockNotificationService
+    {
+        public DailyUsersEmailService(
+            AppDbContext context,
+            IEmailService emailService)
+            : base(context, emailService)
+        {
+        }
+
+        public async Task SendDailyUserLowStockReportAsync()
+        {
+            var today = DateTime.Today;
+
+            var weeklySchedule = $"W-{(int)today.DayOfWeek}";
+            var monthlySchedule = $"M-{today.Day}";
+            var yearlySchedule = $"Y-{today.Month}-{today.Day}";
+
+            var users = await Context.Users
+                .Where(x =>
+                    x.Role == "User" &&
+                    (
+                        x.NotificationSchedule == "D" ||
+                        x.NotificationSchedule == weeklySchedule ||
+                        x.NotificationSchedule == monthlySchedule ||
+                        x.NotificationSchedule == yearlySchedule
+                    ))
+                .ToListAsync();
+
+            if (!users.Any())
+                return;
+
+            var products = await GetLowStockProductsAsync();
+
+            if (!products.Any())
+                return;
+
+            var body = await BuildEmailBody(products);
+
+            foreach (var user in users)
+            {
+                await EmailService.SendEmailAsync(
+                    user.Email,
+                    "Low Stock Report",
+                    body);
+            }
+        }
+    }
+}

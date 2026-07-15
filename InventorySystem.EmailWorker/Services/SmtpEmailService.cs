@@ -3,7 +3,7 @@ using InventorySystem.Service.Interfaces;
 using Microsoft.Extensions.Options;
 using System.Net.Mail;
 
-namespace InventorySystem.Service.Services
+namespace InventorySystem.EmailWorker.Services
 {
     public class SmtpEmailService : IEmailService
     {
