@@ -19,7 +19,7 @@ function App() {
         <BrowserRouter>
             <Navbar />
             <ToastContainer
-                position="bottom-right"
+                position="top-right"
                 autoClose={3000}
                 newestOnTop
                 closeOnClick

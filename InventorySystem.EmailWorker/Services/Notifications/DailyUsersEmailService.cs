@@ -1,57 +1,64 @@
-﻿using InventorySystem.EmailWorker.Interfaces;
-using InventorySystem.Service.Data;
-using InventorySystem.Service.Interfaces;
-using Microsoft.EntityFrameworkCore;
+﻿    using InventorySystem.EmailWorker.Interfaces;
+    using InventorySystem.Service.Data;
+    using InventorySystem.Service.Interfaces;
+    using Microsoft.EntityFrameworkCore;
 
-namespace InventorySystem.EmailWorker.Services.Notifications
-{
-    public class DailyUsersEmailService
-        : BaseLowStockNotificationService,
-          IUserLowStockNotificationService
+    namespace InventorySystem.EmailWorker.Services.Notifications
     {
-        public DailyUsersEmailService(
-            AppDbContext context,
-            IEmailService emailService)
-            : base(context, emailService)
+        public class DailyUsersEmailService
+            : BaseLowStockNotificationService,
+              IUserLowStockNotificationService
         {
-        }
-
-        public async Task SendDailyUserLowStockReportAsync()
-        {
-            var today = DateTime.Today;
-
-            var weeklySchedule = $"W-{(int)today.DayOfWeek}";
-            var monthlySchedule = $"M-{today.Day}";
-            var yearlySchedule = $"Y-{today.Month}-{today.Day}";
-
-            var users = await Context.Users
-                .Where(x =>
-                    x.Role == "User" &&
-                    (
-                        x.NotificationSchedule == "D" ||
-                        x.NotificationSchedule == weeklySchedule ||
-                        x.NotificationSchedule == monthlySchedule ||
-                        x.NotificationSchedule == yearlySchedule
-                    ))
-                .ToListAsync();
-
-            if (!users.Any())
-                return;
-
-            var products = await GetLowStockProductsAsync();
-
-            if (!products.Any())
-                return;
-
-            var body = await BuildEmailBody(products);
-
-            foreach (var user in users)
+            public DailyUsersEmailService(
+                AppDbContext context,
+                IEmailService emailService)
+                : base(context, emailService)
             {
-                await EmailService.SendEmailAsync(
-                    user.Email,
-                    "Low Stock Report",
-                    body);
+            }
+
+            public async Task SendDailyUserLowStockReportAsync()
+            {
+                var today = DateTime.Today;
+
+                var validSchedules = new List<string>
+                {
+                    "D",
+                    $"W-{(int)today.DayOfWeek}",
+                    $"M-{today.Day}",
+                    $"Y-{today.Month}-{today.Day}"
+                };
+
+                var daysInMonth = DateTime.DaysInMonth(today.Year, today.Month);
+                if (today.Day == daysInMonth)
+                {
+                    for (int d = today.Day + 1; d <= 31; d++)
+                    {
+                        validSchedules.Add($"M-{d}");
+                        validSchedules.Add($"Y-{today.Month}-{d}");
+                    }
+                }
+
+                var users = await Context.Users
+                    .Where(x => x.Role == "User" && validSchedules.Contains(x.NotificationSchedule))
+                    .ToListAsync();
+
+                if (!users.Any())
+                    return;
+
+                var products = await GetLowStockProductsAsync();
+
+                if (!products.Any())
+                    return;
+
+                var body = await BuildEmailBody(products,"user");
+
+                foreach (var user in users)
+                {
+                    await EmailService.SendEmailAsync(
+                        user.Email,
+                        "Low Stock Report",
+                        body);
+                }
             }
         }
     }
-}

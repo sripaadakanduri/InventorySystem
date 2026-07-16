@@ -80,6 +80,23 @@ function Products() {
     }, []);
 
     useEffect(() => {
+        const queryParams = new URLSearchParams(location.search);
+        const stockParam = queryParams.get("stock");
+
+        const initialFilters = {
+            ...filters,
+            stock: stockParam ? Number(stockParam) : ""
+        };
+
+        if (stockParam) {
+            setFilters(initialFilters);
+        }
+
+        fetchProducts(initialFilters);
+        fetchCategories();
+    }, []);
+
+    useEffect(() => {
         if (showForm) {
             formRef.current?.scrollIntoView({
                 behavior: "smooth",

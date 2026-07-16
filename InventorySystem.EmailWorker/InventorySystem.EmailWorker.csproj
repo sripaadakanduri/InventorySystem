@@ -24,6 +24,7 @@
 
 	<!-- Email template -->
 	<ItemGroup>
+		<Content Include="..\..\..\..\Downloads\inventory_image.jpg" Link="Images\inventory_image.jpg" />
 		<Content Include="Templates\LowStockReportTemplate.html">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</Content>
@@ -35,10 +36,15 @@
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</Content>
 
-		<Content Include="appsettings.Development.json"
-				 Condition="Exists('appsettings.Development.json')">
+		<Content Include="appsettings.Development.json" Condition="Exists('appsettings.Development.json')">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</Content>
+		<Content Include="Templates\UserTemplate.html">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+	</ItemGroup>
+	<ItemGroup>
+	  <Folder Include="Images\" />
 	</ItemGroup>
 
 </Project>

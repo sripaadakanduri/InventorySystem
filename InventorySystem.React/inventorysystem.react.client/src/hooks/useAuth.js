@@ -1,32 +1,43 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useAuthContext } from "../context/AuthContext";
 import * as authService from "../services/authService";
+import { getRedirectDestination } from "../utils/getRedirectDestination";
 
 const useAuth = () => {
     const navigate = useNavigate();
+    const location = useLocation();
     const auth = useAuthContext();
 
     const handleLogin = async (data) => {
+        const destination = getRedirectDestination(location.state?.from);
+
         await authService.login(data);
         await auth.refreshUser();
-        navigate("/dashboard", { replace: true });
+
+        navigate(destination, { replace: true });
+
     };
 
     const handleGoogleLogin = async (idToken) => {
+        const destination = getRedirectDestination(location.state?.from);
+
         await authService.googleLogin(idToken);
         await auth.refreshUser();
-        navigate("/dashboard", { replace: true });
+
+        navigate(destination, { replace: true });
     };
 
     const handleRegister = async (data) => {
         await authService.register(data);
         await auth.refreshUser();
+
         navigate("/dashboard", { replace: true });
     };
 
     const handleLogout = () => {
         authService.logout();
         auth.refreshUser();
+
         navigate("/login", { replace: true });
     };
 
@@ -35,7 +46,7 @@ const useAuth = () => {
         handleLogin,
         handleGoogleLogin,
         handleRegister,
-        handleLogout
+        handleLogout,
     };
 };
 

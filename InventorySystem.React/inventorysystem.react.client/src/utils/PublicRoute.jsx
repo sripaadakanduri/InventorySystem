@@ -1,8 +1,10 @@
-import { Navigate } from "react-router-dom";
+import { Navigate, useLocation } from "react-router-dom";
 import useAuth from "../hooks/useAuth";
+import { getRedirectDestination } from "./getRedirectDestination";
 
 const PublicRoute = ({ children }) => {
     const { user, loading } = useAuth();
+    const location = useLocation();
 
     if (loading) {
         return (
@@ -13,7 +15,12 @@ const PublicRoute = ({ children }) => {
     }
 
     if (user) {
-        return <Navigate to="/dashboard" replace />;
+        return (
+            <Navigate
+                to={getRedirectDestination(location.state?.from)}
+                replace
+            />
+        );
     }
 
     return children;

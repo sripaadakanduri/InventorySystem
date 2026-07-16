@@ -487,7 +487,7 @@ function OrderForm({
                                             <Plus className="w-5 h-5" />
                                         </button>
                                     ) : (
-                                        <div className="w-[44px]"></div>
+                                            <div className="w-[44px]"></div>
                                     )}
                                 </div>
                             </div>
@@ -514,7 +514,7 @@ function OrderForm({
                             <button
                                 type="button"
                                 onClick={onCancelEdit}
-                                className="rounded-lg bg-red-500 px-6 py-2.5 text-sm font-semibold text-white shadow-md hover:bg-red-600 transition"
+                                className="min-w-[160px] rounded-lg bg-red-500 px-6 py-3 text-base font-semibold text-white shadow-md transition hover:bg-red-600"
                             >
                                 Cancel Edit
                             </button>
@@ -523,7 +523,7 @@ function OrderForm({
                         <button
                             type="submit"
                             disabled={loading}
-                            className="min-w-[160px] rounded-lg bg-green-500 px-8 py-3 text-base font-semibold text-white shadow-md transition hover:bg-green-600 disabled:cursor-not-allowed disabled:opacity-70"
+                            className="min-w-[160px] rounded-lg bg-green-500 px-6 py-3 text-base font-semibold text-white shadow-md transition hover:bg-green-600 disabled:cursor-not-allowed disabled:opacity-70"
                         >
                             {loading
                                 ? "Processing..."

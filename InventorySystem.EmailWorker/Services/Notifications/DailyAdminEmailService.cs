@@ -31,7 +31,7 @@ namespace InventorySystem.EmailWorker.Services.Notifications
             if (!products.Any())
                 return;
 
-            var body = await BuildEmailBody(products);
+            var body = await BuildEmailBody(products,"admin");
 
             foreach (var admin in admins)
             {

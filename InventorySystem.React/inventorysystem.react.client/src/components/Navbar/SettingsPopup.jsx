@@ -278,7 +278,7 @@ const SettingsPopup = ({ isOpen, onClose }) => {
             setLoading(false);
         }
 
-        
+
 
     };
 
@@ -323,7 +323,7 @@ const SettingsPopup = ({ isOpen, onClose }) => {
 
                     <div>
                         <label className="flex items-center gap-2 mb-1 block text-md font-medium">
-                           <EnvelopeIcon className="h-5 w-5"/> Email
+                            <EnvelopeIcon className="h-5 w-5" /> Email
                         </label>
 
                         <input
@@ -366,15 +366,14 @@ const SettingsPopup = ({ isOpen, onClose }) => {
                                         }
                                     }}
                                     disabled={form.role === "Admin"}
-                                    className={`h-4 w-4 rounded border-gray-300 focus:ring-blue-500 ${
-                                        form.role === "Admin" ? "text-gray-400 cursor-not-allowed" : "text-blue-600"
-                                    }`}
+                                    className={`h-4 w-4 rounded border-gray-300 focus:ring-blue-500 ${form.role === "Admin" ? "text-gray-400 cursor-not-allowed" : "text-blue-600"
+                                        }`}
                                 />
                                 <span className="text-sm font-medium text-gray-700">Get Notifications</span>
                             </label>
 
                             {
-                                notifications &&(
+                                notifications && (
                                     <div className="flex justify-end mt-3">
                                         <div className="flex rounded-full bg-gray-100 p-1">
                                             {options.map((option) => (
@@ -383,17 +382,15 @@ const SettingsPopup = ({ isOpen, onClose }) => {
                                                     key={option}
                                                     onClick={() => setSelectedOpt(option)}
                                                     disabled={form.role === "Admin"}
-                                                    className={`rounded-full px-4 py-2 text-sm font-medium transition-all duration-200 ${
-                                                        selectedOpt === option
-                                                            ? "bg-blue-600 text-white shadow"
-                                                            : "text-gray-600"
-                                                    } ${
-                                                        form.role === "Admin" && selectedOpt !== option
+                                                    className={`rounded-full px-4 py-2 text-sm font-medium transition-all duration-200 ${selectedOpt === option
+                                                        ? "bg-blue-600 text-white shadow"
+                                                        : "text-gray-600"
+                                                        } ${form.role === "Admin" && selectedOpt !== option
                                                             ? "opacity-50 cursor-not-allowed"
                                                             : form.role === "Admin"
                                                                 ? "cursor-not-allowed"
                                                                 : "hover:bg-gray-200"
-                                                    }`}
+                                                        }`}
                                                 >
                                                     {option}
                                                 </button>
@@ -416,8 +413,8 @@ const SettingsPopup = ({ isOpen, onClose }) => {
                                                         updateSchedule("weekly", day.value);
                                                     }}
                                                     className={`px-3 py-2 rounded-lg border transition ${weekDay === day.value
-                                                            ? "bg-blue-600 text-white border-blue-600"
-                                                            : "bg-white hover:bg-gray-100 border-gray-300"
+                                                        ? "bg-blue-600 text-white border-blue-600"
+                                                        : "bg-white hover:bg-gray-100 border-gray-300"
                                                         }`}
                                                 >
                                                     {day.label}
@@ -429,26 +426,31 @@ const SettingsPopup = ({ isOpen, onClose }) => {
                             }
                             {
                                 selectedOpt === "Monthly" && (
-                                    <div className="flex items-center gap-4 mt-3">
-                                        <label className="whitespace-nowrap font-medium">
-                                            Choose a date
-                                        </label>
+                                    <div className="flex flex-col gap-2 mt-3">
+                                        <div className="flex items-center gap-4 justify-end">
+                                            <label className="whitespace-nowrap font-medium">
+                                                Choose a date
+                                            </label>
 
-                                        <select
-                                            value={monthDate}
-                                            onChange={(e) => {
-                                                const date = Number(e.target.value);
-                                                setMonthDate(date);
-                                                updateSchedule("monthly", date);
-                                            }}
-                                            className="flex-1 border rounded-lg px-3 py-2"
-                                        >
-                                            {Array.from({ length: 31 }, (_, i) => (
-                                                <option key={i + 1} value={i + 1}>
-                                                    {i + 1}
-                                                </option>
-                                            ))}
-                                        </select>
+                                            <select
+                                                value={monthDate}
+                                                onChange={(e) => {
+                                                    const date = Number(e.target.value);
+                                                    setMonthDate(date);
+                                                    updateSchedule("monthly", date);
+                                                }}
+                                                className="flex w-[70px] border rounded-lg px-3 py-2"
+                                            >
+                                                {Array.from({ length: 31 }, (_, i) => (
+                                                    <option key={i + 1} value={i + 1}>
+                                                        {i + 1}
+                                                    </option>
+                                                ))}
+                                            </select>
+                                        </div>
+                                        <span className="text-xs text-gray-500 text-right">
+                                            *If a month has fewer days, it will be sent on the last day of the month.
+                                        </span>
                                     </div>
                                 )
                             }
@@ -465,7 +467,7 @@ const SettingsPopup = ({ isOpen, onClose }) => {
                                                     const year = Number(yearStr);
                                                     const month = Number(monthStr);
                                                     const date = Number(dateStr);
-                                                    
+
                                                     setYearYear(year);
                                                     setYearMonth(month);
                                                     setYearDate(date);
@@ -482,7 +484,7 @@ const SettingsPopup = ({ isOpen, onClose }) => {
                     </div>
 
 
-                    
+
                     {changePassword && (
                         <ChangePassword
                             form={form}

@@ -125,7 +125,7 @@ export const exportToExcel = async (orders, products) => {
             left: { style: "thin" }, right: { style: "thin" }
         };
     });
-    headerRow.height = 24;
+    headerRow.height = 30;
 
     let currentRowNumber = 2;
 
@@ -141,7 +141,7 @@ export const exportToExcel = async (orders, products) => {
                 status: order.status,
                 createdAt: order.createdAt
             });
-            row.height = 22;
+            row.height = 24;
             currentRowNumber++;
         } else {
             order.items.forEach((item, index) => {
@@ -156,7 +156,7 @@ export const exportToExcel = async (orders, products) => {
                     status: index === 0 ? order.status : "",
                     createdAt: index === 0 ? order.createdAt : ""
                 });
-                row.height = 22;
+                row.height = 24;
                 currentRowNumber++;
             });
         }

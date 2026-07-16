@@ -188,7 +188,7 @@ const ForgotPassword = ({ isOpen, onClose }) => {
                                                 onChange={handleChange}
                                                 maxLength={6}
                                                 className="block w-full rounded-md border border-gray-300 py-2 pl-10 pr-3 text-sm tracking-widest focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
-                                                placeholder="000000"
+                                                placeholder="0000"
                                                 required
                                             />
                                         </div>

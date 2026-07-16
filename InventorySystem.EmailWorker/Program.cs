@@ -25,6 +25,8 @@ try
         .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
         .AddEnvironmentVariables();
 
+    builder.Services.Configure<LowStockNotificationSettings>(builder.Configuration.GetSection("LowStockNotification"));
+
     var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
     File.AppendAllText(logFile,
@@ -50,21 +52,8 @@ try
 
     var job = scope.ServiceProvider.GetRequiredService<EmailJob>();
 
-    File.AppendAllText(logFile,
-        $"[{DateTime.Now:yyyy-MM-dd HH:mm:ss}] Executing Admin Job{Environment.NewLine}");
-
     await job.AdminExecute();
-
-    File.AppendAllText(logFile,
-        $"[{DateTime.Now:yyyy-MM-dd HH:mm:ss}] Admin Job Completed{Environment.NewLine}");
-
-    File.AppendAllText(logFile,
-        $"[{DateTime.Now:yyyy-MM-dd HH:mm:ss}] Executing User Job{Environment.NewLine}");
-
     await job.UserDailyExecute();
-
-    File.AppendAllText(logFile,
-        $"[{DateTime.Now:yyyy-MM-dd HH:mm:ss}] User Job Completed{Environment.NewLine}");
 
     File.AppendAllText(logFile,
         $"[{DateTime.Now:yyyy-MM-dd HH:mm:ss}] Worker Finished{Environment.NewLine}");
