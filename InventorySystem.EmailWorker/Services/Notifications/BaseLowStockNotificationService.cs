@@ -89,6 +89,18 @@ namespace InventorySystem.EmailWorker.Services.Notifications
             template = template.Replace("{{MORE_PRODUCTS_LINK}}", linkHtml);
             template = template.Replace("{{USERNAME}}", user.Username);
 
+            var imagePath = Path.Combine(AppContext.BaseDirectory, "Images", "inventory_image.jpg");
+            if (File.Exists(imagePath))
+            {
+                var imageBytes = await File.ReadAllBytesAsync(imagePath);
+                var base64Image = Convert.ToBase64String(imageBytes);
+                template = template.Replace("{{LOGO_IMAGE}}", $"data:image/jpeg;base64,{base64Image}");
+            }
+            else
+            {
+                template = template.Replace("{{LOGO_IMAGE}}", string.Empty);
+            }
+
             return template;
         }
     }

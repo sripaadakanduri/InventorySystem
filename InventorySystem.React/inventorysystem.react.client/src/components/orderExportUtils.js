@@ -192,7 +192,7 @@ export const exportToExcel = async (orders, products) => {
     saveAs(blob, "Orders.xlsx");
 };
 
-export const exportToPDF = (orders, products) => {
+export const exportToPDF = async (orders, products) => {
     const data = buildExportData(orders, products);
 
     const doc = new jsPDF({
@@ -212,12 +212,26 @@ export const exportToPDF = (orders, products) => {
             order.createdAt
         ]
     }));
+
+    try {
+        const logoRes = await fetch("/inventory_logo.png");
+        const blob = await logoRes.blob();
+        const reader = new FileReader();
+        await new Promise(resolve => {
+            reader.onloadend = resolve;
+            reader.readAsDataURL(blob);
+        });
+        doc.addImage(reader.result, 'PNG', 5, 5, 20, 20);
+    } catch (e) {
+        console.error("Failed to load logo", e);
+    }
+
     doc.setFontSize(18);
     doc.setFont("helvetica", "bold");
-    doc.text("Orders Report", 5, 6);
+    doc.text("Orders Report", 30, 18);
 
     autoTable(doc, {
-        startY: 12,
+        startY: 30,
         pageBreak: "auto",
         rowPageBreak: "avoid",
 

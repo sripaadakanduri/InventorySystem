@@ -112,7 +112,7 @@ function Orders() {
     const handleExportOrders = async (exportAction) => {
         try {
             const filteredOrders = await getFilteredOrdersForExport();
-            exportAction(filteredOrders, products);
+            await exportAction(filteredOrders, products);
         } catch (err) {
             console.error(err);
             toast.error("Failed to export filtered orders.");

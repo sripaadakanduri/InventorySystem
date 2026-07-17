@@ -119,12 +119,29 @@ export const exportTransactionsToExcel = (transactions) => {
     saveAs(blob, "AuditLogs.xlsx");
 };
 
-export const exportTransactionsToPDF = (transactions) => {
+export const exportTransactionsToPDF = async (transactions) => {
     const data = buildExportData(transactions);
     const doc = new jsPDF("landscape");
 
+    try {
+        const logoRes = await fetch("/inventory_logo.png");
+        const blob = await logoRes.blob();
+        const reader = new FileReader();
+        await new Promise(resolve => {
+            reader.onloadend = resolve;
+            reader.readAsDataURL(blob);
+        });
+        doc.addImage(reader.result, 'PNG', 10, 5, 20, 20);
+    } catch (e) {
+        console.error("Failed to load logo", e);
+    }
+
+    doc.setFontSize(18);
+    doc.setFont("helvetica", "bold");
+    doc.text("Audit Logs", 35, 18);
+
     autoTable(doc, {
-        startY: 10,
+        startY: 30,
 
         head: [[
             "Username",

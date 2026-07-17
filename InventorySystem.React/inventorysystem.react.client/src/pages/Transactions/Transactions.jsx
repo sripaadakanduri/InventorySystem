@@ -97,7 +97,7 @@ const Transactions = () => {
     const handleExportTransactions = async (exportAction) => {
         try {
             const filteredTransactions = await getFilteredTransactionsForExport();
-            exportAction(filteredTransactions);
+            await exportAction(filteredTransactions);
         } catch (error) {
             console.error("Error exporting transactions:", error);
             toast.error("Failed to export filtered audit logs.");

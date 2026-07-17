@@ -37,7 +37,13 @@ namespace InventorySystem.EmailWorker.Services.Notifications
         {
             container.Row(row =>
             {
-                row.RelativeItem().Column(column =>
+                var imagePath = Path.Combine(AppContext.BaseDirectory, "Images", "inventory_image.jpg");
+                if (File.Exists(imagePath))
+                {
+                    row.ConstantItem(50).Image(imagePath);
+                }
+
+                row.RelativeItem().PaddingLeft(15).Column(column =>
                 {
                     column.Item().Text("Low Stock Report").FontSize(20).SemiBold().FontColor(Colors.Blue.Darken2);
                     column.Item().Text($"Generated on {DateTime.Now:MMMM dd, yyyy HH:mm}");
