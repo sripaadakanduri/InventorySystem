@@ -2,6 +2,9 @@
 using InventorySystem.EmailWorker.Interfaces;
 using InventorySystem.Service.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
+using InventorySystem.Core.Configurations;
+using InventorySystem.EmailWorker.Services;
 
 
 namespace InventorySystem.EmailWorker.Services.Notifications
@@ -12,8 +15,9 @@ namespace InventorySystem.EmailWorker.Services.Notifications
     {
         public DailyAdminEmailService(
             AppDbContext context,
-            IEmailService emailService)
-            : base(context, emailService)
+            SmtpEmailService emailService,
+            IOptions<LowStockNotificationSettings> settings)
+            : base(context, emailService, settings)
         {
         }
 
@@ -32,13 +36,16 @@ namespace InventorySystem.EmailWorker.Services.Notifications
                 return;
 
             var body = await BuildEmailBody(products,"admin");
+            var pdfBytes = LowStockPdfReportGenerator.Generate(products);
 
             foreach (var admin in admins)
             {
-                await EmailService.SendEmailAsync(
+                await EmailService.SendEmailWithAttachmentAsync(
                     admin.Email,
                     "Daily Low Stock Report",
-                    body);
+                    body,
+                    pdfBytes,
+                    "LowStockReport.pdf");
             }
         }
     }

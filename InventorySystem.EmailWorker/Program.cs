@@ -9,6 +9,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using QuestPDF.Infrastructure;
+
+QuestPDF.Settings.License = LicenseType.Community;
 
 var logFile = Path.Combine(AppContext.BaseDirectory, "worker.log");
 
@@ -42,6 +45,7 @@ try
         builder.Configuration.GetSection("SmtpEmailSettings"));
 
     builder.Services.AddScoped<IEmailService, SmtpEmailService>();
+    builder.Services.AddScoped<SmtpEmailService>();
     builder.Services.AddScoped<IAdminLowStockNotificationService, DailyAdminEmailService>();
     builder.Services.AddScoped<IUserLowStockNotificationService, DailyUsersEmailService>();
     builder.Services.AddScoped<EmailJob>();

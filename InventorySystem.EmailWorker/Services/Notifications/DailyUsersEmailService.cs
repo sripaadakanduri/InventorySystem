@@ -1,20 +1,24 @@
-﻿    using InventorySystem.EmailWorker.Interfaces;
-    using InventorySystem.Service.Data;
-    using InventorySystem.Service.Interfaces;
-    using Microsoft.EntityFrameworkCore;
+﻿using InventorySystem.EmailWorker.Interfaces;
+using InventorySystem.Service.Data;
+using InventorySystem.Service.Interfaces;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
+using InventorySystem.Core.Configurations;
+using InventorySystem.EmailWorker.Services;
 
-    namespace InventorySystem.EmailWorker.Services.Notifications
+namespace InventorySystem.EmailWorker.Services.Notifications
     {
         public class DailyUsersEmailService
             : BaseLowStockNotificationService,
               IUserLowStockNotificationService
         {
-            public DailyUsersEmailService(
-                AppDbContext context,
-                IEmailService emailService)
-                : base(context, emailService)
-            {
-            }
+        public DailyUsersEmailService(
+            AppDbContext context,
+            SmtpEmailService emailService,
+            IOptions<LowStockNotificationSettings> settings)
+            : base(context, emailService, settings)
+        {
+        }
 
             public async Task SendDailyUserLowStockReportAsync()
             {
@@ -51,13 +55,16 @@
                     return;
 
                 var body = await BuildEmailBody(products,"user");
+                var pdfBytes = LowStockPdfReportGenerator.Generate(products);
 
                 foreach (var user in users)
                 {
-                    await EmailService.SendEmailAsync(
+                    await EmailService.SendEmailWithAttachmentAsync(
                         user.Email,
                         "Low Stock Report",
-                        body);
+                        body,
+                        pdfBytes,
+                        "LowStockReport.pdf");
                 }
             }
         }

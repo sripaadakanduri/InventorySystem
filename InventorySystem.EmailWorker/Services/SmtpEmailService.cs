@@ -1,4 +1,4 @@
-﻿using InventorySystem.Core.Configurations;
+using InventorySystem.Core.Configurations;
 using InventorySystem.Service.Interfaces;
 using Microsoft.Extensions.Options;
 using System.Net.Mail;
@@ -15,6 +15,11 @@ namespace InventorySystem.EmailWorker.Services
         }
 
         public async Task SendEmailAsync(string to, string subject, string body)
+        {
+            await SendEmailWithAttachmentAsync(to, subject, body, null, null);
+        }
+
+        public async Task SendEmailWithAttachmentAsync(string to, string subject, string body, byte[]? attachmentData = null, string? attachmentName = null)
         {
             try
             {
@@ -38,6 +43,21 @@ namespace InventorySystem.EmailWorker.Services
                 };
 
                 message.To.Add(to);
+
+                if (attachmentData != null && !string.IsNullOrEmpty(attachmentName))
+                {
+                    var attachment = new Attachment(new MemoryStream(attachmentData), attachmentName, "application/pdf");
+                    if (attachment.ContentDisposition != null)
+                    {
+                        attachment.ContentDisposition.CreationDate = DateTime.Now;
+                        attachment.ContentDisposition.ModificationDate = DateTime.Now;
+                        attachment.ContentDisposition.ReadDate = DateTime.Now;
+                        attachment.ContentDisposition.FileName = attachmentName;
+                        attachment.ContentDisposition.Size = attachmentData.Length;
+                        attachment.ContentDisposition.DispositionType = System.Net.Mime.DispositionTypeNames.Attachment;
+                    }
+                    message.Attachments.Add(attachment);
+                }
 
                 Console.WriteLine($"Connecting to {_settings.SmtpServer}:{_settings.Port}");
                 Console.WriteLine("Sending email...");

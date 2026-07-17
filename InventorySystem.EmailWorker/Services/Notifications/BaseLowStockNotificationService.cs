@@ -1,4 +1,4 @@
-﻿using InventorySystem.Core.Configurations;
+using InventorySystem.Core.Configurations;
 using InventorySystem.Core.Entities;
 using InventorySystem.Service.Data;
 using InventorySystem.Service.Interfaces;
@@ -11,12 +11,12 @@ namespace InventorySystem.EmailWorker.Services.Notifications
     public abstract class BaseLowStockNotificationService
     {
         protected readonly AppDbContext Context;
-        protected readonly IEmailService EmailService;
+        protected readonly SmtpEmailService EmailService;
         protected readonly LowStockNotificationSettings Settings;
 
         protected BaseLowStockNotificationService(
             AppDbContext context,
-            IEmailService emailService,
+            SmtpEmailService emailService,
             IOptions<LowStockNotificationSettings> settings)
         {
             Context = context;
