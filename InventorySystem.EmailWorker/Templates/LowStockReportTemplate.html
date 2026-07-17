@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html>
 
 <head>
@@ -131,7 +131,7 @@
 
                 <h2>Low Stock Notification</h2>
 
-                <p>Hello,</p>
+                <p>Hello {{USERNAME}},</p>
 
                 <p>
                     This is an automated inventory notification from
@@ -150,25 +150,7 @@
 
                 </div>
 
-                <table>
-
-                    <thead>
-
-                        <tr>
-                            <th>Product</th>
-                            <th>Category</th>
-                            <th>Current Stock</th>
-                        </tr>
-
-                    </thead>
-
-                    <tbody>
-
-                        {{PRODUCT_ROWS}}
-
-                    </tbody>
-
-                </table>
+                {{PRODUCT_TABLE}}
                 {{MORE_PRODUCTS_LINK}}
                 <p style="margin-top:30px;">
                     If you have already replenished these products, you may disregard

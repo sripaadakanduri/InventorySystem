@@ -1,4 +1,4 @@
-﻿using InventorySystem.Core.DTOs;
+using InventorySystem.Core.DTOs;
 using InventorySystem.Core.Entities;
 using InventorySystem.Service.Auth;
 using InventorySystem.Service.Data;
@@ -56,6 +56,7 @@ namespace InventorySystem.Service.Services
             {
                 Token = token,
                 Username = user.Username,
+                Email = user.Email,
                 Role = user.Role
             };
         }
@@ -80,6 +81,7 @@ namespace InventorySystem.Service.Services
             {
                 Token = token,
                 Username = user.Username,
+                Email = user.Email,
                 Role = user.Role
             };
         }
@@ -123,6 +125,7 @@ namespace InventorySystem.Service.Services
             {
                 Token = token,
                 Username = user.Username,
+                Email = user.Email,
                 Role = user.Role
             };
         }

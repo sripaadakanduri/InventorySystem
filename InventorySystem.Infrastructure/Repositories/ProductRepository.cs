@@ -59,7 +59,7 @@ namespace InventorySystem.Service.Repositories
                 if (filter.Stock.HasValue)
                 {
                     query = query.Where(p =>
-                        p.StockQuantity <= filter.Stock.Value
+                        p.StockQuantity < filter.Stock.Value
                     );
                 }
 

@@ -90,6 +90,7 @@ namespace InventorySystem.Service.Services
                 .Select(u => new RegisterDto
                 {
                     Username = u.Username,
+                    Email = u.Email,
                     Role = u.Role
                 })
                 .FirstOrDefaultAsync();
