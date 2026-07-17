@@ -1,4 +1,4 @@
-﻿using InventorySystem.Service.DTOs.CurrencyInfoDtos;
+using InventorySystem.Service.DTOs.CurrencyInfoDtos;
 using InventorySystem.Service.Interfaces;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
@@ -100,7 +100,7 @@ namespace InventorySystem.Service.Services
                 currencies,
                 new MemoryCacheEntryOptions
                 {
-                    AbsoluteExpirationRelativeToNow = TimeSpan.FromHours(24)
+                    AbsoluteExpirationRelativeToNow = TimeSpan.FromHours(_configuration.GetValue<int>("CacheSettings:CurrencySymbolExpirationHours", 24))
                 });
 
             return currencies;

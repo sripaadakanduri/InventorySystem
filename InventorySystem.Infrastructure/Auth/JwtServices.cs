@@ -1,4 +1,4 @@
-﻿using System.IdentityModel.Tokens.Jwt;
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using InventorySystem.Core.Entities;
@@ -67,7 +67,7 @@ namespace InventorySystem.Service.Auth
 
                 claims: claims,
 
-                expires: DateTime.UtcNow.AddHours(2),
+                expires: DateTime.UtcNow.AddHours(_configuration.GetValue<int>("Jwt:ExpiresInHours", 2)),
 
                 signingCredentials: credentials
             );

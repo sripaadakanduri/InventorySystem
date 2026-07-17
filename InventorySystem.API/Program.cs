@@ -47,12 +47,7 @@ builder.Services.AddHttpClient<IExchangeRateService, ExchangeRateService>();
 builder.Services.AddHttpClient<ICurrencySymbolService, CurrencySymbolService>();
 var allowedOrigins = builder.Configuration
     .GetSection("AllowedOrigins")
-    .Get<string[]>();
-
-
-allowedOrigins = allowedOrigins?.Length > 0
-    ? allowedOrigins
-    : new[] { "http://localhost:5176" };
+    .Get<string[]>() ?? Array.Empty<string>();
 
 builder.Services.AddCors(options =>
 {

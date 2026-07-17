@@ -2,6 +2,7 @@ using InventorySystem.Service.Data;
 using InventorySystem.Service.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Configuration;
 using System.Security.Cryptography;
 namespace InventorySystem.Service.Services
 {
@@ -10,16 +11,19 @@ namespace InventorySystem.Service.Services
         private readonly AppDbContext _context;
         private readonly IMemoryCache _cache;
         private readonly IEmailService _emailService;
+        private readonly IConfiguration _configuration;
         private const string OtpTemplatePath = "EmailPages/OtpEmailTemplate.html";
 
         public OtpService(
             AppDbContext context,
             IMemoryCache cache,
-            IEmailService emailService)
+            IEmailService emailService,
+            IConfiguration configuration)
         {
             _context = context;
             _cache = cache;
             _emailService = emailService;
+            _configuration = configuration;
         }
 
         public async Task SendOtpAsync(int userId)
@@ -38,7 +42,7 @@ namespace InventorySystem.Service.Services
             _cache.Set(
                 $"OTP_{userId}",
                 otp,
-                TimeSpan.FromMinutes(5));
+                TimeSpan.FromMinutes(_configuration.GetValue<int>("OtpSettings:ExpirationMinutes", 5)));
 
             var body = await BuildOtpEmailBodyAsync(user.Username, otp);
 
@@ -75,7 +79,7 @@ namespace InventorySystem.Service.Services
             _cache.Set(
                 $"OTP_{email.ToLower()}",
                 otp,
-                TimeSpan.FromMinutes(5));
+                TimeSpan.FromMinutes(_configuration.GetValue<int>("OtpSettings:ExpirationMinutes", 5)));
 
             var body = await BuildOtpEmailBodyAsync(user.Username, otp);
 

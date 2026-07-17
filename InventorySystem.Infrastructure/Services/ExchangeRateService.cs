@@ -1,4 +1,4 @@
-﻿using InventorySystem.Service.Interfaces;
+using InventorySystem.Service.Interfaces;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using System;
@@ -48,7 +48,7 @@ namespace InventorySystem.Service.Services
             if(result != null && result.Result =="success" && result.Conversion_Rates != null)
             {
                 var cachedEntryOptions = new MemoryCacheEntryOptions()
-                    .SetAbsoluteExpiration(TimeSpan.FromHours(12));
+                    .SetAbsoluteExpiration(TimeSpan.FromHours(_configuration.GetValue<int>("CacheSettings:ExchangeRateExpirationHours", 12)));
 
                 _cache.Set(CacheKey, result.Conversion_Rates, cachedEntryOptions);
 
