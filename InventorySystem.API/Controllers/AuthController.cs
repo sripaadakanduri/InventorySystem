@@ -33,6 +33,7 @@ namespace InventorySystem.API.Controllers
                 {
                     Token = result.Token,
                     Username = result.Username,
+                    Email = result.Email,
                     Role = result.Role
                 });
             }
@@ -53,6 +54,7 @@ namespace InventorySystem.API.Controllers
                 {
                     Token = result.Token,
                     Username = result.Username,
+                    Email = result.Email,
                     Role = result.Role
                 });
             }
@@ -73,6 +75,7 @@ namespace InventorySystem.API.Controllers
                 {
                     Token = result.Token,
                     Username = result.Username,
+                    Email = result.Email,
                     Role = result.Role
                 });
             }
@@ -92,10 +95,13 @@ namespace InventorySystem.API.Controllers
                 return Unauthorized();
 
             var user = await _userService.GetUserAsync(username);
+            if (user == null)
+                return Unauthorized();
 
             return Ok(new
             {
                 Username = user.Username,
+                Email = user.Email,
                 Role = user.Role
             });
         }

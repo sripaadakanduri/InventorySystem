@@ -81,6 +81,27 @@ function Products() {
 
     useEffect(() => {
         const queryParams = new URLSearchParams(location.search);
+        
+        // Security check for email link
+        const expectedEmail = queryParams.get("userEmail");
+        if (expectedEmail && user?.email) {
+            if (expectedEmail.toLowerCase() !== user.email.toLowerCase()) {
+                toast.error("Please login with the correct account to view this link.");
+                
+                // Clear the auth token directly
+                // (Since we don't have direct access to authContext.logout without navigating,
+                // we clear the cookie and reload the page to let ProtectedRoute handle the redirect seamlessly)
+                document.cookie = "AuthToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+                window.location.reload();
+                return;
+            } else {
+                // If they match, just clean the userEmail param from the URL so it doesn't linger
+                queryParams.delete("userEmail");
+                const newSearch = queryParams.toString();
+                window.history.replaceState({}, document.title, window.location.pathname + (newSearch ? "?" + newSearch : ""));
+            }
+        }
+
         const stockParam = queryParams.get("stock");
 
         const initialFilters = {

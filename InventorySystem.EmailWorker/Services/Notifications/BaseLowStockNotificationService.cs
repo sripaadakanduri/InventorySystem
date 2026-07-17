@@ -32,9 +32,9 @@ namespace InventorySystem.EmailWorker.Services.Notifications
                 .ToListAsync();
         }
 
-        protected async Task<string> BuildEmailBody(List<Product> products, string role)
+        protected async Task<string> BuildEmailBody(List<Product> products, User user)
         {
-            var templatePath = role.Equals("admin", StringComparison.OrdinalIgnoreCase)
+            var templatePath = user.Role.Equals("admin", StringComparison.OrdinalIgnoreCase)
                 ? "Templates/LowStockReportTemplate.html"
                 : "Templates/UserTemplate.html";
 
@@ -44,36 +44,50 @@ namespace InventorySystem.EmailWorker.Services.Notifications
 
             var template = await File.ReadAllTextAsync(path);
 
-            var rows = new StringBuilder();
+            var tableHtml = string.Empty;
+            var linkHtml = string.Empty;
 
-            foreach (var product in products.Take(Settings.MaxProductsInEmail))
+            if (products.Count <= Settings.MaxProductsInEmail)
             {
-                rows.Append($@"
+                var rows = new StringBuilder();
+                foreach (var product in products)
+                {
+                    rows.Append($@"
         <tr>
             <td>{product.Name}</td>
             <td>{product.Category}</td>
             <td>{product.StockQuantity}</td>
         </tr>");
-            }
+                }
 
-            template = template.Replace("{{PRODUCT_ROWS}}", rows.ToString());
-
-            if (products.Count > Settings.MaxProductsInEmail)
-            {
-                var link = $@"
-                    <p style='margin-top:20px;'>
-                        There are more low-stock products.
-                        <a href='{Settings.ProductPageUrl}'>
-                            Click here to view all low-stock products.
-                        </a>
-                    </p>";
-
-                template = template.Replace("{{MORE_PRODUCTS_LINK}}", link);
+                tableHtml = $@"
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Product</th>
+                            <th>Category</th>
+                            <th>Current Stock</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {rows}
+                    </tbody>
+                </table>";
             }
             else
             {
-                template = template.Replace("{{MORE_PRODUCTS_LINK}}", string.Empty);
+                linkHtml = $@"
+                    <p style='margin-top:20px;'>
+                        There are {products.Count} low-stock products. 
+                        <a href='{Settings.ProductPageUrl}?stock={Settings.Threshold}&userEmail={user.Email}'>
+                            Click here to view all low-stock products.
+                        </a>
+                    </p>";
             }
+
+            template = template.Replace("{{PRODUCT_TABLE}}", tableHtml);
+            template = template.Replace("{{MORE_PRODUCTS_LINK}}", linkHtml);
+            template = template.Replace("{{USERNAME}}", user.Username);
 
             return template;
         }

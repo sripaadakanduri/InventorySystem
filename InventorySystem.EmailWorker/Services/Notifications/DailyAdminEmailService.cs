@@ -1,4 +1,4 @@
-﻿using InventorySystem.Service.Data;
+using InventorySystem.Service.Data;
 using InventorySystem.EmailWorker.Interfaces;
 using InventorySystem.Service.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -35,11 +35,11 @@ namespace InventorySystem.EmailWorker.Services.Notifications
             if (!products.Any())
                 return;
 
-            var body = await BuildEmailBody(products,"admin");
             var pdfBytes = LowStockPdfReportGenerator.Generate(products);
 
             foreach (var admin in admins)
             {
+                var body = await BuildEmailBody(products, admin);
                 await EmailService.SendEmailWithAttachmentAsync(
                     admin.Email,
                     "Daily Low Stock Report",
