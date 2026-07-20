@@ -13,6 +13,7 @@ import Orders from "./pages/Orders/Orders";
 import Transactions from "./pages/Transactions/Transactions";
 import UsersManagement from "./pages/UsersManagement/UsersManagement";
 import Analytics from "./pages/Analytics/Analytics";
+import Report from "./pages/Reports/Report"
 
 function App() {
     return (
@@ -84,6 +85,14 @@ function App() {
                     element={
                         <ProtectedRoute role="Admin">
                             <UsersManagement />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/admin/reports"
+                    element={
+                        <ProtectedRoute role="Admin">
+                            <Report />
                         </ProtectedRoute>
                     }
                 />

@@ -171,17 +171,17 @@ const Navbar = () => {
 
                         </div>
 
-                        <div className="my-3 border border-gray-200"></div>
+                        <div className="my-2 border border-gray-200"></div>
 
                         <div >
                         <Link
                             to="/dashboard"
                             className={`
                                 flex w-full items-center gap-3
-                                rounded-2xl px-3 py-2
+                                rounded-2xl px-2 py-1
                                 transition duration-300
                                 hover:bg-blue-50
-                                mb-2
+                                mb-1
                                 ${location.pathname === "/dashboard"
                                     ? "bg-blue-50 text-blue-600"
                                     : ""
@@ -199,10 +199,10 @@ const Navbar = () => {
                             to="/orders"
                             className={`
                                 flex w-full items-center gap-3
-                                rounded-2xl px-3 py-2
+                                rounded-2xl px-2 py-1
                                 transition duration-300
                                 hover:bg-blue-50
-                                mb-2
+                                mb-1
                                 ${location.pathname === "/orders"
                                     ? "bg-blue-50 text-blue-600"
                                     : ""
@@ -220,9 +220,9 @@ const Navbar = () => {
                             to="/products"
                             className={`
                                 flex w-full items-center gap-3
-                                rounded-2xl px-3 py-2
+                                rounded-2xl px-2 py-1
                                 transition duration-300
-                                hover:bg-blue-50 mb-2
+                                hover:bg-blue-50 mb-1
                                 ${location.pathname === "/products"
                                     ? "bg-blue-50 text-blue-600"
                                     : ""
@@ -243,7 +243,7 @@ const Navbar = () => {
 
                                 <p
                                     className="
-                                        mb-2 ml-2 text-xs
+                                        mb-1 ml-2 text-xs
                                         font-semibold uppercase
                                         tracking-wider text-gray-400 mb-2
                                     "
@@ -255,9 +255,9 @@ const Navbar = () => {
                                     to="/admin/users"
                                     className={`
                                         flex w-full items-center gap-3
-                                        rounded-2xl px-3 py-2
+                                        rounded-2xl px-2 py-1
                                         transition duration-300
-                                        hover:bg-blue-50 mb-2
+                                        hover:bg-blue-50 mb-1
                                         ${location.pathname === "/admin/users"
                                             ? "bg-blue-50 text-blue-600"
                                             : ""
@@ -270,14 +270,33 @@ const Navbar = () => {
                                     <span>Users</span>
 
                                 </Link>
+                                    <Link
+                                        to="/admin/reports"
+                                        className={`
+                                        flex w-full items-center gap-3
+                                        rounded-2xl px-2 py-1
+                                        transition duration-300
+                                        hover:bg-blue-50 mb-1
+                                        ${location.pathname === "/admin/users"
+                                                ? "bg-blue-50 text-blue-600"
+                                                : ""
+                                            }
+                                    `}
+                                    >
+
+                                        <Users size={16} />
+
+                                        <span>Reports</span>
+
+                                    </Link>
 
                                 <Link
                                     to="/transactions"
                                     className={`
                                         flex w-full items-center gap-3
-                                        rounded-2xl px-3 py-2
+                                        rounded-2xl px-2 py-1
                                         transition duration-300
-                                        hover:bg-blue-50 mb-2
+                                        hover:bg-blue-50 mb-1
                                         ${location.pathname === "/transactions"
                                             ? "bg-blue-50 text-blue-600"
                                             : ""
