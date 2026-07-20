@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import api from "../../services/api";
 import {getAllCurrencySymbols} from "../../services/CurrencySymbolService";
+import ReportTable from '../../components/ReportsTable/reportTable';
+
 import 
 {Search ,RotateCcw,Download} from "lucide-react";
 function Report() {
@@ -107,6 +109,17 @@ function Report() {
                         <RotateCcw className="w-5 h-5 group-hover:-rotate-180 transition-transform duration-300" /> Reset</button>
                 </div>
             </div>
+
+            {
+                selectedProduct && selectedStartDate && selectedEndDate && selectedCurrency && (
+                    <ReportTable
+                        selectedProduct={selectedProduct}
+                        selectedStartDate={selectedStartDate}
+                        selectedEndDate={selectedEndDate}
+                        selectedCurrency={selectedCurrency}
+                    />
+                )
+            }
     </div>
   );
 }
