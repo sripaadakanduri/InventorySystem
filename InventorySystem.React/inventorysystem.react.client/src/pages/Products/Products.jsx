@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { toast } from "react-toastify";
-
+import {useNavigate} from "react-router-dom";
 import ProductForm from "../../components/ProductForm/ProductForm";
 import ProductImportModal from "../../components/ProductImportModal/ProductImportModal";
 import ProductTable from "../../components/ProductTable/ProductTable";
@@ -23,6 +23,8 @@ import {
 import useAuth from "../../hooks/useAuth";
 
 function Products() {
+    const navigate=useNavigate();
+
     const [open, setOpen] = useState(false);
     const [products, setProducts] = useState([]);
     const [selectedProduct, setSelectedProduct] = useState(null);
@@ -85,14 +87,11 @@ function Products() {
         // Security check for email link
         const expectedEmail = queryParams.get("userEmail");
         if (expectedEmail && user?.email) {
-            if (expectedEmail.toLowerCase() !== user.email.toLowerCase()) {
-                toast.error("Please login with the correct account to view this link.");
-                
+            if (expectedEmail.toLowerCase() !== user.email.toLowerCase()) {                
                 // Clear the auth token directly
-                // (Since we don't have direct access to authContext.logout without navigating,
                 // we clear the cookie and reload the page to let ProtectedRoute handle the redirect seamlessly)
                 document.cookie = "AuthToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-                window.location.reload();
+                navigate("/login");
                 return;
             } else {
                 // If they match, just clean the userEmail param from the URL so it doesn't linger
