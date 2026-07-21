@@ -1,19 +1,29 @@
-function reportTable({ 
-selectedProduct,
-selectedStartDate,
-selectedEndDate,
-selectedCurrency,
-}
-) {
-    return(
-        <div>
-        <h2 className="text-xl font-semibold mb-4">Report Table</h2>
-        <p>Selected Product: {selectedProduct}</p>
-        <p>Selected Start Date: {selectedStartDate}</p>
-        <p>Selected End Date: {selectedEndDate}</p>
-        <p>Selected Currency: {selectedCurrency}</p>
-        </div>
-    )
+import DataTable from "../DataTable";
+
+function ReportTable({
+    orders = [],
+    columns = [],
+    loading = false,
+    currentPage,
+    pageSize,
+    onPageChange,
+    onPageSizeChange
+}) {
+    return (
+        <DataTable
+            data={orders}
+            columns={columns}
+            loading={loading}
+            emptyMessage="No orders found for the selected filters."
+            pagination={true}
+            currentPage={currentPage}
+            pageSize={pageSize}
+            totalItems={orders.length}
+            onPageChange={onPageChange}
+            onPageSizeChange={onPageSizeChange}
+            getRowKey={(row, index) => `${row.orderNumber}-${row.productName}-${index}`}
+        />
+    );
 }
 
-export default reportTable;
+export default ReportTable;

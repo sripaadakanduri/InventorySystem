@@ -83,8 +83,6 @@ if (app.Environment.IsDevelopment())
 }
 app.UseCors("AllowReact");
 app.UseHttpsRedirection();
-app.UseHangfireDashboard();
-app.MapHangfireDashboard();
 app.UseAuthentication();
 app.UseAuthorization();
 
