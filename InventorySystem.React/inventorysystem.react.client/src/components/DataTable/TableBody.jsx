@@ -27,10 +27,12 @@ function TableBody({
                             {columns.map((column) => (
                                 <td
                                     key={column.key}
-                                    className="px-4 py-3 text-sm text-gray-700"
+                                    className="text-center px-4 py-3 text-sm text-gray-700"
                                 >
-                                    {row[column.key]}
-                                </td>
+                                    {column.render
+                                        ? column.render(row[column.key], row)
+                                        : row[column.key]}
+                                                                </td>
                             ))}
                         </tr>
                     );

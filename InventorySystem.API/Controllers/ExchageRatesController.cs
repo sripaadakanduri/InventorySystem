@@ -5,9 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace InventorySystem.API.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
-    [Authorize]
-    public class ExchangeRatesController : ControllerBase
+    [Route("api/[controller]")]    public class ExchangeRatesController : ControllerBase
     {
         private readonly IExchangeRateService _exchangeRateService;
 

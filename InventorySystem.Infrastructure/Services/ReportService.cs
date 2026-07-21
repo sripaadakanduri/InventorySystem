@@ -33,7 +33,7 @@ namespace InventorySystem.Service.Services
                     Quantity = i.Quantity,
                     OriginalAmount = i.TotalPrice,
                     OriginalCurrency = i.Order.Currency,
-                    ConvertedAmount = i.TotalPrice
+                    ConvertedAmount = i.BaseTotalPrice
                 })
                 .OrderByDescending(x => x.OrderDate)
                 .ToListAsync();

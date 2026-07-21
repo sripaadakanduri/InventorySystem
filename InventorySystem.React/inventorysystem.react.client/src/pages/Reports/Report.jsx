@@ -7,6 +7,7 @@ import DataTable from "../../components/DataTable";
 import { getAllCurrencySymbols } from "../../services/CurrencySymbolService";
 import { getProducts } from "../../services/ProductService";
 import * as reportService from "../../services/reportService";
+import { getLatestRates } from "../../services/ExchangeRateService";
 
 function Report() {
     const [selectedProduct, setSelectedProduct] = useState("");
@@ -19,6 +20,7 @@ function Report() {
     const [orders, setOrders] = useState([]);
     const [products, setProducts] = useState([]);
     const [currencies, setCurrencies] = useState({});
+    const [exchangeRates, setExchangeRates] = useState({});
     const [isLoading, setIsLoading] = useState(false);
     const [hasSearched, setHasSearched] = useState(false);
     const [currentPage, setCurrentPage] = useState(1);
@@ -53,13 +55,15 @@ function Report() {
     useEffect(() => {
         const loadFilters = async () => {
             try {
-                const [productsData, currenciesData] = await Promise.all([
+                const [productsData, currenciesData, ratesData] = await Promise.all([
                     getProducts({}),
-                    getAllCurrencySymbols()
+                    getAllCurrencySymbols(),
+                    getLatestRates()
                 ]);
 
                 setProducts(productsData ?? []);
                 setCurrencies(currenciesData ?? {});
+                setExchangeRates(ratesData ?? {});
             } catch (error) {
                 console.error("Error loading report filters:", error);
             }
@@ -88,10 +92,17 @@ function Report() {
             const values = await reportService.getTotalQuantityAndRange(selectedProduct, selectedStartDate, selectedEndDate);
             const currencyFrequency = await reportService.getFrequencyOfCurrency(selectedProduct, selectedStartDate, selectedEndDate);
             setCurrencyCounts(currencyFrequency ?? {});
-            const normalizedOrders = (data ?? []).map(normalizeReportRow);
+            const rate = exchangeRates[selectedCurrency] ?? 1;
+
+            const normalizedOrders = (data ?? [])
+                .map(normalizeReportRow)
+                .map(order => ({
+                    ...order,
+                    orderDate: order.orderDate ? new Date(order.orderDate).toISOString().split("T")[0] : null,
+                    convertedAmount: formatAmount(order.convertedAmount * rate)
+                }));
 
             setOrders(normalizedOrders);
-
             setStats({
                 totalQuantity: values.totalQuantity ?? values.TotalQuantity ?? values.item1 ?? 0,
                 totalDays: values.totalDays ?? values.TotalDays ?? values.item2 ?? 0,
@@ -167,7 +178,8 @@ function Report() {
         {
             key: "convertedAmount",
             title: "Selected Currency Amount",
-            render: (value) => `${selectedCurrency || ""} ${formatAmount(value)}`.trim()
+            render: (value) =>
+                `${selectedCurrency} ${value}`
         }
     ];
 
@@ -298,7 +310,7 @@ function Report() {
                     />
                 </div>
             )}
-            {hasSearched && (
+            {hasSearched && !isLoading && (
                 <div className="m-10 flex justify-center ">
                     <div className="w-full  rounded-xl border-l-4 border-blue-500 bg-white p-8 shadow-xl">
                         <div className="grid grid-cols-2 gap-10">

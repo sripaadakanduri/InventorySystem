@@ -9,7 +9,8 @@ import {
     Users,
     CreditCard,
     LogOut,
-    SlidersHorizontal
+    SlidersHorizontal,
+    FileBarChart
 } from "lucide-react";
 
 const Navbar = () => {
@@ -284,7 +285,7 @@ const Navbar = () => {
                                     `}
                                     >
 
-                                        <Users size={16} />
+                                        <FileBarChart size={16} />
 
                                         <span>Reports</span>
 
