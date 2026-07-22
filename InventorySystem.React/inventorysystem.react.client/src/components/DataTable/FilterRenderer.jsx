@@ -86,31 +86,35 @@ function FilterRenderer({
                     <input
                         type="date"
                         name={filter.startKey}
-                        value={value?.start ?? ""}
+                        value={value?.[filter.startKey] ?? ""}
                         onChange={(e) =>
                             onChange?.({
                                 target: {
                                     name: filter.startKey,
-                                    value: e.target.value
-                                }
+                                    value: e.target.value,
+                                },
                             })
                         }
-                        className={`border border-gray-300 rounded-lg px-2 py-1 text-sm focus:outline-none font-medium text-gray-500 focus:ring-2 focus:ring-blue-400 ${filter.className ?? "w-36"}`}
+                        className={`border border-gray-300 rounded-lg px-2 py-1 text-sm focus:outline-none font-medium text-gray-500 focus:ring-2 focus:ring-blue-400 ${
+                            filter.className ?? "w-36"
+                        }`}
                     />
 
                     <input
                         type="date"
                         name={filter.endKey}
-                        value={value?.end ?? ""}
+                        value={value?.[filter.endKey] ?? ""}
                         onChange={(e) =>
                             onChange?.({
                                 target: {
                                     name: filter.endKey,
-                                    value: e.target.value
-                                }
+                                    value: e.target.value,
+                                },
                             })
                         }
-                        className={`border border-gray-300 rounded-lg px-2 py-1 text-sm focus:outline-none font-medium text-gray-500 focus:ring-2 focus:ring-blue-400 ${filter.className ?? "w-36"}`}
+                        className={`border border-gray-300 rounded-lg px-2 py-1 text-sm focus:outline-none font-medium text-gray-500 focus:ring-2 focus:ring-blue-400 ${
+                            filter.className ?? "w-36"
+                        }`}
                     />
                 </div>
             );

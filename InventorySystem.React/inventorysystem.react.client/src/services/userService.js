@@ -3,8 +3,8 @@
 export const getUsers = async (filters = {}) => {
     const params = {};
 
-    if (filters.Username) params.User = filters.Username;
-    if (filters.Role) params.Role = filters.Role;
+    if (filters.username) params.User = filters.username;
+    if (filters.role) params.Role = filters.role;
 
     const response = await api.get("/users", { params });
 

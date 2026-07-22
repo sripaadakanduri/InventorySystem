@@ -63,7 +63,14 @@ function TableHeader({
                                 {filter ? (
                                     <FilterRenderer
                                         filter={filter}
-                                        value={filters[filter.key]}
+                                        value={
+                                            filter.type === "date-range"
+                                                ? {
+                                                    [filter.startKey]: filters[filter.startKey],
+                                                    [filter.endKey]: filters[filter.endKey],
+                                                }
+                                                : filters[filter.key]
+                                        }
                                         onChange={
                                             filter.instant
                                                 ? onInstantFilterChange

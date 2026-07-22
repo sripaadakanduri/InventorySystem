@@ -202,14 +202,12 @@ const Transactions = () => {
 
         },
         {
-            key: "startDate",
-            type: "date",
-            placeholder: "Start Date"
-        },
-        {
-            key: "endDate",
-            type: "date",
-            placeholder: "End Date"
+            key: "createdAt",
+            type: "date-range",
+            startKey: "startDate",
+            endKey: "endDate",
+            instant: true,
+            className: "w-36"
         }
     ]
     return (
