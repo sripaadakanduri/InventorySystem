@@ -1,8 +1,7 @@
 import { useEffect, useState } from "react";
 import { Pencil, Trash2 } from "lucide-react";
-import api from "../../services/api";
-import { getCurrencySymbol } from "../../services/CurrencySymbolService";
 import DataTable from "../DataTable/DataTable";
+import CurrencySelector from "../CurrencySelector";
 
 function ProductTable({
     products,
@@ -21,39 +20,13 @@ function ProductTable({
     selectedCurrency,
     setSelectedCurrency
 }){
-    const [symbol, setSymbol] = useState();
-    const [currencies, setCurrencies] = useState();
+    const [selectedCurrencyInfo, setSelectedCurrencyInfo] = useState(null);
     const [currentPage, setCurrentPage] = useState(1);
     const [pageSize, setPageSize] = useState(10);
-
-   useEffect(() => {
-        const fetchCurrencies = async () => {
-            const response = await api.get("/currency/symbols");
-            setCurrencies(response.data);
-        };
-
-        fetchCurrencies();
-    }, []);
 
     useEffect(() => {
         setCurrentPage(1);
     }, [products]);
-
-    useEffect(() => {
-        if(selectedCurrency){
-            handleSymbol(selectedCurrency);
-        }
-
-    },[selectedCurrency])
-     const handleSymbol = async (code) => {
-        try {
-            const sym = await getCurrencySymbol(code);
-            setSymbol(sym.symbol);
-        }
-        catch (error) {
-            console.log(error);
-        }
-    };
 
     const columns = [
         {
@@ -66,7 +39,7 @@ function ProductTable({
             title: "Price",     
             render: (_, row) => (
                 <>
-                    {symbol || ""}
+                    {selectedCurrencyInfo?.symbol || selectedCurrency || ""}
                     {(
                         parseFloat(row.price) *
                         (exchangeRates[selectedCurrency] || 1)
@@ -154,7 +127,7 @@ function ProductTable({
                         name="priceSort"
                         value={filters.priceSort}
                         onChange={onPriceSortChange}
-                        className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 w-32 font-medium text-gray-400"
+                        className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 w-32 font-medium text-gray-700"
                     >
                         <option value="">Sort Price</option>
                         <option value="lowToHigh">Low to High</option>
@@ -162,22 +135,14 @@ function ProductTable({
                     </select>
 
                     {/* Currency */}
-                    <select
-                        name="currency"
-                        value={selectedCurrency}
-                        onChange={(e) => setSelectedCurrency(e.target.value)}
-                        className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 w-32 font-medium text-gray-400"
-                    >
-                        {Object.entries(currencies ?? {}).map(([code, currency]) => (
-                            <option
-                                key={code}
-                                value={code}
-                            >
-                                {currency.code} - {currency.name}
-                            </option>
-                        ))}
-                    </select>
-
+                    <CurrencySelector
+                        selectedCurrency={selectedCurrency}
+                        onCurrencyChange={setSelectedCurrency}
+                        disabled={false}
+                        onCurrencyDetailsChange={setSelectedCurrencyInfo}
+                        className="w-32 justify-center"
+                        selectClassName="w-32 text-sm"
+                    />
                 </div>
             )
         },

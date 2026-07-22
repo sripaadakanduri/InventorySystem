@@ -202,7 +202,7 @@ function Orders() {
 
                         <button
                             onClick={() => handleExportOrders(exportToPDF)}
-                            className={`flex items-center gap-4 w-full bg-white px-4 py-3 text-left border-x border-gray-200 hover:bg-gray-100 transition-all duration-300 delay-150 ${open
+                            className={`flex items-center gap-4 w-full bg-white px-4 py-3 text-left border-x border-gray-200 rounded-b-xl hover:bg-gray-100 transition-all duration-300 delay-150 ${open
                                 ? "opacity-100 translate-y-0"
                                 : "opacity-0 -translate-y-3 pointer-events-none"
                                 }`}

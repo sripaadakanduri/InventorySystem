@@ -2,9 +2,8 @@ import { useEffect, useState } from "react";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import { Download, RotateCcw, Search } from "lucide-react";
-
+import CurrencySelector from "../../components/CurrencySelector";
 import DataTable from "../../components/DataTable";
-import { getAllCurrencySymbols } from "../../services/CurrencySymbolService";
 import { getProducts } from "../../services/ProductService";
 import * as reportService from "../../services/reportService";
 import { getLatestRates } from "../../services/ExchangeRateService";
@@ -19,7 +18,6 @@ function Report() {
     const [currencyCounts, setCurrencyCounts] = useState({});
     const [orders, setOrders] = useState([]);
     const [products, setProducts] = useState([]);
-    const [currencies, setCurrencies] = useState({});
     const [exchangeRates, setExchangeRates] = useState({});
     const [isLoading, setIsLoading] = useState(false);
     const [hasSearched, setHasSearched] = useState(false);
@@ -30,17 +28,6 @@ function Report() {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2
     });
-
-    const getCurrencyDisplay = (currency, code) => {
-        if (!currency) return { code, name: code, symbol: code };
-        if (typeof currency === "string") return { code, name: currency, symbol: currency };
-
-        return {
-            code: currency.code || code,
-            name: currency.name || code,
-            symbol: currency.symbol || currency.code || code
-        };
-    };
 
     const normalizeReportRow = (row) => ({
         productName: row.productName ?? row.ProductName ?? "",
@@ -55,14 +42,12 @@ function Report() {
     useEffect(() => {
         const loadFilters = async () => {
             try {
-                const [productsData, currenciesData, ratesData] = await Promise.all([
+                const [productsData, ratesData] = await Promise.all([
                     getProducts({}),
-                    getAllCurrencySymbols(),
                     getLatestRates()
                 ]);
 
                 setProducts(productsData ?? []);
-                setCurrencies(currenciesData ?? {});
                 setExchangeRates(ratesData ?? {});
             } catch (error) {
                 console.error("Error loading report filters:", error);
@@ -86,29 +71,58 @@ function Report() {
         try {
             setIsLoading(true);
             setHasSearched(true);
-            const name =products.find((product) => String(product.id) === String(selectedProduct))?.name || selectedProduct;
-            setSelectedProductName(name);
-            const data = await reportService.getOrdersByFilters(selectedProduct, selectedStartDate, selectedEndDate);
-            const values = await reportService.getTotalQuantityAndRange(selectedProduct, selectedStartDate, selectedEndDate);
-            const currencyFrequency = await reportService.getFrequencyOfCurrency(selectedProduct, selectedStartDate, selectedEndDate);
-            setCurrencyCounts(currencyFrequency ?? {});
-            const rate = exchangeRates[selectedCurrency] ?? 1;
 
-            const normalizedOrders = (data ?? [])
-                .map(normalizeReportRow)
-                .map(order => ({
-                    ...order,
-                    orderDate: order.orderDate ? new Date(order.orderDate).toISOString().split("T")[0] : null,
-                    convertedAmount: formatAmount(order.convertedAmount * rate)
-                }));
+            const name =
+                products.find((product) => String(product.id) === String(selectedProduct))
+                    ?.name || selectedProduct;
+
+            setSelectedProductName(name);
+
+            const [data, values, currencyFrequency] = await Promise.all([
+                reportService.getOrdersByFilters(
+                    selectedProduct,
+                    selectedStartDate,
+                    selectedEndDate
+                ),
+                reportService.getTotalQuantityAndRange(
+                    selectedProduct,
+                    selectedStartDate,
+                    selectedEndDate
+                ),
+                reportService.getFrequencyOfCurrency(
+                    selectedProduct,
+                    selectedStartDate,
+                    selectedEndDate
+                ),
+            ]);
+
+            setCurrencyCounts(currencyFrequency ?? {});
+
+            const normalizedOrders = (data ?? []).map((order) => ({
+                ...normalizeReportRow(order),
+                orderDate: order.orderDate
+                    ? new Date(order.orderDate).toISOString().split("T")[0]
+                    : null,
+            }));
 
             setOrders(normalizedOrders);
+
             setStats({
-                totalQuantity: values.totalQuantity ?? values.TotalQuantity ?? values.item1 ?? 0,
-                totalDays: values.totalDays ?? values.TotalDays ?? values.item2 ?? 0,
+                totalQuantity:
+                    values.totalQuantity ??
+                    values.TotalQuantity ??
+                    values.item1 ??
+                    0,
+                totalDays:
+                    values.totalDays ??
+                    values.TotalDays ??
+                    values.item2 ??
+                    0,
             });
+
             setCurrentPage(1);
-        } catch (error) {
+        } 
+        catch (error) {
             console.error("Error fetching report orders:", error);
             setOrders([]);
             alert("Unable to load report data.");
@@ -179,7 +193,9 @@ function Report() {
             key: "convertedAmount",
             title: "Selected Currency Amount",
             render: (value) =>
-                `${selectedCurrency} ${value}`
+                `${selectedCurrency} ${formatAmount(
+                    value * (exchangeRates[selectedCurrency] ?? 1)
+                )}`
         }
     ];
 
@@ -242,22 +258,13 @@ function Report() {
 
                 <div className="flex flex-col space-y-2">
                     <label className="text-sm font-medium">Currency</label>
-                    <select
-                        className="rounded-md border border-gray-300 p-2 focus:border-blue-500"
-                        value={selectedCurrency}
-                        onChange={(e) => setSelectedCurrency(e.target.value)}
-                    >
-                        <option value="">Select Currency</option>
-                        {Object.entries(currencies).map(([code, currency]) => {
-                            const display = getCurrencyDisplay(currency, code);
-
-                            return (
-                                <option key={code} value={code}>
-                                    {display.code} - {display.name}
-                                </option>
-                            );
-                        })}
-                    </select>
+                    <CurrencySelector
+                        selectedCurrency={selectedCurrency}
+                        onCurrencyChange={setSelectedCurrency}
+                        disabled={false}
+                        className="w-full"
+                        selectClassName="w-full"
+                    />
                 </div>
 
                 <div className="flex flex-col justify-end gap-2">

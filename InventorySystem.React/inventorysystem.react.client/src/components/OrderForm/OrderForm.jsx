@@ -2,7 +2,8 @@ import { useEffect, useState, useRef } from "react";
 import { toast } from "react-toastify";
 import { createOrder, updateOrder } from "../../services/ordersService";
 import api from "../../services/api";
-import { getCurrencySymbol } from '../../services/CurrencySymbolService';
+import CurrencySelector from "../CurrencySelector";
+
 import {
     Plus,
     Minus,
@@ -13,21 +14,7 @@ import {
 
 const BASE_CURRENCY = "USD";
 
-const getCurrencyDisplay = (currency, code) => {
-    if (!currency) {
-        return { code, name: code, symbol: code };
-    }
 
-    if (typeof currency === "string") {
-        return { code, name: currency, symbol: currency };
-    }
-
-    return {
-        code: currency.code || code,
-        name: currency.name || code,
-        symbol: currency.symbol || currency.code || code,
-    };
-};
 
 const SearchableProductSelect = ({ value, onChange, products }) => {
     const [isOpen, setIsOpen] = useState(false);
@@ -142,9 +129,7 @@ function OrderForm({
     setSelectedCurrency
 }) {
     const [products, setProducts] = useState([]);
-    const [currencySymbol, setCurrencySymbol] = useState();
-    const [currencies, setCurrencies] = useState({});
-
+    const [selectedCurrencyInfo, setSelectedCurrencyInfo] = useState(null);
 
     const [items, setItems] = useState([
         {
@@ -175,14 +160,7 @@ function OrderForm({
 
     useEffect(() => {
         fetchProducts();
-        fetchCurrencies();
     }, []);
-
-
-    const fetchCurrencies = async () => {
-        const response = await api.get("/currency/symbols");
-        setCurrencies(response.data);
-    };
 
     const fetchProducts = async () => {
         try {
@@ -202,22 +180,6 @@ function OrderForm({
             }
         ]);
     };
-    const handleCurrencySymbol = async (code) => {
-        try {
-            const data = await getCurrencySymbol(code);
-            setCurrencySymbol(data.symbol);
-        } catch (err) {
-            console.error(err);
-            setCurrencySymbol("");
-        }
-    };
-
-    useEffect(() => {
-        if (selectedCurrency) {
-            handleCurrencySymbol(selectedCurrency);
-        }
-    }, [selectedCurrency]);
-
     const handleRemoveItem = (index) => {
         setItems(items.filter((_, i) => i !== index));
     };
@@ -236,15 +198,7 @@ function OrderForm({
         return total + (Number(product?.price) || 0) * quantity;
     }, 0);
 
-    const selectedCurrencyInfo = getCurrencyDisplay(
-        currencies[selectedCurrency],
-        selectedCurrency
-    );
-    const baseCurrencyInfo = getCurrencyDisplay(
-        currencies[BASE_CURRENCY],
-        BASE_CURRENCY
-    );
-    const selectedRate = exchangeRates[selectedCurrency] || 1;
+    const currencySymbol = selectedCurrencyInfo?.symbol || selectedCurrency || BASE_CURRENCY;
     const hasSelectedProducts = items.some((item) => item.productId);
 
     const handleSubmit = async (e) => {
@@ -325,26 +279,14 @@ function OrderForm({
                         Select Currency
                     </label>
 
-                    <select
-                        id="currency"
-                        value={selectedCurrency}
-                        onChange={(e) => setSelectedCurrency(e.target.value)}
+                    <CurrencySelector
+                        selectedCurrency={selectedCurrency}
+                        onCurrencyChange={setSelectedCurrency}
                         disabled={!hasSelectedProducts}
-                        className={`w-64 rounded-lg border border-gray-300 px-4 py-2 text-base focus:outline-none focus:ring-2 focus:ring-blue-500 ${!hasSelectedProducts
-                                ? "cursor-not-allowed bg-gray-100 text-gray-500"
-                                : "bg-white"
-                            }`}
-                    >
-                        {Object.entries(currencies).map(([code, currency]) => {
-                            const display = getCurrencyDisplay(currency, code);
-
-                            return (
-                                <option key={code} value={code}>
-                                    {display.code} - {display.name}
-                                </option>
-                            );
-                        })}
-                    </select>
+                        onCurrencyDetailsChange={setSelectedCurrencyInfo}
+                        className="w-full max-w-xs"
+                        selectClassName="w-full"
+                    />
                 </div>
 
                 <div className="space-y-3">
@@ -523,7 +465,7 @@ function OrderForm({
                         <button
                             type="submit"
                             disabled={loading}
-                            className="min-w-[160px] rounded-lg bg-green-500 px-6 py-3 text-base font-semibold text-white shadow-md transition hover:bg-green-600 disabled:cursor-not-allowed disabled:opacity-70"
+                            className="min-w-[160px] rounded-lg bg-green-600 px-6 py-3 text-base font-semibold text-white shadow-md transition hover:bg-green-700 disabled:cursor-not-allowed disabled:opacity-70"
                         >
                             {loading
                                 ? "Processing..."

@@ -147,7 +147,7 @@ const UsersManagement = () => {
                 <div className="flex items-center justify-center">
                     {row.role === "User" ? (
                         <button
-                            className="flex items-center gap-2 text-indigo-600 hover:text-white bg-indigo-50 hover:bg-indigo-600 border border-indigo-200 hover:border-indigo-600 px-3 py-2 rounded-lg transition shadow-sm text-sm font-medium"
+                            className="flex min-w-[150px] items-center gap-2 text-indigo-600 hover:text-white bg-indigo-50 hover:bg-indigo-600 border border-indigo-200 hover:border-indigo-600 px-3 py-2 rounded-lg transition shadow-sm text-sm font-medium"
                             onClick={(e) => {
                                 e.stopPropagation();
                                 handleRoleUpdate(row.id, "Admin");
@@ -158,7 +158,7 @@ const UsersManagement = () => {
                         </button>
                     ) : (
                         <button
-                            className={`flex items-center gap-2 px-3 py-2 rounded-lg transition shadow-sm text-sm font-medium ${
+                            className={`flex max-w-[180px] items-center gap-2 px-3 py-2 rounded-lg transition shadow-sm text-sm font-medium ${
                                 row.username.toLowerCase() === "bunny"
                                     ? "bg-gray-100 text-gray-400 border border-gray-200 cursor-not-allowed"
                                     : "text-amber-600 hover:text-white bg-amber-50 hover:bg-amber-600 border border-amber-200 hover:border-amber-600"
