@@ -23,7 +23,7 @@ function FilterRenderer({
                         placeholder={filter.placeholder ?? ""}
                         onChange={handleChange}
                         onKeyDown={onKeyDown}
-                        className={`border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 ${filter.className ?? "w-32"}`}
+                        className={`border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none font-medium text-gray-500 focus:ring-2 focus:ring-blue-400 ${filter.className ?? "w-32"}`}
                     />
                 </div>
             );
@@ -39,7 +39,7 @@ function FilterRenderer({
                         placeholder={filter.placeholder ?? ""}
                         onChange={handleChange}
                         onKeyDown={onKeyDown}
-                        className={`border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 ${filter.className ?? "w-32"}`}
+                        className={`border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none font-medium text-gray-500 focus:ring-2 focus:ring-blue-400 ${filter.className ?? "w-32"}`}
                     />
                 </div>
             );
@@ -52,7 +52,7 @@ function FilterRenderer({
                         name={filter.key}
                         value={value ?? ""}
                         onChange={handleChange}
-                        className={`border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 ${filter.className ?? "w-32"}`}
+                        className={`border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none font-medium text-gray-400 focus:ring-2 focus:ring-blue-400 ${filter.className ?? "w-32"}`}
                     >
                         {(filter.options ?? []).map(option => (
                             <option
@@ -75,7 +75,7 @@ function FilterRenderer({
                         name={filter.key}
                         value={value ?? ""}
                         onChange={handleChange}
-                        className={`border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 ${filter.className ?? "w-36"}`}
+                        className={`border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none font-medium text-gray-500 focus:ring-2 focus:ring-blue-400 ${filter.className ?? "w-36"}`}
                     />
                 </div>
             );
@@ -95,7 +95,7 @@ function FilterRenderer({
                                 }
                             })
                         }
-                        className={`border border-gray-300 rounded-lg px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 ${filter.className ?? "w-36"}`}
+                        className={`border border-gray-300 rounded-lg px-2 py-1 text-sm focus:outline-none font-medium text-gray-500 focus:ring-2 focus:ring-blue-400 ${filter.className ?? "w-36"}`}
                     />
 
                     <input
@@ -110,7 +110,7 @@ function FilterRenderer({
                                 }
                             })
                         }
-                        className={`border border-gray-300 rounded-lg px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 ${filter.className ?? "w-36"}`}
+                        className={`border border-gray-300 rounded-lg px-2 py-1 text-sm focus:outline-none font-medium text-gray-500 focus:ring-2 focus:ring-blue-400 ${filter.className ?? "w-36"}`}
                     />
                 </div>
             );

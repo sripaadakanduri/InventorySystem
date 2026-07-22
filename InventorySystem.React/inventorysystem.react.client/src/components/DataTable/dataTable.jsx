@@ -9,7 +9,7 @@ function dataTable({
     data = [],
     columns = [],
     loading = false,
-    emptyMessage = "No Records Found",
+    emptyMessage ,
     /* FILTERS*/ 
     filters = {},
     filterConfig = [],
@@ -47,7 +47,7 @@ function dataTable({
         return data.slice(start, start + pageSize);
 
     }, [
-        data,
+        data,   
         pagination,
         currentPage,
         pageSize

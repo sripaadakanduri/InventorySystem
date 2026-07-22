@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
-import Pagination from "../Pagination/Pagination";
 import { Pencil, Trash2 } from "lucide-react";
-import { getCurrencySymbol } from "../../services/CurrencySymbolService"
 import api from "../../services/api";
+import { getCurrencySymbol } from "../../services/CurrencySymbolService";
+import DataTable from "../DataTable/DataTable";
+
 function ProductTable({
     products,
     role,
@@ -16,23 +17,24 @@ function ProductTable({
     onDelete,
     deletingProductId,
     isLoading,
-    onStockFilterChange,
     exchangeRates,
     selectedCurrency,
     setSelectedCurrency
-}) {
+}){
+    const [symbol, setSymbol] = useState();
+    const [currencies, setCurrencies] = useState();
     const [currentPage, setCurrentPage] = useState(1);
     const [pageSize, setPageSize] = useState(10);
-    const [symbol,setSymbol]= useState();
-    const [currencies, setCurrencies]=useState();
 
-    useEffect(() => {
+   useEffect(() => {
         const fetchCurrencies = async () => {
             const response = await api.get("/currency/symbols");
             setCurrencies(response.data);
         };
+
         fetchCurrencies();
-    })
+    }, []);
+
     useEffect(() => {
         setCurrentPage(1);
     }, [products]);
@@ -41,9 +43,9 @@ function ProductTable({
         if(selectedCurrency){
             handleSymbol(selectedCurrency);
         }
-    },[selectedCurrency])
 
-    const handleSymbol = async (code) => {
+    },[selectedCurrency])
+     const handleSymbol = async (code) => {
         try {
             const sym = await getCurrencySymbol(code);
             setSymbol(sym.symbol);
@@ -52,230 +54,210 @@ function ProductTable({
             console.log(error);
         }
     };
-    const handleFilterKeyDown = (e) => {
-        if (e.key === "Enter") {
-            onFilterApply();
-        }
-    };
 
-    const indexOfLastProduct = currentPage * pageSize;
-    const indexOfFirstProduct = indexOfLastProduct - pageSize;
-    const currentProducts = products.slice(
-        indexOfFirstProduct,
-        indexOfLastProduct
-    );
+    const columns = [
+        {
+            key: "name",
+            title: "Name"
+        },
+
+        {
+            key: "price",
+            title: "Price",
+            render: (_, row) => (
+                <>
+                    {symbol || ""}
+                    {(
+                        parseFloat(row.price) *
+                        (exchangeRates[selectedCurrency] || 1)
+                    ).toFixed(2)}
+                </>
+            )
+        },
+
+        {
+            key: "category",
+            title: "Category"
+        },
+
+        {
+            key: "stock",
+            title: "Stock Quantity",
+            render: (_, row) => (
+                <span
+                    className={
+                        row.stockQuantity > 20
+                            ? "text-green-600 font-bold"
+                            : row.stockQuantity > 0
+                            ? "text-yellow-600 font-bold"
+                            : "text-red-600 font-bold"
+                    }
+                >
+                    {row.stockQuantity}
+                </span>
+            )
+        },
+
+        ...(role === "ADMIN"
+            ? [
+                {
+                    key: "actions",
+                    title: "Actions",
+
+                    render: (_, row) => (
+                        <div className="flex justify-center gap-3">
+
+                            <button
+                                className="text-blue-600 hover:text-white bg-blue-50 hover:bg-blue-600 border border-blue-200 hover:border-blue-600 p-2 rounded-lg transition"
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    onEdit(row);
+                                }}
+                            >
+                                <Pencil className="w-5 h-5" />
+                            </button>
+
+                            <button
+                                className="text-red-600 hover:text-white bg-red-50 hover:bg-red-600 border border-red-200 hover:border-red-600 p-2 rounded-lg transition"
+                                disabled={deletingProductId === row.id}
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    onDelete(row);
+                                }}
+                            >
+                                <Trash2 className="w-5 h-5" />
+                            </button>
+
+                        </div>
+                    )
+                }
+            ]
+            : [])
+    ];
+
+    const filterConfig = [
+        {
+            key: "name",
+            type: "text",
+            placeholder: "Filter Name..."
+        },
+
+        {
+            key: "price",
+            type: "custom",
+
+            render: () => (
+                <div className="flex flex-col items-center gap-2">
+
+                    {/* Price Sort */}
+                    <select
+                        name="priceSort"
+                        value={filters.priceSort}
+                        onChange={onPriceSortChange}
+                        className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 w-32 font-medium text-gray-400"
+                    >
+                        <option value="">Sort Price</option>
+                        <option value="lowToHigh">Low to High</option>
+                        <option value="highToLow">High to Low</option>
+                    </select>
+
+                    {/* Currency */}
+                    <select
+                        name="currency"
+                        value={selectedCurrency}
+                        onChange={(e) => setSelectedCurrency(e.target.value)}
+                        className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 w-32 font-medium text-gray-400"
+                    >
+                        {Object.entries(currencies ?? {}).map(([code, currency]) => (
+                            <option
+                                key={code}
+                                value={code}
+                            >
+                                {currency.code} - {currency.name}
+                            </option>
+                        ))}
+                    </select>
+
+                </div>
+            )
+        },
+
+        {
+            key: "category",
+            type: "select",
+            instant: true,
+            options: [
+                {
+                    value: "",
+                    label: "All Categories"
+                },
+                ...categories.map(category => ({
+                    value: category,
+                    label: category
+                }))
+            ]
+        },
+
+        {
+            key: "stock",
+            type: "number",
+            placeholder: "Filter Stock..."
+        }
+    ];
 
     return (
-        <div className="w-full overflow-x-auto rounded-3xl border border-gray-200 shadow-lg bg-white mt-6">
-            <table className="w-full border-collapse">
-                <thead className="bg-blue-50 text-gray-700 border-b border-gray-200">
-                    <tr>
-                        <th className="p-4 text-center font-semibold border-b border-gray-200">
-                            Name
-                        </th>
 
-                        <th className="p-4 text-center font-semibold border-b border-gray-200">
-                            <div className="flex items-center justify-center gap-2">
-                                <span>Price</span>
-                            </div>
-                        </th>
+    <DataTable
 
-                        <th className="p-4 text-center font-semibold border-b border-gray-200">
-                            Category
-                        </th>
+        data={products}
 
-                        <th className="p-4 text-center font-semibold border-b border-gray-200">
-                            Stock Quantity
-                        </th>
+        columns={columns}
 
-                        {role === "ADMIN" && (
-                            <th className="p-4 text-center font-semibold border-b border-gray-200">
-                                Actions
-                            </th>
-                        )}
-                    </tr>
+        loading={isLoading}
 
-                    <tr>
-                        <th className="p-2 px-4">
-                            <div className="flex justify-center">
-                                <input
-                                    type="text"
-                                    name="name"
-                                    placeholder="Filter Name..."
-                                    value={filters.name}
-                                    onChange={onFilterChange}
-                                    onKeyDown={handleFilterKeyDown}
-                                    className="border border-gray-300 rounded-lg px-3 py-2 text-sm font-normal focus:outline-none focus:ring-2 focus:ring-blue-400 w-32"
-                                />
-                            </div>
-                        </th>
+        emptyMessage="No Products Found"
 
-                        <th className="p-2 px-4">
-                            <div className="flex flex-col justify-center items-center gap-3">
-                                <select
-                                    name="priceSort"
-                                    value={filters.priceSort}
-                                    onChange={onPriceSortChange}
-                                    className="border border-gray-300 rounded-lg px-3 py-2 text-sm font-normal focus:outline-none focus:ring-2 focus:ring-blue-400 w-32"
-                                >
-                                    <option value="">Sort Price</option>
-                                    <option value="lowToHigh">
-                                        Low to High
-                                    </option>
-                                    <option value="highToLow">
-                                        High to Low
-                                    </option>
-                                </select>
+        filters={filters}
 
-                                <select
-                                    value={selectedCurrency}
-                                    onChange={(e) =>
-                                        setSelectedCurrency(e.target.value)
-                                    }
-                                    className="border border-gray-300 rounded-lg px-3 py-2 text-sm font-normal focus:outline-none focus:ring-2 focus:ring-blue-400 w-32"
-                                >
-                                    {Object.entries(currencies ?? {}).map(([code, currency]) => (
-                                        <option key={code} value={code}>
-                                            {currency.code} - {currency.name}
-                                        </option>
-                                    ))}
-                                </select>
-                            </div>
-                        </th>
+        filterConfig={filterConfig}
 
-                        <th className="p-2 px-4">
-                            <div className="flex justify-center">
-                                <select
-                                    name="category"
-                                    value={filters.category}
-                                    onChange={onCategoryFilterChange}
-                                    className="border border-gray-300 rounded-lg px-3 py-2 text-sm font-normal focus:outline-none focus:ring-2 focus:ring-blue-400 w-32"
-                                >
-                                    <option value="">All Categories</option>
-                                    {categories.map((cat) => (
-                                        <option key={cat} value={cat}>
-                                            {cat}
-                                        </option>
-                                    ))}
-                                </select>
-                            </div>
-                        </th>
+        onFilterChange={onFilterChange}
 
-                        <th className="p-2 px-4">
-                            <div className="flex justify-center">
-                                <input
-                                    type="number"
-                                    name="stock"
-                                    placeholder="Filter Stcok..."
-                                    value={filters.stock}
-                                    onChange={onStockFilterChange}
-                                    onKeyDown={handleFilterKeyDown}
-                                    className="border border-gray-300 rounded-lg px-3 py-2 text-sm font-normal focus:outline-none focus:ring-2 focus:ring-blue-400 w-32"
-                                />
-                            </div>
-                        </th>
+        onInstantFilterChange={(e)=>{
 
-                        {role === "ADMIN" && <th className="p-2 px-4"></th>}
-                    </tr>
-                </thead>
+            switch(e.target.name){
 
-                <tbody>
-                    {isLoading ? (
-                        <tr>
-                            <td
-                                colSpan={role === "ADMIN" ? 5 : 4}
-                                className="p-8 text-center text-gray-500 text-lg"
-                            >
-                                Loading products...
-                            </td>
-                        </tr>
-                    ) : currentProducts.length > 0 ? (
-                        currentProducts.map((product) => (
-                            <tr
-                                key={product.id}
-                                className="border-b border-gray-200 hover:bg-gray-100 hover:translate-x-0.5 hover:cursor-pointer transform transition duration-200"
-                            >
-                                <td className="p-4 font-medium text-gray-900 text-center">
-                                    {product.name}
-                                </td>
+                case "category":
+                    onCategoryFilterChange(e);
+                    break;
 
-                                <td className="p-4 text-gray-700 text-center">
-                                    {symbol || ""}
-                                    {(
-                                        parseFloat(product.price) *
-                                        (exchangeRates[selectedCurrency] || 1)
-                                    ).toFixed(2)}
-                                </td>
+                case "priceSort":
+                    onPriceSortChange(e);
+                    break;
 
-                                <td className="p-4 text-gray-600 font-medium text-center">
-                                    {product.category}
-                                </td>
+                default:
+                    onFilterChange(e);
 
-                                <td className="p-4 text-center font-bold">
-                                    <span
-                                        className={`${product.stockQuantity > 20
-                                            ? "text-green-600"
-                                            : product.stockQuantity > 0
-                                                ? "text-yellow-600"
-                                                : "text-red-600"
-                                            }`}
-                                    >
-                                        {product.stockQuantity}
-                                    </span>
-                                </td>
+            }
 
-                                {role === "ADMIN" && (
-                                    <td className="p-4">
-                                        <div className="flex items-center justify-center gap-3">
-                                            <button
-                                                className="text-blue-600 hover:text-white bg-blue-50 hover:scale-110 hover:bg-blue-600 border border-blue-200 hover:border-blue-600 p-2 rounded-lg transition transform shadow-sm"
-                                                onClick={() => onEdit(product)}
-                                                title="Edit Product"
-                                            >
-                                                <Pencil className="w-5 h-5" />
-                                            </button>
+        }}
 
-                                            <button
-                                                className="inline-flex items-center text-red-600 hover:text-white hover:scale-110 bg-red-50 hover:bg-red-600 border border-red-200 hover:border-red-600 p-2 rounded-lg transform transition duration-200 shadow-sm disabled:opacity-50 disabled:hover:scale-100 disabled:cursor-not-allowed"
-                                                onClick={() =>
-                                                    onDelete(product)
-                                                }
-                                                disabled={
-                                                    deletingProductId ===
-                                                    product.id
-                                                }
-                                                title="Delete Product"
-                                            >
-                                                <Trash2 className="w-5 h-5" />
-                                            </button>
-                                        </div>
-                                    </td>
-                                )}
-                            </tr>
-                        ))
-                    ) : (
-                        <tr>
-                            <td
-                                colSpan={role === "ADMIN" ? 5 : 4}
-                                className="p-8 text-center text-gray-500 text-lg"
-                            >
-                                No Products Found
-                            </td>
-                        </tr>
-                    )}
-                </tbody>
-            </table>
+        onFilterApply={onFilterApply}
 
-            <div className="p-4 bg-white rounded-b-3xl">
-                <Pagination
-                    currentPage={currentPage}
-                    totalItems={products.length}
-                    pageSize={pageSize}
-                    onPageChange={setCurrentPage}
-                    onPageSizeChange={setPageSize}
-                />
-            </div>
-        </div>
+        pagination={true}
+
+        currentPage={currentPage}
+
+        pageSize={pageSize}
+
+        totalItems={products.length}
+
+        onPageChange={setCurrentPage}
+
+        onPageSizeChange={setPageSize}
+
+    />
+
     );
 }
 
