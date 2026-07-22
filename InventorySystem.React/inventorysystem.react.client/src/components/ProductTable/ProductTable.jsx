@@ -63,7 +63,7 @@ function ProductTable({
 
         {
             key: "price",
-            title: "Price",
+            title: "Price",     
             render: (_, row) => (
                 <>
                     {symbol || ""}
@@ -208,54 +208,32 @@ function ProductTable({
     return (
 
     <DataTable
-
         data={products}
-
         columns={columns}
-
         loading={isLoading}
-
         emptyMessage="No Products Found"
-
         filters={filters}
-
         filterConfig={filterConfig}
-
         onFilterChange={onFilterChange}
-
         onInstantFilterChange={(e)=>{
-
             switch(e.target.name){
-
                 case "category":
                     onCategoryFilterChange(e);
                     break;
-
                 case "priceSort":
                     onPriceSortChange(e);
                     break;
-
                 default:
                     onFilterChange(e);
-
             }
-
         }}
-
         onFilterApply={onFilterApply}
-
         pagination={true}
-
         currentPage={currentPage}
-
         pageSize={pageSize}
-
         totalItems={products.length}
-
         onPageChange={setCurrentPage}
-
         onPageSizeChange={setPageSize}
-
     />
 
     );

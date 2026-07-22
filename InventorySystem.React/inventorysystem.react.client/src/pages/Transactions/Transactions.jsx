@@ -3,11 +3,12 @@ import transactionService from '../../services/transactionService';
 import Pagination from '../../components/Pagination/Pagination';
 import { toast } from 'react-toastify';
 import { formatApiDate } from '../../utils/dateUtils';
+import DataTable from '../../components/DataTable';
 import {
     Activity,
     ChevronDown,
     FileSpreadsheet,
-    FileText,
+    FileText,   
     File,
 } from 'lucide-react';
 import {
@@ -30,14 +31,6 @@ const Transactions = () => {
 
     const [currentPage, setCurrentPage] = useState(1);
     const [pageSize, setPageSize] = useState(10);
-
-    const indexOfLastItem = currentPage * pageSize;
-    const indexOfFirstItem = indexOfLastItem - pageSize;
-
-    const currentTransactions = transactions.slice(
-        indexOfFirstItem,
-        indexOfLastItem
-    );
 
     const fetchTransactions = async (activeFilters = filters) => {
         try {
@@ -68,12 +61,6 @@ const Transactions = () => {
     const handleFilterApply = () => {
         fetchTransactions(filters);
         setCurrentPage(1);
-    };
-
-    const handleFilterKeyDown = (e) => {
-        if (e.key === "Enter") {
-            handleFilterApply();
-        }
     };
 
     const handleInstantFilterChange = (e) => {
@@ -113,12 +100,118 @@ const Transactions = () => {
         return "bg-blue-50 text-blue-700 border-blue-200";
     };
 
-    if (loading) return (
-        <div className="flex justify-center items-center min-h-[50vh]">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
-        </div>
-    );
+    // if (loading) return (
+    //     <div className="flex justify-center items-center min-h-[50vh]">
+    //         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
+    //     </div>
+    // );
+    const columns =[
+        {
+            key: "username",
+            title: "Username",
+            render: (_, row) => (row.user?.username.charAt(0).toUpperCase() + row.user?.username.slice(1)) || `User ${row.userId}`,
+        },
+        {
+            key: "product",
+            title: "Product",
+            render: (_, row) => row.product?.name || `Product ${row.productId}`,
+        },
+        {
+            key: "quantityChanged",
+            title: "Change",
+            render: (value) => (
+                <span className={value > 0 ? 'text-green-600' : 'text-red-600'}>
+                    {value > 0 ? `+${value}` : value}
+                </span>
+            )
+        },
+        {
+            key: "remainingStock",
+            title: "Stock",
+            render: (value) => (
+                <span className="text-gray-600 font-medium">{value}</span>
+            )
+        },
+        {
+            key: "actionType",
+            title: "Action Type",
+            render: (value) => (
+                <span className={`px-2 py-1 rounded-full text-xs font-medium border ${getBadgeStyle(value)}`}>
+                    {value}
+                </span>
+            )
+        },
+        {
+            key: "createdAt",
+            title: "Date & Time",
+            render: (value) => (
+                <span className="text-gray-500 text-sm">{formatApiDate(value)}</span>
+            )
+        }
+    ];
 
+    const filterConfig = [
+        {
+            key: "username",
+            type: "text",
+            placeholder: "Filter user..."
+        },
+        {
+            key: "product",
+            type: "text",
+            placeholder: "Filter product..."
+        },
+        {
+            key: "actionType",
+            type: "select",
+            instant: true,
+            options: [
+                {
+                    value: "",
+                    label: "All"
+                },
+                {
+                    value: "ManualAdd",
+                    label: "ManualAdd"
+                },
+                {
+                    value: "ManualRemove",
+                    label: "ManualRemove"
+                },
+                {
+                    value: "OrderPlaced",
+                    label: "OrderPlaced"
+                },
+                {
+                    value: "OrderCancelled",
+                    label: "OrderCancelled"
+                },
+                {
+                    value: "ProductDeleted",
+                    label: "ProductDeleted"
+                },
+                {
+                    value: "StockIn",
+                    label: "Stock In",
+                },
+                {
+                    value: "StockOut",
+                    label: "Stock Out",
+                },
+            ]
+
+        },
+        {
+            key: "startDate",
+            type: "date",
+            placeholder: "Start Date"
+        },
+        {
+            key: "endDate",
+            type: "date",
+            placeholder: "End Date"
+        }
+    ]
     return (
         <div className="max-w-7xl mx-auto p-6 mt-8 ">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8 ml-3">
@@ -197,124 +290,22 @@ const Transactions = () => {
                 </div>
             </div>
 
-            <div className="w-full overflow-x-auto rounded-3xl shadow-lg bg-white mt-6">
-                <table className="w-full border-collapse">
-                    <thead className="bg-blue-50 text-gray-700 ">
-                        <tr>
-                            <th className="p-4 text-center font-semibold border-b border-gray-200">Username</th>
-                            <th className="p-4 text-center font-semibold border-b border-gray-200">Product Name</th>
-                            <th className="p-4 text-center font-semibold border-b border-gray-200">Change</th>
-                            <th className="p-4 text-center font-semibold border-b border-gray-200">Stock</th>
-                            <th className="p-4 text-center font-semibold border-b border-gray-200">Action Type</th>
-                            <th className="p-4 text-center font-semibold border-b border-gray-200">Date & Time</th>
-                        </tr>
-                        <tr>
-                            <th className="p-2 px-4">
-                                <div className="flex justify-center">
-                                    <input
-                                        type="text"
-                                        name="username"
-                                        placeholder="Filter user..."
-                                        value={filters.username}
-                                        onChange={handleFilterChange}
-                                        onKeyDown={handleFilterKeyDown}
-                                        className="border border-gray-300 rounded-lg px-3 py-2 text-sm font-normal focus:outline-none focus:ring-2 focus:ring-blue-400 w-32"
-                                    />
-                                </div>
-                            </th>
-                            <th className="p-2 px-4">
-                                <div className="flex justify-center">
-                                    <input
-                                        type="text"
-                                        name="product"
-                                        placeholder="Filter product..."
-                                        value={filters.product}
-                                        onChange={handleFilterChange}
-                                        onKeyDown={handleFilterKeyDown}
-                                        className="border border-gray-300 rounded-lg px-3 py-2 text-sm font-normal focus:outline-none focus:ring-2 focus:ring-blue-400 w-32"
-                                    />
-                                </div>
-                            </th>
-                            <th className="p-2 px-4"></th>
-                            <th className="p-2 px-4"></th>
-                            <th className="p-2 px-4">
-                                <div className="flex justify-center">
-                                    <select
-                                        name="actionType"
-                                        value={filters.actionType}
-                                        onChange={handleInstantFilterChange}
-                                        className="border border-gray-300 rounded-lg px-3 py-2 text-sm font-normal focus:outline-none focus:ring-2 focus:ring-blue-400 w-32"
-                                    >
-                                        <option value="">All</option>
-                                        <option value="ManualAdd">ManualAdd</option>
-                                        <option value="ManualRemove">ManualRemove</option>
-                                        <option value="OrderPlaced">OrderPlaced</option>
-                                        <option value="OrderCancelled">OrderCancelled</option>
-                                        <option value="ProductDeleted">ProductDeleted</option>
-                                    </select>
-                                </div>
-                            </th>
-                            <th className="p-2 px-4">
-                                <div className="flex flex-col gap-2 justify-center items-center">
-                                    <input
-                                        type="date"
-                                        name="startDate"
-                                        value={filters.startDate}
-                                        onChange={handleInstantFilterChange}
-                                        className="border border-gray-300 rounded-lg px-2 py-1 text-sm font-normal focus:outline-none focus:ring-2 focus:ring-blue-400 w-full max-w-[140px]"
-                                        title="Start Date"
-                                    />
-                                    <input
-                                        type="date"
-                                        name="endDate"
-                                        value={filters.endDate}
-                                        onChange={handleInstantFilterChange}
-                                        className="border border-gray-300 rounded-lg px-2 py-1 text-sm font-normal focus:outline-none focus:ring-2 focus:ring-blue-400 w-full max-w-[140px]"
-                                        title="End Date"
-                                    />
-                                </div>
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {currentTransactions.length > 0 ? (
-                            currentTransactions.map(t => (
-                                <tr key={t.id} className="border-b border-gray-200 hover:bg-gray-100 cursor-pointer hover:translate-0.5 transform transition duration-150">
-                                    <td className="p-4 text-center font-medium text-gray-900">{(t.user?.username.charAt(0).toUpperCase() + t.user?.username.slice(1)) || `User ${t.userId}`}</td>
-                                    <td className="p-4 text-center text-gray-700">{t.product?.name || `Product ${t.productId}`}</td>
-                                    <td className="p-4 text-center font-bold">
-                                        <span className={t.quantityChanged > 0 ? 'text-green-600' : 'text-red-600'}>
-                                            {t.quantityChanged > 0 ? `+${t.quantityChanged}` : t.quantityChanged}
-                                        </span>
-                                    </td>
-                                    <td className="p-4 text-center text-gray-600 font-medium">{t.remainingStock}</td>
-                                    <td className="p-4 text-center">
-                                        <span className={`px-3 py-1 rounded-full text-sm font-medium border ${getBadgeStyle(t.actionType)}`}>
-                                            {t.actionType}
-                                        </span>
-                                    </td>
-                                    <td className="p-4 text-center text-gray-500 text-sm">{formatApiDate(t.createdAt)}</td>
-                                </tr>
-                            ))
-                        ) : (
-                            <tr>
-                                <td colSpan="6" className="p-8 text-center text-gray-500 text-lg">
-                                    No transactions found.
-                                </td>
-                            </tr>
-                        )}
-                    </tbody>
-                </table>
-                <div className="p-4 bg-white rounded-b-3xl">
-                    <Pagination
-                        currentPage={currentPage}
-                        totalItems={transactions.length}
-                        pageSize={pageSize}
-                        onPageChange={setCurrentPage}
-                        onPageSizeChange={setPageSize}
-                    />
-                </div>
-            </div>
+            <DataTable
+                data={transactions}
+                columns={columns}
+                filters={filters}
+                filterConfig={filterConfig}
+                onFilterChange={handleFilterChange}
+                onInstantFilterChange={handleInstantFilterChange}
+                onFilterApply={handleFilterApply}
+                onPageSizeChange={setPageSize}
+                onPageChange={setCurrentPage}
+                currentPage={currentPage}
+                pageSize={pageSize}
+                loading={loading}
+                emptyMessage="No transactions found."
+            />
+
         </div>
     );
 };
