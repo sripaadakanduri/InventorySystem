@@ -230,7 +230,7 @@ function Products() {
 
     return (
         <div className="page-container">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 rounded-3xl mt-8 border border-gray-200 shadow-lg">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 rounded-3xl border border-gray-200 shadow-lg">
                 <div>
                     <div className="flex items-center gap-3">
                         <Package className="text-indigo-600" size={28} />

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
-import { Download, RotateCcw, Search } from "lucide-react";
+import { Download, RotateCcw, Search ,FileBarChart} from "lucide-react";
 import CurrencySelector from "../../components/CurrencySelector";
 import DataTable from "../../components/DataTable";
 import { getProducts } from "../../services/ProductService";
@@ -233,10 +233,16 @@ function Report() {
         <div className="page-container">
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                 <div>
-                    <h1 className="text-2xl font-semibold">Product Sales Report</h1>
-                    <p className="text-sm text-gray-600">
-                        View product wise sales details and summary for the selected period and currency
-                    </p>
+                    <div className="flex items-center justify-start gap-2">
+                        <FileBarChart className="h-10 w-10 text-blue-800 " />
+                        <div>
+                            <h1 className="text-2xl font-semibold">Product Sales Report</h1>
+                            <p className="text-sm text-gray-600 ">
+                                View product wise sales details and summary for the selected period and currency
+                            </p>
+                        </div>
+                    </div>
+                    
                 </div>
 
                 <button
