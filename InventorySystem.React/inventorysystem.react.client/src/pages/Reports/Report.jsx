@@ -141,7 +141,7 @@ function Report() {
         setCurrentPage(1);
     };
 
-    const handleDownloadPDF = () => {
+    const handleDownloadPDF =async () => {
         if (orders.length === 0) {
             alert("Search and load report data before downloading.");
             return;
@@ -151,15 +151,45 @@ function Report() {
         const currencyPrefix = selectedCurrency || "Converted";
         const doc = new jsPDF({ orientation: "landscape", unit: "mm", format: "a4" });
 
+       const logoRes = await fetch("/inventory_logo.png");
+        const blob = await logoRes.blob();
+
+        const reader = new FileReader();
+        await new Promise(resolve => {
+            reader.onloadend = resolve;
+            reader.readAsDataURL(blob);
+        });
+
+        // Logo
+        doc.addImage(reader.result, "PNG", 5, 5, 20, 20);
+
+        // Title beside the logo
         doc.setFontSize(16);
-        doc.text("Product Sales Report", 14, 16);
+        doc.setFont("helvetica", "bold");
+        doc.text("Product Sales Report", 30, 16);
+
+        // Details below the logo
+        doc.setFont("helvetica", "normal");
         doc.setFontSize(10);
-        doc.text(`Product: ${productName}`, 14, 24);
-        doc.text(`Period: ${selectedStartDate} to ${selectedEndDate}`, 14, 30);
-        doc.text(`Currency Frequency: ${Object.entries(currencyCounts).map(([currency, count]) => `${currency}: ${count}`).join(", ")}`, 14, 36);
+
+        let y = 35;
+
+        doc.text(`Product: ${productName}`, 10, y);
+        y += 6;
+
+        doc.text(`Period: ${selectedStartDate} to ${selectedEndDate}`, 10, y);
+        y += 6;
+
+        doc.text(
+            `Currency Frequency: ${Object.entries(currencyCounts)
+                .map(([currency, count]) => `${currency}: ${count}`)
+                .join(", ")}`,
+            10,
+            y
+        );
 
         autoTable(doc, {
-            startY: 38,
+            startY: 55,
             head: [["Product", "Order Number", "Order Date", "Quantity", "Original Amount", "Selected Currency Amount"]],
             body: orders.map((order) => [
                 order.productName,
@@ -193,15 +223,15 @@ function Report() {
             key: "convertedAmount",
             title: "Selected Currency Amount",
             render: (value) =>
-                `${selectedCurrency} ${formatAmount(
+                `${selectedCurrency || "USD"} ${formatAmount(
                     value * (exchangeRates[selectedCurrency] ?? 1)
                 )}`
         }
     ];
 
     return (
-        <div className="max-w-7xl mx-auto my-6 p-4">
-            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="w-full max-w-7xl mx-auto flex flex-col gap-6 p-4 sm:p-6">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mt-10">
                 <div>
                     <h1 className="text-2xl font-semibold">Product Sales Report</h1>
                     <p className="text-sm text-gray-600">
@@ -219,7 +249,7 @@ function Report() {
                 </button>
             </div>
 
-            <div className="mt-6 grid gap-4 rounded-md p-4 shadow-md md:grid-cols-5">
+            <div className="mt-6 grid gap-4 bg-white rounded-xl p-4 shadow-md md:grid-cols-5">
                 <div className="flex flex-col space-y-2">
                     <label className="text-sm font-medium">Product</label>
                     <select
@@ -286,7 +316,7 @@ function Report() {
                 </div>
             </div>
             {!hasSearched && (
-                <div className="relative h-[calc(100vh-280px)] flex justify-center px-4">
+                <div className="relative h-[calc(100vh-200px)] 2xl:h-[calc(100vh-450px)] flex justify-center px-4">
                     <div className="absolute left-1/2 top-1/2 w-full max-w-2xl -translate-x-1/2 -translate-y-1/2 rounded-xl border-l-4 border-blue-500 bg-white px-8 py-6 shadow-xl">
                         <h1 className="text-xl font-semibold text-gray-800">
                         Select a product and date range to generate a report.
