@@ -50,7 +50,7 @@ function Products() {
     const fetchCategories = async () => {
         try {
             const allProducts = await getProducts({});
-            const uniqueCategories = [...new Set(allProducts.map((p) => p.category).filter(Boolean))].sort();
+            const uniqueCategories = [...new Set(allProducts.map((p) => p.category?.trim().toLowerCase()).filter(Boolean))].sort();
             setCategories(uniqueCategories);
         } catch (error) {
             console.error("Unable to load categories:", error);
@@ -77,11 +77,6 @@ function Products() {
     };
 
     useEffect(() => {
-        fetchProducts();
-        fetchCategories();
-    }, []);
-
-    useEffect(() => {
         const queryParams = new URLSearchParams(location.search);
         
         // Security check for email link
@@ -103,8 +98,10 @@ function Products() {
 
         const stockParam = queryParams.get("stock");
 
-        const initialFilters = {
-            ...filters,
+       const initialFilters = {
+            name: "",
+            priceSort: "",
+            category: "",
             stock: stockParam ? Number(stockParam) : ""
         };
 
@@ -198,10 +195,14 @@ function Products() {
     };
 
     const handleFilterChange = (e) => {
-        setFilters({
-            ...filters,
-            [e.target.name]: e.target.value
-        });
+        const { name, value } = e.target;
+
+        setFilters(prev => ({
+            ...prev,
+            [name]: name === "stock"
+                ? (value === "" ? "" : Number(value))
+                : value
+        }));
     };
 
     const handleCategoryFilterChange = (e) => {
@@ -222,16 +223,6 @@ function Products() {
 
         setFilters(updatedFilters);
         fetchProducts(updatedFilters);
-    };
-    const handleStockFilterChange = (e) => {
-        const { name, value } = e.target;
-
-        setFilters(prev => ({
-            ...prev,
-            [name]: name === "stock"
-                ? (value === "" ? "" : Number(value))
-                : value
-        }));
     };
     const handleFilterApply = () => {
         fetchProducts(filters);
@@ -323,7 +314,6 @@ function Products() {
                 onCategoryFilterChange={handleCategoryFilterChange}
                 onPriceSortChange={handlePriceSortChange}
                 onFilterApply={handleFilterApply}
-                onStockFilterChange={handleStockFilterChange}
                 onEdit={handleEdit}
                 onDelete={handleDeleteRequest}
                 deletingProductId={deletingProductId}

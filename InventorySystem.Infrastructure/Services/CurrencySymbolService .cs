@@ -95,15 +95,23 @@ namespace InventorySystem.Service.Services
                 offset += limit;
             }
 
+            var sortedCurrencies = currencies
+                .OrderBy(c => c.Key) // Sort by currency code (AUD, CAD, EUR...)
+                .ToDictionary(
+                    c => c.Key,
+                    c => c.Value,
+                    StringComparer.OrdinalIgnoreCase);
+
             _cache.Set(
                 CacheKey,
-                currencies,
+                sortedCurrencies,
                 new MemoryCacheEntryOptions
                 {
-                    AbsoluteExpirationRelativeToNow = TimeSpan.FromHours(_configuration.GetValue<int>("CacheSettings:CurrencySymbolExpirationHours", 24))
+                    AbsoluteExpirationRelativeToNow = TimeSpan.FromHours(
+                        _configuration.GetValue<int>("CacheSettings:CurrencySymbolExpirationHours", 24))
                 });
 
-            return currencies;
+            return sortedCurrencies;
         }
 
         public async Task<string?> GetSymbolAsync(string currencyCode)

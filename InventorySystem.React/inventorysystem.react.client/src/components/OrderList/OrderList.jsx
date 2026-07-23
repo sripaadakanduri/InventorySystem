@@ -3,7 +3,7 @@ import api from "../../services/api";
 import Pagination from "../Pagination/Pagination";
 import { getAllCurrencySymbols } from '../../services/CurrencySymbolService';
 import { formatApiDate } from "../../utils/dateUtils";
-
+import DataTable from "../DataTable";
 const getCurrencySymbolText = (currency) => {
     if (!currency) {
         return "$";
@@ -84,6 +84,20 @@ function OrderList({
                 return "Unknown";
         }
     };
+    const getStatusClass = (status) => {
+        switch (status) {
+            case 1:
+                return "bg-yellow-100 text-yellow-700";
+            case 2:
+                return "bg-green-50 text-green-700";
+            case 3:
+                return "bg-red-100 text-red-700";
+            case 4:
+                return "bg-gray-200 text-gray-700";
+            default:
+                return "bg-blue-50 text-blue-700";
+        }
+    };
 
     const openViewModal = (order) => {
         setSelectedOrder(order);
@@ -91,168 +105,120 @@ function OrderList({
 
     const formatMoney = (value) => Number(value || 0).toFixed(2);
 
+    const columns = [
+        {
+            key: "username",
+            title: "Username",
+            render: (value) => value ? value.charAt(0).toUpperCase() + value.slice(1) : `User ${row.userId}`,
+        
+        },
+        {
+            key: "orderNumber",
+            title:"Order No",
+        },
+        {
+            key: "totalAmount",
+            title: "Total Amount",
+            render: (value,row) =>(<>{formatMoney(value)}{" "}{getCurrencySymbolText(symbols[row.currency])}</>) 
+        },
+        {
+            key: "totalQuantity",
+            title: "Quantity",
+        
+        },
+        {
+            key: "status",
+            title: "Status",
+            render: (value) => (
+                <span
+                    className={`px-2 py-1 rounded-full text-xs font-medium border ${getStatusClass(value)}`}
+                >
+                    {getStatusText(value)}
+                </span>
+            ),
+        },
+        {
+            key: "createdAt",
+            title: "Date & Time",
+            render: (value) => (
+                <span className="text-gray-500 text-sm">{formatApiDate(value)}</span>
+                
+            ),
+        }
+
+        
+    ]
+
+    const filterConfig = [
+        {
+            key: "username",
+            type: "text",
+            placeholder: "Filter user..."
+        },
+        {
+            key: "orderNumber",
+            type: "text",
+            placeholder: "Filter order..."
+        },
+        {
+            key: "status",
+            type: "select",
+            instant: true,
+            options: [
+                {
+                    value: "",
+                    label: "All"
+                },
+                {
+                    value: 1,
+                    label: "Pending"
+                },
+                {
+                    value: 2,
+                    label: "Confirmed"
+                },
+                {
+                    value: 3,
+                    label: "Failed"
+                },
+                {
+                    value: 4,
+                    label: "Cancelled"
+                },
+                {
+                    value: 5,
+                    label: "Updated"
+                }
+            ]
+        },
+        {
+            key: "createdAt",
+            type:"date-range",
+            startKey: "startDate",
+            endKey: "endDate",
+            instant: true,
+        }
+    ]
     return (
         <div className="w-full overflow-x-auto rounded-3xl border border-gray-200 shadow-lg bg-white">
-            <table className="w-full border-separate border-spacing-0 rounded-3xl">
-                <thead className="bg-blue-50 text-gray-700">
-                    <tr className="border-b border-gray-200">
-                        <th className="p-4 text-center font-semibold border-b border-gray-200">
-                            User
-                        </th>
-                        <th className="p-4 text-center font-semibold border-b border-gray-200">
-                            Order No
-                        </th>
-                        <th className="p-4 text-center font-semibold border-b border-gray-200">
-                            Total
-                        </th>
-                        <th className="p-4 text-center font-semibold border-b border-gray-200">
-                            Quantity
-                        </th>
-                        <th className="p-4 text-center font-semibold border-b border-gray-200">
-                            Status
-                        </th>
-                        <th className="p-4 text-center font-semibold border-b border-gray-200">
-                            Created
-                        </th>
-                    </tr>
-
-                    <tr>
-                        <th className="p-2 px-4">
-                            <div className="flex justify-center">
-                                <input
-                                    type="text"
-                                    name="user"
-                                    placeholder="Filter User..."
-                                    value={filters.user}
-                                    onChange={onFilterChange}
-                                    onKeyDown={handleFilterKeyDown}
-                                    className="border border-gray-300 rounded-lg px-3 py-2 text-sm font-normal focus:outline-none focus:ring-2 focus:ring-blue-400 w-32"
-                                />
-                            </div>
-                        </th>
-
-                        <th className="p-2 px-4">
-                            <div className="flex justify-center">
-                                <input
-                                    type="text"
-                                    name="orderNumber"
-                                    placeholder="Filter order no..."
-                                    value={filters.orderNumber}
-                                    onChange={onFilterChange}
-                                    onKeyDown={handleFilterKeyDown}
-                                    className="border border-gray-300 rounded-lg px-3 py-2 text-sm font-normal focus:outline-none focus:ring-2 focus:ring-blue-400 w-32"
-                                />
-                            </div>
-                        </th>
-                        <th className="p-2 px-4"></th>
-                        <th className="p-2 px-4"></th>
-
-                        <th className="p-2 px-4">
-                            <div className="flex justify-center">
-                                <select
-                                    name="status"
-                                    value={filters.status}
-                                    onChange={onInstantFilterChange}
-                                    className="border border-gray-300 rounded-lg px-3 py-2 text-sm font-normal focus:outline-none focus:ring-2 focus:ring-blue-400 w-32"
-                                >
-                                    <option value="">All Statuses</option>
-                                    <option value="1">Pending</option>
-                                    <option value="2">Confirmed</option>
-                                    <option value="3">Failed</option>
-                                    <option value="4">Cancelled</option>
-                                    <option value="5">Updated</option>
-                                </select>
-                            </div>
-                        </th>
-
-                        <th className="p-2 px-4">
-                            <div className="flex flex-col gap-2 justify-center items-center">
-                                <input
-                                    type="date"
-                                    name="startDate"
-                                    value={filters.startDate}
-                                    onChange={onInstantFilterChange}
-                                    className="border border-gray-300 rounded-lg px-2 py-1 text-sm font-normal focus:outline-none focus:ring-2 focus:ring-blue-400 w-full max-w-[140px]"
-                                />
-
-                                <input
-                                    type="date"
-                                    name="endDate"
-                                    value={filters.endDate}
-                                    onChange={onInstantFilterChange}
-                                    className="border border-gray-300 rounded-lg px-2 py-1 text-sm font-normal focus:outline-none focus:ring-2 focus:ring-blue-400 w-full max-w-[140px]"
-                                />
-                            </div>
-                        </th>
-                    </tr>
-                </thead>
-
-                <tbody>
-                    {currentOrders.length > 0 ? (
-                        currentOrders.map((order) => (
-                            <tr
-                                key={order.id}
-                                onClick={() => openViewModal(order)}
-                                className="hover:bg-gray-50 cursor-pointer transition transform duration-150 border border-gray-200"
-                            >
-                                <td className="p-4 text-center">
-                                    {order.username.charAt(0).toUpperCase() +
-                                        order.username.slice(1)}
-                                </td>
-                                <td className="p-4 text-center">
-                                    {order.orderNumber}
-                                </td>
-                                <td className="p-4 font-medium text-center">
-                                    {formatMoney(order.totalAmount)}{" "}
-                                    {getCurrencySymbolText(symbols[order.currency])}
-                                </td>
-
-                                <td className="p-4 text-center">
-                                    {order.totalQuantity}
-                                </td>
-
-                                <td className="p-4 text-center">
-                                    <span
-                                        className={`px-3 py-1 rounded-full text-sm font-medium ${order.status === 1
-                                            ? "bg-yellow-100 text-yellow-700"
-                                            : order.status === 2
-                                                ? "bg-green-50 text-green-700"
-                                                : order.status === 3
-                                                    ? "bg-red-100 text-red-700"
-                                                    : order.status === 4
-                                                        ? "bg-gray-200 text-gray-700"
-                                                        : "bg-blue-50 text-blue-700"
-                                            }`}
-                                    >
-                                        {getStatusText(order.status)}
-                                    </span>
-                                </td>
-
-                                <td className="p-4 text-gray-600 text-center">
-                                    {formatApiDate(order.createdAt)}
-                                </td>
-                            </tr>
-                        ))
-                    ) : (
-                        <tr>
-                            <td colSpan="5" className="text-center py-8 text-gray-500">
-                                No Orders Found
-                            </td>
-                        </tr>
-                    )}
-                </tbody>
-            </table>
-
-            <div className="p-4">
-                <Pagination
-                    currentPage={currentPage}
-                    totalItems={orders.length}
-                    pageSize={pageSize}
-                    onPageChange={setCurrentPage}
-                    onPageSizeChange={setPageSize}
-                />
-            </div>
-
+            
+            <DataTable
+                data={orders}
+                columns={columns}   
+                filters={filters}
+                filterConfig={filterConfig}
+                onFilterChange={onFilterChange}
+                onInstantFilterChange={onInstantFilterChange}
+                onFilterApply={onFilterApply}
+                pagination={true}
+                onPageSizeChange={setPageSize}
+                onPageChange={setCurrentPage}
+                currentPage={currentPage}
+                pageSize={pageSize}
+                totalItems={orders.length}
+                emptyMessage="No orders found."
+                onRowClick={(order)=>{openViewModal(order)}}
+            />
             {selectedOrder && (
                 <div
                     className="fixed inset-0 bg-black/50 flex items-center justify-center z-50"

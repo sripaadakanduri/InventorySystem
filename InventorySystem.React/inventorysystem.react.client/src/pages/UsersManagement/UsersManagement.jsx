@@ -4,6 +4,7 @@ import { getUsers, updateUserRole, createUser } from "../../services/userService
 import Pagination from "../../components/Pagination/Pagination";
 import { Users, Shield, ShieldOff, Plus, X } from "lucide-react";
 import UserHoverCard from "./UserHoverCard";
+import DataTable from "../../components/DataTable";
 
 const UsersManagement = () => {
     const [users, setUsers] = useState([]);
@@ -19,8 +20,8 @@ const UsersManagement = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const [pageSize, setPageSize] = useState(10);
     const [filters, setFilters] = useState({
-        Username: "",
-        Role: ""
+        username: "",
+        role: ""
     });
 
     const fetchUsers = async (filterParams = filters) => {
@@ -110,6 +111,105 @@ const UsersManagement = () => {
     const indexOfFirstUser = indexOfLastUser - pageSize;
     const currentUsers = users.slice(indexOfFirstUser, indexOfLastUser);
 
+    const columns = [
+        {
+            key: "username",
+            title: "Username",
+            render: (value, row) => (
+                        <UserHoverCard user={row}>
+                            {value.charAt(0).toUpperCase() + value.slice(1)}
+                        </UserHoverCard>
+                    ) 
+        },
+        {
+            key: "email",
+            title: "Email",
+        },
+        {
+            key: "role",
+            title: "Role",
+            render: (value) => (
+                <span
+                    className={`px-3 py-1 rounded-full text-sm font-medium border ${
+                        value === "Admin"
+                            ? "bg-purple-50 text-purple-700 border-purple-200"
+                            : "bg-gray-100 text-gray-700 border-gray-200"
+                    }`}
+                >
+                    {value}
+                </span>
+            )
+        },
+        {
+            key: "action",
+            title: "Action",
+            render: (_, row) => (
+                <div className="flex items-center justify-center">
+                    {row.role === "User" ? (
+                        <button
+                            className="flex min-w-[150px] items-center gap-2 text-indigo-600 hover:text-white bg-indigo-50 hover:bg-indigo-600 border border-indigo-200 hover:border-indigo-600 px-3 py-2 rounded-lg transition shadow-sm text-sm font-medium"
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                handleRoleUpdate(row.id, "Admin");
+                            }}
+                        >
+                            <Shield className="w-4 h-4" />
+                            Make Admin
+                        </button>
+                    ) : (
+                        <button
+                            className={`flex max-w-[180px] items-center gap-2 px-3 py-2 rounded-lg transition shadow-sm text-sm font-medium ${
+                                row.username.toLowerCase() === "bunny"
+                                    ? "bg-gray-100 text-gray-400 border border-gray-200 cursor-not-allowed"
+                                    : "text-amber-600 hover:text-white bg-amber-50 hover:bg-amber-600 border border-amber-200 hover:border-amber-600"
+                            }`}
+                            disabled={row.username.toLowerCase() === "bunny"}
+                            title={
+                                row.username.toLowerCase() === "bunny"
+                                    ? "Cannot remove this admin"
+                                    : ""
+                            }
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                handleRoleUpdate(row.id, "User");
+                            }}
+                        >
+                            <ShieldOff className="w-4 h-4" />
+                            Remove Admin
+                        </button>
+                    )}
+                </div>
+            )
+        }
+    ];
+    const filterConfig = [
+        {
+            key: "username",
+            type: "text",
+            placeholder: "Filter by name...",
+            className: "w-32"
+        },
+        {
+            key: "role",
+            type: "select",
+            instant: true,
+            className: "w-32",
+            options: [
+                {
+                    value: "",
+                    label: "All Roles"
+                },
+                {
+                    value: "Admin",
+                    label: "Admin"
+                },
+                {
+                    value: "User",
+                    label: "User"
+                }
+            ]
+        }
+    ];
     return (
         <div className="max-w-7xl mx-auto p-6 mt-8">
             <div className="flex justify-between items-center mb-8">
@@ -126,111 +226,23 @@ const UsersManagement = () => {
             </div>
 
             <div className="w-full overflow-x-auto rounded-3xl border border-gray-200 shadow-lg bg-white mt-6">
-                <table className="w-full border-collapse">
-                    <thead className="bg-blue-50 text-white border-b border-gray-200">
-                        <tr className="text-black">
-                            <th className="p-4 text-center font-semibold w-1/3">Username</th>
-                            <th className="p-4 text-center font-semibold w-1/4">Email</th>
-                            <th className="p-4 text-center font-semibold w-1/4">Role</th>
-                            <th className="p-4 text-center font-semibold w-1/6">Action</th>
-                        </tr>
-                        <tr className="text-white">
-                            <th className="p-2 px-4">
-                                <div className="flex justify-center">
-                                    <input
-                                        type="text"
-                                        name="Username"
-                                        placeholder="Filter by name..."
-                                        value={filters.Username}
-                                        onChange={handleFilterChange}
-                                        onKeyDown={handleFilterKeyDown}
-                                        className="border border-gray-300 rounded-lg px-3 py-2 text-sm font-normal text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-400 w-32"
-                                    />
-                                </div>
-                            </th>
-                            <th className="p-2 px-4 text-black"></th>
-                            <th className="p-2 px-4">
-                                <div className="flex justify-center">
-                                    <select
-                                        name="Role"
-                                        value={filters.Role}
-                                        onChange={handleInstantFilterChange}
-                                        className="border border-gray-300 rounded-lg px-3 py-2 text-sm font-normal text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-400 w-32"
-                                    >
-                                        <option value="">All Roles</option>
-                                        <option value="Admin">Admin</option>
-                                        <option value="User">User</option>
-                                    </select>
-                                </div>
-                            </th>
-                            <th className="p-2 text-black px-4"></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {loading ? (
-                            <tr>
-                                <td colSpan="4" className="p-8 text-center text-gray-500 text-lg">
-                                    Loading users...
-                                </td>
-                            </tr>
-                        ) : currentUsers.length > 0 ? (
-                            currentUsers.map((user) => (
-                                <tr key={user.id} className="border-b border-gray-200 hover:bg-indigo-50 transition duration-150 cursor-pointer hover:translate-0.5 transform">
-                                    <td className="p-4 text-center font-medium text-gray-900">
-                                        <UserHoverCard user={user}>
-                                            {user.username.charAt(0).toUpperCase() + user.username.slice(1)}
-                                        </UserHoverCard>
-                                    </td>
-                                    <td className="p-4 text-center text-gray-600">{user.email}</td>
-                                    <td className="p-4 text-center">
-                                        <span className={`px-3 py-1 rounded-full text-sm font-medium border ${user.role === "Admin" ? 'bg-purple-50 text-purple-700 border-purple-200' : 'bg-gray-100 text-gray-700 border-gray-200'}`}>
-                                            {user.role}
-                                        </span>
-                                    </td>
-                                    <td className="p-4 text-center">
-                                        <div className="flex items-center justify-center gap-3">
-                                            {user.role === "User" ? (
-                                                <button
-                                                    className="flex items-center gap-2 text-indigo-600 hover:text-white bg-indigo-50 hover:bg-indigo-600 border border-indigo-200 hover:border-indigo-600 px-3 py-2 rounded-lg transition shadow-sm w-full justify-center text-sm font-medium"
-                                                    onClick={() => handleRoleUpdate(user.id, "Admin")}
-                                                >
-                                                    <Shield className="w-4 h-4" /> Make Admin
-                                                </button>
-                                            ) : (
-                                                <button
-                                                    className={`flex items-center gap-2 px-3 py-2 rounded-lg transition shadow-sm w-full justify-center text-sm font-medium ${user.username.toLowerCase() === "bunny"
-                                                        ? "bg-gray-100 text-gray-400 border border-gray-200 cursor-not-allowed"
-                                                        : "text-amber-600 hover:text-white bg-amber-50 hover:bg-amber-600 border border-amber-200 hover:border-amber-600"
-                                                        }`}
-                                                    onClick={() => handleRoleUpdate(user.id, "User")}
-                                                    disabled={user.username.toLowerCase() === "bunny"}
-                                                    title={user.username.toLowerCase() === "bunny" ? "Cannot remove this admin" : ""}
-                                                >
-                                                    <ShieldOff className="w-4 h-4" /> Remove Admin
-                                                </button>
-                                            )}
-                                        </div>
-                                    </td>
-                                </tr>
-                            ))
-                        ) : (
-                            <tr>
-                                <td colSpan="4" className="p-8 text-center text-gray-500 text-lg">
-                                    No users found
-                                </td>
-                            </tr>
-                        )}
-                    </tbody>
-                </table>
-                <div className="p-4 bg-white rounded-b-3xl">
-                    <Pagination
-                        currentPage={currentPage}
-                        totalItems={users.length}
-                        pageSize={pageSize}
-                        onPageChange={setCurrentPage}
-                        onPageSizeChange={setPageSize}
-                    />
-                </div>
+                <DataTable
+                    data={users}
+                    columns={columns}
+                    filters={filters}
+                    filterConfig={filterConfig}
+                    onFilterChange={handleFilterChange}
+                    onInstantFilterChange={handleInstantFilterChange}
+                    onFilterApply={handleFilterApply}
+                    pagination={true}
+                    onPageSizeChange={setPageSize}
+                    onPageChange={setCurrentPage}
+                    currentPage={currentPage}
+                    pageSize={pageSize}
+                    totalItems={users.length}
+                    emptyMessage="No users found."
+                    loading={loading}
+                />
             </div>
 
             {showAddModal && (

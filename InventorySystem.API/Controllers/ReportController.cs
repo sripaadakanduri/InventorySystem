@@ -40,5 +40,18 @@ namespace InventorySystem.API.Controllers
             var frequencies = await _reportService.GetCurrencyFrequencyByProductAsync(productId, startDateTime, endDateTime);
             return Ok(frequencies);
         }
+        [HttpGet("total-quantity")]
+        public async Task<IActionResult> GetTotalQuantityAndRange(
+            [FromQuery] int productId,
+            [FromQuery] DateOnly startDate,
+            [FromQuery] DateOnly endDate)
+        {
+            var startDateTime = startDate.ToDateTime(TimeOnly.MinValue);
+            var endDateTime = endDate.ToDateTime(TimeOnly.MaxValue);
+
+            var result = await _reportService.GetTotalQuantityAndRange(productId, startDateTime, endDateTime);
+
+            return Ok(result);
+        }
     }
 }

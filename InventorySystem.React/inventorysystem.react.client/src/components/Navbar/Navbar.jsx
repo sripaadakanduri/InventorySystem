@@ -9,7 +9,8 @@ import {
     Users,
     CreditCard,
     LogOut,
-    SlidersHorizontal
+    SlidersHorizontal,
+    FileBarChart
 } from "lucide-react";
 
 const Navbar = () => {
@@ -277,14 +278,14 @@ const Navbar = () => {
                                         rounded-2xl px-2 py-1
                                         transition duration-300
                                         hover:bg-blue-50 mb-1
-                                        ${location.pathname === "/admin/users"
+                                        ${location.pathname === "/admin/reports"
                                                 ? "bg-blue-50 text-blue-600"
                                                 : ""
                                             }
                                     `}
                                     >
 
-                                        <Users size={16} />
+                                        <FileBarChart size={16} />
 
                                         <span>Reports</span>
 

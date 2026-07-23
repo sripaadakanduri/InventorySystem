@@ -1,0 +1,74 @@
+﻿<!DOCTYPE html>
+<html>
+
+<head>
+    <style>
+
+        body {
+            font-family: Arial;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            max-width: 700px;
+            margin: auto;
+            padding: 20px;
+            border-radius: 8px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background: #2563eb;
+            color: white;
+            padding: 10px;
+        }
+
+        td {
+            border: 1px solid #ddd;
+            padding: 10px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+
+        <h2>Daily Low Stock Report</h2>
+
+        <p>
+            The following products are currently below their configured stock threshold.
+        </p>
+
+        <table>
+
+            <thead>
+
+                <tr>
+                    <th>Product</th>
+                    <th>Current Stock</th>
+                </tr>
+
+            </thead>
+
+            <tbody>
+
+                {{PRODUCT_ROWS}}
+
+            </tbody>
+
+        </table>
+
+        <br>
+
+    </div>
+
+</body>
+
+</html>

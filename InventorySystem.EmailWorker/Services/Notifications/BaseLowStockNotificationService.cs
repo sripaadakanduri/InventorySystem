@@ -53,11 +53,11 @@ namespace InventorySystem.EmailWorker.Services.Notifications
                 foreach (var product in products)
                 {
                     rows.Append($@"
-        <tr>
-            <td>{product.Name}</td>
-            <td>{product.Category}</td>
-            <td>{product.StockQuantity}</td>
-        </tr>");
+                    <tr>
+                        <td>{product.Name}</td>
+                        <td>{product.Category}</td>
+                        <td>{product.StockQuantity}</td>
+                    </tr>");
                 }
 
                 tableHtml = $@"

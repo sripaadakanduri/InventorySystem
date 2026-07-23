@@ -61,7 +61,7 @@ const UserHoverCard = ({ user, children }) => {
                     <div className="absolute w-full h-8 bottom-[-32px] left-0 bg-transparent"></div>
                     
                     <div className="flex flex-col gap-2 text-sm text-gray-700 font-normal relative">
-                        <div className="font-semibold text-gray-900 border-b pb-1 mb-1">{user.username}</div>
+                        <div className="font-semibold text-blue-600 border-b pb-1 mb-1">{user.username}</div>
                         <div className="flex flex-col">
                             <span className="text-xs text-gray-500 font-medium">Email</span>
                             <span className="break-all">{user.email}</span>
