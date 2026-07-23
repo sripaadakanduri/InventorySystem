@@ -18,7 +18,7 @@ namespace InventorySystem.Service.Interfaces
             int orderId,
             int userId
         );
-        Task<OrderDto> UpdateOrderAsync(int orderId, CreateOrderDto dto);
+        Task<OrderDto> UpdateOrderAsync(int orderId, CreateOrderDto dto, int userId);
 
         Task<List<OrderDto>> GetOrdersByUserAsync(
             int userId,

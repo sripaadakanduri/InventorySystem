@@ -40,7 +40,11 @@ const Navbar = () => {
                     items-center justify-between
                     rounded-full border border-gray-200
                     bg-white/80 px-4 py-2
+<<<<<<< Updated upstream
                     shadow-lg backdrop-blur
+=======
+                    shadow-lg backdrop-blur mx-2 mb-6 2xl:mx-8
+>>>>>>> Stashed changes
                 "
             >
 
