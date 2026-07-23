@@ -48,7 +48,7 @@ function Products() {
     const fetchCategories = async () => {
         try {
             const allProducts = await getProducts({});
-            const uniqueCategories = [...new Set(allProducts.map((p) => p.category).filter(Boolean))].sort();
+            const uniqueCategories = [...new Set(allProducts.map((p) => p.category?.trim().toLowerCase()).filter(Boolean))].sort();
             setCategories(uniqueCategories);
         } catch (error) {
             console.error("Unable to load categories:", error);

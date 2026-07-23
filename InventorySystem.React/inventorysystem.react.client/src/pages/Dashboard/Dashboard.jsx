@@ -7,6 +7,7 @@ import {
     ShoppingCart,
     Users,
     ClipboardList,
+    FileBarChart 
 } from "lucide-react";
 
 import { getProducts } from "../../services/ProductService";
@@ -76,7 +77,7 @@ export default function Dashboard() {
     const cards = [
         {
             title: "Products",
-            description: "Manage inventory products",
+            description: "Manage inventory",
             icon: <Package size={22} />,
             path: "/products",
             iconBg: "#eff6ff",
@@ -110,6 +111,14 @@ export default function Dashboard() {
             path: "/transactions", // Corrected path to match routing
             iconBg: "#fff7ed",
             iconColor: "#ea580c",
+        },
+        {
+            title: "Reports",
+            description: "View Product sales",
+            icon: <FileBarChart   size={22} />,
+            path: "/transactions", // Corrected path to match routing
+            iconBg: "#dbeafe",
+            iconColor: "#2563eb"
         },
     ];
 
@@ -327,7 +336,7 @@ export default function Dashboard() {
                 </div>
 
                 {/* CARDS */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
 
                     {allCards.map((card, index) => (
 
