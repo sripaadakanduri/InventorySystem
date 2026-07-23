@@ -116,7 +116,7 @@ export default function Dashboard() {
             title: "Reports",
             description: "View Product sales",
             icon: <FileBarChart   size={22} />,
-            path: "/transactions", // Corrected path to match routing
+            path: "/admin/reports", // Corrected path to match routing
             iconBg: "#dbeafe",
             iconColor: "#2563eb"
         },
