@@ -84,7 +84,7 @@ namespace InventorySystem.Service.Services
                             UserId = userId,
                             QuantityChanged = -item.Quantity,
                             RemainingStock = product.StockQuantity,
-                            ActionType = "OrderPlaced",
+                            ActionType = nameof(InventoryActionType.OrderPlaced),
                             CreatedAt = DateTime.UtcNow
                         });
                     }
@@ -236,7 +236,7 @@ namespace InventorySystem.Service.Services
                             UserId = userId,
                             QuantityChanged = item.Quantity,
                             RemainingStock = item.Product.StockQuantity,
-                            ActionType = "OrderCancelled",
+                            ActionType = nameof(InventoryActionType.OrderCancelled),
                             CreatedAt = DateTime.UtcNow
                         });
                     }
@@ -256,7 +256,7 @@ namespace InventorySystem.Service.Services
         }
 
 
-        public async Task<OrderDto> UpdateOrderAsync(int orderId, CreateOrderDto dto)
+        public async Task<OrderDto> UpdateOrderAsync(int orderId, CreateOrderDto dto, int userId)
         {
             using var transaction = await _unitOfWork.BeginTransactionAsync();
 
@@ -289,9 +289,9 @@ namespace InventorySystem.Service.Services
                                 ProductId = oldItem.ProductId,
                                 QuantityChanged = oldItem.Quantity,
                                 RemainingStock = oldItem.Product.StockQuantity,
-                                ActionType = "OrderUpdatedRevert",
+                                ActionType = nameof(InventoryActionType.OrderUpdated),
                                 CreatedAt = DateTime.UtcNow,
-                                UserId = order.UserId
+                                UserId = userId
                             });
                         }
                     }
@@ -349,9 +349,9 @@ namespace InventorySystem.Service.Services
                             ProductId = product.Id,
                             QuantityChanged = -item.Quantity,
                             RemainingStock = product.StockQuantity,
-                            ActionType = "OrderUpdated",
+                            ActionType = nameof(InventoryActionType.OrderUpdated),
                             CreatedAt = DateTime.UtcNow,
-                            UserId = order.UserId
+                            UserId = userId
                         });
                     }
                 }

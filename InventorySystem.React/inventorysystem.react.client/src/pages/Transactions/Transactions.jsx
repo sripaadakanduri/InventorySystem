@@ -92,13 +92,20 @@ const Transactions = () => {
     };
 
     const getBadgeStyle = (actionType) => {
-        if (actionType === "StockIn" || actionType === "ManualAdd") return "bg-green-50 text-green-700 border-green-200";
-        if (actionType === "StockOut" || actionType === "ManualRemove") return "bg-red-50 text-red-700 border-red-200";
+        actionType = getDisplayActionType(actionType);
+
+        if (actionType === "StockIn" || actionType === "ProductCreated" || actionType === "ProductImported") return "bg-green-50 text-green-700 border-green-200";
+        if (actionType === "StockOut") return "bg-red-50 text-red-700 border-red-200";
         if (actionType === "ProductDeleted") return "bg-rose-50 text-rose-700 border-rose-200";
         if (actionType === "OrderPlaced") return "bg-amber-50 text-amber-700 border-amber-200";
         if (actionType === "OrderCancelled") return "bg-gray-100 text-gray-700 border-gray-200";
+        if (actionType === "OrderUpdated") return "bg-purple-50 text-purple-700 border-purple-200";
         return "bg-blue-50 text-blue-700 border-blue-200";
     };
+
+    const getDisplayActionType = (actionType) => (
+        actionType === "OrderUpdatedRevert" ? "OrderUpdated" : actionType
+    );
 
     // if (loading) return (
     //     <div className="flex justify-center items-center min-h-[50vh]">
@@ -137,7 +144,7 @@ const Transactions = () => {
             title: "Action Type",
             render: (value) => (
                 <span className={`px-2 py-1 rounded-full text-xs font-medium border ${getBadgeStyle(value)}`}>
-                    {value}
+                    {getDisplayActionType(value)}
                 </span>
             )
         },
@@ -171,32 +178,36 @@ const Transactions = () => {
                     label: "All"
                 },
                 {
-                    value: "ManualAdd",
-                    label: "ManualAdd"
+                    value: "ProductCreated",
+                    label: "Product Created"
                 },
                 {
-                    value: "ManualRemove",
-                    label: "ManualRemove"
-                },
-                {
-                    value: "OrderPlaced",
-                    label: "OrderPlaced"
-                },
-                {
-                    value: "OrderCancelled",
-                    label: "OrderCancelled"
+                    value: "ProductImported",
+                    label: "Product Imported"
                 },
                 {
                     value: "ProductDeleted",
-                    label: "ProductDeleted"
+                    label: "Product Deleted"
                 },
                 {
                     value: "StockIn",
-                    label: "Stock In",
+                    label: "Stock In"
                 },
                 {
                     value: "StockOut",
-                    label: "Stock Out",
+                    label: "Stock Out"
+                },
+                {
+                    value: "OrderPlaced",
+                    label: "Order Placed"
+                },
+                {
+                    value: "OrderCancelled",
+                    label: "Order Cancelled"
+                },
+                {
+                    value: "OrderUpdated",
+                    label: "Order Updated"
                 },
             ]
 

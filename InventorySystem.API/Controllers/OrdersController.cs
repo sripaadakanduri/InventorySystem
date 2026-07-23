@@ -130,7 +130,13 @@ namespace InventorySystem.API.Controllers
         {
             try
             {
-                var updatedOrder = await _orderService.UpdateOrderAsync(id, dto);
+                var userId = int.Parse(
+                    User.FindFirst(
+                        ClaimTypes.NameIdentifier
+                    )!.Value
+                );
+
+                var updatedOrder = await _orderService.UpdateOrderAsync(id, dto, userId);
                 return Ok(updatedOrder);
             }
             catch (Exception ex)

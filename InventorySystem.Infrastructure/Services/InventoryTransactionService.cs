@@ -55,9 +55,14 @@ namespace InventorySystem.Service.Services
                 {
                     var actionType = filter.ActionType.Trim().ToLower();
 
-                    query = query.Where(t =>
-                        t.ActionType.ToLower() == actionType
-                    );
+                    query = actionType == "orderupdated"
+                        ? query.Where(t =>
+                            t.ActionType.ToLower() == actionType ||
+                            t.ActionType.ToLower() == "orderupdatedrevert"
+                        )
+                        : query.Where(t =>
+                            t.ActionType.ToLower() == actionType
+                        );
                 }
 
                 if (filter.StartDate.HasValue)

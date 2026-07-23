@@ -1,5 +1,6 @@
 using InventorySystem.Core.DTOs;
 using InventorySystem.Core.Entities;
+using InventorySystem.Common.Enums;
 using InventorySystem.Service.Interfaces;
 using System.Globalization;
 using CsvHelper;
@@ -90,7 +91,7 @@ namespace InventorySystem.Service.Services
                         userId,
                         product.StockQuantity,
                         product.StockQuantity,
-                        "StockIn"
+                        nameof(InventoryActionType.ProductCreated)
                     );
                 }
 
@@ -135,7 +136,9 @@ namespace InventorySystem.Service.Services
                 if (oldStock != product.StockQuantity)
                 {
                     var change = product.StockQuantity - oldStock;
-                    var actionType = change > 0 ? "ManualAdd" : "ManualRemove";
+                    var actionType = change > 0
+                        ? nameof(InventoryActionType.StockIn)
+                        : nameof(InventoryActionType.StockOut);
 
                     await _transactionService.LogTransactionAsync(
                         product.Id,
@@ -176,7 +179,7 @@ namespace InventorySystem.Service.Services
                     userId,
                     -product.StockQuantity,
                     0,
-                    "ProductDeleted"
+                    nameof(InventoryActionType.ProductDeleted)
                 );
 
                 await _unitOfWork.SaveChangesAsync();
@@ -302,7 +305,7 @@ namespace InventorySystem.Service.Services
                         userId,
                         product.StockQuantity,
                         product.StockQuantity,
-                        "Product Imported");
+                        nameof(InventoryActionType.ProductImported));
                 }
             }
 
