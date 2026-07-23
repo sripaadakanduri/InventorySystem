@@ -229,7 +229,7 @@ function Products() {
     };
 
     return (
-        <div className="w-full max-w-7xl mx-auto flex flex-col gap-6 p-4 sm:p-6">
+        <div className="page-container">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 rounded-3xl mt-8 border border-gray-200 shadow-lg">
                 <div>
                     <div className="flex items-center gap-3">

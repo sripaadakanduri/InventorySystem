@@ -211,8 +211,8 @@ const UsersManagement = () => {
         }
     ];
     return (
-        <div className="max-w-7xl mx-auto p-6 mt-8">
-            <div className="flex justify-between items-center mb-8">
+        <div className="page-container">
+            <div className="flex justify-between items-center ">
                 <div className="group flex items-center gap-3">
                     <Users className="w-8 h-8 text-indigo-600 group-hover:scale-120 transition transform duration-300" />
                     <h2 className="text-3xl font-bold text-gray-800">User Management</h2>

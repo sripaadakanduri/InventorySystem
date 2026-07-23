@@ -211,7 +211,7 @@ const Transactions = () => {
         }
     ]
     return (
-        <div className="max-w-7xl mx-auto p-6 mt-8 ">
+        <div className="page-container">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8 ml-3">
                 <div className="inline-flex items-center gap-3 group">
                     <Activity className="w-8 h-8 text-indigo-600 group-hover:scale-x-150 group-hover:translate-x-0.5 transition transform duration-300" />
