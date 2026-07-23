@@ -7,8 +7,7 @@ function TableHeader({
     onFilterChange,
     onInstantFilterChange,
     onFilterApply,
-    handleFilterKeyDown,
-    stickyHeader = false
+    handleFilterKeyDown
 }) {
 
     const getFilter = (key) => {
@@ -20,7 +19,6 @@ function TableHeader({
             className={`
                 bg-blue-50
                 text-gray-700
-                ${stickyHeader ? "sticky top-0 z-20" : ""}
             `}
         >
             <tr>

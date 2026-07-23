@@ -1,7 +1,6 @@
 function TableBody({
     rows = [],
     columns = [],
-    getRowKey = (row) => row.id,
     onRowClick,
     rowClassName
 }) {
@@ -16,7 +15,7 @@ function TableBody({
 
                     return (
                         <tr
-                            key={getRowKey(row, rowIndex)}
+                            key={row.id ?? rowIndex}
                             className={`
                                 border-b border-gray-100 transition
                                 ${onRowClick ? "cursor-pointer hover:bg-gray-50" : ""}
