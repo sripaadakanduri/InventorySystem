@@ -1,4 +1,4 @@
-﻿
+
 using InventorySystem.Core.DTOs;
 
 namespace InventorySystem.Service.Interfaces

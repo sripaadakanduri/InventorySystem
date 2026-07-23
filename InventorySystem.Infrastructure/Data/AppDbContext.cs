@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using InventorySystem.Core.Entities;
 
 namespace InventorySystem.Service.Data
@@ -15,6 +15,7 @@ namespace InventorySystem.Service.Data
         public DbSet<Order> Orders => Set<Order>();
         public DbSet<OrderItem> OrderItems => Set<OrderItem>();
         public DbSet<InventoryTransaction> InventoryTransactions => Set<InventoryTransaction>();
+        public DbSet<ExchangeRate> ExchangeRates => Set<ExchangeRate>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -93,6 +94,14 @@ namespace InventorySystem.Service.Data
                       .WithMany(u => u.InventoryTransactions)
                       .HasForeignKey(it => it.UserId)
                       .OnDelete(DeleteBehavior.Restrict);
+            });
+
+            // ExchangeRate Configuration
+            modelBuilder.Entity<ExchangeRate>(entity =>
+            {
+                entity.HasKey(er => new { er.Date, er.CurrencyCode });
+                entity.Property(er => er.CurrencyCode).IsRequired().HasMaxLength(3);
+                entity.Property(er => er.Rate).HasColumnType("decimal(18,6)");
             });
 
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
