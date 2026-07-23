@@ -119,7 +119,7 @@
 ========================= */
 @layer components {
     .page-container {
-        @apply w-full max-w-screen mx-auto flex flex-col gap-6 p-8 2xl:p-16 ;
+        @apply w-full max-w-screen mx-auto flex flex-col gap-6 p-8 2xl:p-12 ;
     }
 
     .nav-item {
