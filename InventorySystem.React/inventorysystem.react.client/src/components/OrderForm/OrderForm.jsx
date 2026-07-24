@@ -3,121 +3,14 @@ import { toast } from "react-toastify";
 import { createOrder, updateOrder } from "../../services/ordersService";
 import api from "../../services/api";
 import CurrencySelector from "../CurrencySelector";
-
+import SearchableProductSelect from "../SearchableProductSelect";
 import {
     Plus,
     Minus,
     PackagePlus,
-    ChevronDown,
-    ArrowRight,
 } from "lucide-react";
 
 const BASE_CURRENCY = "USD";
-
-
-
-const SearchableProductSelect = ({ value, onChange, products }) => {
-    const [isOpen, setIsOpen] = useState(false);
-    const [search, setSearch] = useState("");
-    const dropdownRef = useRef(null);
-
-    useEffect(() => {
-        const handleClickOutside = (event) => {
-            if (
-                dropdownRef.current &&
-                !dropdownRef.current.contains(event.target)
-            ) {
-                setIsOpen(false);
-                setSearch("");
-            }
-        };
-
-        document.addEventListener("mousedown", handleClickOutside);
-
-        return () =>
-            document.removeEventListener(
-                "mousedown",
-                handleClickOutside
-            );
-    }, []);
-
-    const selectedProduct = products.find(
-        (p) => p.id === Number(value)
-    );
-
-    return (
-        <div className="relative w-full" ref={dropdownRef}>
-            <div
-                className={`w-full border border-gray-300 rounded-lg px-4 py-3 bg-white flex justify-between items-center cursor-pointer ${!selectedProduct
-                        ? "text-gray-500"
-                        : "text-gray-900"
-                    }`}
-                onClick={() => setIsOpen(!isOpen)}
-            >
-                <span className="truncate">
-                    {selectedProduct
-                        ? selectedProduct.name
-                        : "Select Product"}
-                </span>
-
-                <ChevronDown className="w-4 h-4 ml-2 text-gray-500 flex-shrink-0" />
-            </div>
-
-            {isOpen && (
-                <div className="absolute z-20 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-xl">
-                    <div className="p-2 border-b border-gray-100">
-                        <input
-                            type="text"
-                            placeholder="Search..."
-                            value={search}
-                            onChange={(e) =>
-                                setSearch(e.target.value)
-                            }
-                            className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
-                            autoFocus
-                        />
-                    </div>
-
-                    <ul className="max-h-48 overflow-y-auto">
-                        {products
-                            .filter((p) =>
-                                p.name
-                                    .toLowerCase()
-                                    .includes(
-                                        search.toLowerCase()
-                                    )
-                            )
-                            .map((product) => (
-                                <li
-                                    key={product.id}
-                                    className="px-4 py-2 hover:bg-blue-50 cursor-pointer text-gray-800 text-sm"
-                                    onClick={() => {
-                                        onChange(product.id);
-                                        setIsOpen(false);
-                                        setSearch("");
-                                    }}
-                                >
-                                    {product.name}
-                                </li>
-                            ))}
-
-                        {products.filter((p) =>
-                            p.name
-                                .toLowerCase()
-                                .includes(
-                                    search.toLowerCase()
-                                )
-                        ).length === 0 && (
-                                <li className="px-4 py-3 text-sm text-gray-500 text-center">
-                                    No products found
-                                </li>
-                            )}
-                    </ul>
-                </div>
-            )}
-        </div>
-    );
-};
 
 function OrderForm({
     onOrderCreated,
@@ -278,7 +171,6 @@ function OrderForm({
                     >
                         Select Currency
                     </label>
-
                     <CurrencySelector
                         selectedCurrency={selectedCurrency}
                         onCurrencyChange={setSelectedCurrency}
@@ -332,13 +224,10 @@ function OrderForm({
                                     <SearchableProductSelect
                                         value={item.productId}
                                         onChange={(value) =>
-                                            handleChange(
-                                                index,
-                                                "productId",
-                                                value
-                                            )
+                                            handleChange(index, "productId", value)
                                         }
                                         products={products}
+                                        placeholder="Select Product"
                                     />
                                 </div>
 
@@ -429,7 +318,7 @@ function OrderForm({
                                             <Plus className="w-5 h-5" />
                                         </button>
                                     ) : (
-                                            <div className="w-[44px]"></div>
+                                        <div className="w-[44px]"></div>
                                     )}
                                 </div>
                             </div>

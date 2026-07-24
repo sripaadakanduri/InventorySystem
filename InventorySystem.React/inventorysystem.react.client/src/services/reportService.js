@@ -2,38 +2,16 @@ import api from "./api";
 
 const REPORT_BASE_URL = "/Report";
 
-export const getOrdersByFilters = async (productId, startDate, endDate) => {
-    const response = await api.get(`${REPORT_BASE_URL}/orders-by-product`, {
+export const getOrdersByFilters = async (productId, startDate, endDate,currency) => {
+    const response = await api.get(`${REPORT_BASE_URL}/report-data`, {
         params: {
             productId,
             startDate,
             endDate,
+            currency
         },
     });
-
-    return response.data;
-};
-
-export const getFrequencyOfCurrency = async (productId, startDate, endDate) => {
-    const response = await api.get(`${REPORT_BASE_URL}/currency-frequency`, {
-        params: {
-            productId,
-            startDate,
-            endDate,
-        },
-    });
-
-    return response.data;
-};
-
-export const getTotalQuantityAndRange = async (productId, startDate, endDate) => {
-    const response = await api.get(`${REPORT_BASE_URL}/total-quantity`, {
-        params: {
-            productId,
-            startDate,
-            endDate,
-        },
-    });
-
+    console.log("API Response:", response.data);
+    console.log("Orders:", response.data.orders);
     return response.data;
 };

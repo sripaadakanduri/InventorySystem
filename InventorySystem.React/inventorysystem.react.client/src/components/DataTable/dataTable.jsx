@@ -4,13 +4,13 @@ import TableBody from "./TableBody";
 import Pagination from "./Pagination";
 import EmptyState from "./EmptyState";
 import LoadingState from "./LoadingState";
-
-function dataTable({ 
+import { PAGINATION } from "./paginationConfig";
+function dataTable({
     data = [],
     columns = [],
     loading = false,
-    emptyMessage ,
-    /* FILTERS*/ 
+    emptyMessage="",
+    /* FILTERS*/
     filters = {},
     filterConfig = [],
     onFilterChange,
@@ -18,21 +18,16 @@ function dataTable({
     onInstantFilterChange,
     /*PAGINATIOn*/
     pagination = true,
-    currentPage = 1,
-    pageSize = 10,
-    totalItems,
+    currentPage = PAGINATION.DEFAULT_PAGE,
+    pageSize = PAGINATION.DEFAULT_PAGE_SIZE,
+    totalItems = PAGINATION.DEFAULT_TOTAL,
     onPageChange,
     onPageSizeChange,
     /*ROW EVENTS*/
     onRowClick,
-    rowClassName,
-    getRowKey = (row) => row.id,
-    /*CUSTOM COMPONENT*/
-    toolbar,
-    footer,
+    rowClassName="",
     className = "",
     tableClassName = "",
-    stickyHeader = false
 }) {
 
     const total = totalItems ?? data.length;
@@ -47,7 +42,7 @@ function dataTable({
         return data.slice(start, start + pageSize);
 
     }, [
-        data,   
+        data,
         pagination,
         currentPage,
         pageSize
@@ -89,20 +84,6 @@ function dataTable({
         >
 
             {/* =====================
-                    TOOLBAR
-            ====================== */}
-
-            {toolbar &&
-
-                <div className="border-b border-gray-200 p-4">
-
-                    {toolbar}
-
-                </div>
-
-            }
-
-            {/* =====================
                     TABLE
             ====================== */}
 
@@ -124,7 +105,6 @@ function dataTable({
                         onInstantFilterChange={onInstantFilterChange}
                         onFilterApply={onFilterApply}
                         handleFilterKeyDown={handleFilterKeyDown}
-                        stickyHeader={stickyHeader}
                     />
 
                     {
@@ -144,7 +124,6 @@ function dataTable({
                                 <TableBody
                                     rows={paginatedData}
                                     columns={columns}
-                                    getRowKey={getRowKey}
                                     onRowClick={handleRowClick}
                                     rowClassName={rowClassName}
                                 />
@@ -179,24 +158,6 @@ function dataTable({
                         onPageSizeChange={onPageSizeChange}
                     />
 
-                </div>
-            }
-
-            {/* =====================
-                    FOOTER
-            ====================== */}
-            {
-                footer &&
-                <div
-                    className="
-                        border-t
-                        border-gray-200
-                        bg-gray-50
-                        px-6
-                        py-4
-                    "
-                >
-                    {footer}
                 </div>
             }
         </div>

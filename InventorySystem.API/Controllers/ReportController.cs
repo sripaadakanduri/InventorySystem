@@ -15,43 +15,18 @@ namespace InventorySystem.API.Controllers
             _reportService = reportService;
         }
 
-        [HttpGet("orders-by-product")]
+        [HttpGet("report-data")]
         public async Task<IActionResult> GetOrdersByProductAndDateRange(
             [FromQuery] int productId, 
             [FromQuery] DateOnly startDate, 
-            [FromQuery] DateOnly endDate)
+            [FromQuery] DateOnly endDate,
+            [FromQuery] string currency)
         {
             var startDateTime = startDate.ToDateTime(TimeOnly.MinValue);
             var endDateTime = endDate.ToDateTime(TimeOnly.MaxValue);
             
-            var orders = await _reportService.GetOrdersByProductAndDateRangeAsync(productId, startDateTime, endDateTime);
-            return Ok(orders);
-        }
-
-        [HttpGet("currency-frequency")]
-        public async Task<IActionResult> GetCurrencyFrequencyByProduct(
-            [FromQuery] int productId, 
-            [FromQuery] DateOnly startDate, 
-            [FromQuery] DateOnly endDate)
-        {
-            var startDateTime = startDate.ToDateTime(TimeOnly.MinValue);
-            var endDateTime = endDate.ToDateTime(TimeOnly.MaxValue);
-
-            var frequencies = await _reportService.GetCurrencyFrequencyByProductAsync(productId, startDateTime, endDateTime);
-            return Ok(frequencies);
-        }
-        [HttpGet("total-quantity")]
-        public async Task<IActionResult> GetTotalQuantityAndRange(
-            [FromQuery] int productId,
-            [FromQuery] DateOnly startDate,
-            [FromQuery] DateOnly endDate)
-        {
-            var startDateTime = startDate.ToDateTime(TimeOnly.MinValue);
-            var endDateTime = endDate.ToDateTime(TimeOnly.MaxValue);
-
-            var result = await _reportService.GetTotalQuantityAndRange(productId, startDateTime, endDateTime);
-
-            return Ok(result);
+            var data = await _reportService.GetProductSalesReportAsync(productId, startDateTime, endDateTime,currency);
+            return Ok(data);
         }
     }
 }

@@ -1,7 +1,8 @@
+import { PAGINATION } from "./paginationConfig";
 function Pagination({
-    currentPage = 1,
+    currentPage,
     totalItems = 0,
-    pageSize = 10,
+    pageSize,
     onPageChange,
     onPageSizeChange
 }) {
@@ -26,7 +27,7 @@ function Pagination({
                     value={pageSize}
                     onChange={(e) => onPageSizeChange?.(Number(e.target.value))}
                 >
-                    {[10, 25, 50, 100].map((size) => (
+                    {PAGINATION.PAGE_SIZE_OPTIONS.map((size) => (
                         <option key={size} value={size}>
                             {size}
                         </option>

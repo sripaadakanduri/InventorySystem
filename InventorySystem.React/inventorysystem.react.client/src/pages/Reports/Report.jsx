@@ -7,6 +7,8 @@ import DataTable from "../../components/DataTable";
 import { getProducts } from "../../services/ProductService";
 import * as reportService from "../../services/reportService";
 import { getLatestRates } from "../../services/ExchangeRateService";
+import SearchableProductSelect from "../../components/SearchableProductSelect";
+import { PAGINATION } from "../../components/DataTable/paginationConfig";
 
 function Report() {
     const [selectedProduct, setSelectedProduct] = useState("");
@@ -14,15 +16,18 @@ function Report() {
     const [selectedCurrency, setSelectedCurrency] = useState("");
     const [selectedStartDate, setSelectedStartDate] = useState("");
     const [selectedEndDate, setSelectedEndDate] = useState("");
+
+    const [reportCurrency, setReportCurrency] = useState("");
+
     const [stats, setStats] = useState({ totalQuantity: 0, totalDays: 0 });
     const [currencyCounts, setCurrencyCounts] = useState({});
     const [orders, setOrders] = useState([]);
+
     const [products, setProducts] = useState([]);
-    const [exchangeRates, setExchangeRates] = useState({});
     const [isLoading, setIsLoading] = useState(false);
     const [hasSearched, setHasSearched] = useState(false);
-    const [currentPage, setCurrentPage] = useState(1);
-    const [pageSize, setPageSize] = useState(10);
+    const [currentPage, setCurrentPage] = useState(PAGINATION.DEFAULT_PAGE);
+    const [pageSize, setPageSize] = useState(PAGINATION.DEFAULT_PAGE_SIZE);
 
     const formatAmount = (value) => Number(value ?? 0).toLocaleString(undefined, {
         minimumFractionDigits: 2,
@@ -36,19 +41,14 @@ function Report() {
         quantity: row.quantity ?? row.Quantity ?? 0,
         originalAmount: row.originalAmount ?? row.OriginalAmount ?? 0,
         originalCurrency: row.originalCurrency ?? row.OriginalCurrency ?? "",
-        convertedAmount: row.convertedAmount ?? row.ConvertedAmount ?? 0
+        convertedAmount: row.convertedAmount ?? row.convertedAmount ?? 0
     });
 
     useEffect(() => {
         const loadFilters = async () => {
             try {
-                const [productsData, ratesData] = await Promise.all([
-                    getProducts({}),
-                    getLatestRates()
-                ]);
-
+                const productsData = await getProducts({});
                 setProducts(productsData ?? []);
-                setExchangeRates(ratesData ?? {});
             } catch (error) {
                 console.error("Error loading report filters:", error);
             }
@@ -58,13 +58,13 @@ function Report() {
     }, []);
 
     const fetchReport = async () => {
-        if (!selectedProduct || !selectedStartDate || !selectedEndDate) {
-            alert("Please select product, from date, and to date.");
+        if (!selectedProduct || !selectedStartDate || !selectedEndDate || !selectedCurrency) {
+            toast.error("Please select product, from date, to date and currency.");
             return;
         }
 
         if (new Date(selectedStartDate) > new Date(selectedEndDate)) {
-            alert("From date cannot be after to date.");
+            toast.error("From date cannot be after to date.");
             return;
         }
 
@@ -78,27 +78,16 @@ function Report() {
 
             setSelectedProductName(name);
 
-            const [data, values, currencyFrequency] = await Promise.all([
-                reportService.getOrdersByFilters(
-                    selectedProduct,
-                    selectedStartDate,
-                    selectedEndDate
-                ),
-                reportService.getTotalQuantityAndRange(
-                    selectedProduct,
-                    selectedStartDate,
-                    selectedEndDate
-                ),
-                reportService.getFrequencyOfCurrency(
-                    selectedProduct,
-                    selectedStartDate,
-                    selectedEndDate
-                ),
-            ]);
+            const data = await reportService.getOrdersByFilters(
+                selectedProduct,
+                selectedStartDate,
+                selectedEndDate,
+                selectedCurrency
+            );
+            setReportCurrency(selectedCurrency);
+            setCurrencyCounts(data?.currencyFrequency ?? {});
 
-            setCurrencyCounts(currencyFrequency ?? {});
-
-            const normalizedOrders = (data ?? []).map((order) => ({
+            const normalizedOrders = (data?.orders ?? []).map((order) => ({
                 ...normalizeReportRow(order),
                 orderDate: order.orderDate
                     ? new Date(order.orderDate).toISOString().split("T")[0]
@@ -108,42 +97,23 @@ function Report() {
             setOrders(normalizedOrders);
 
             setStats({
-                totalQuantity:
-                    values.totalQuantity ??
-                    values.TotalQuantity ??
-                    values.item1 ??
-                    0,
-                totalDays:
-                    values.totalDays ??
-                    values.TotalDays ??
-                    values.item2 ??
-                    0,
+                totalQuantity: data?.totalQuantity ?? 0,
+                totalDays: data?.totalDays ?? 0,
             });
-
-            setCurrentPage(1);
-        } 
+            setCurrentPage(PAGINATION.DEFAULT_PAGE);
+        }
         catch (error) {
             console.error("Error fetching report orders:", error);
             setOrders([]);
-            alert("Unable to load report data.");
+            toast.error("Unable to load report data.");
         } finally {
             setIsLoading(false);
         }
     };
 
-    const handleReset = () => {
-        setSelectedProduct("");
-        setSelectedCurrency("");
-        setSelectedStartDate("");
-        setSelectedEndDate("");
-        setOrders([]);
-        setHasSearched(false);
-        setCurrentPage(1);
-    };
-
-    const handleDownloadPDF =async () => {
+    const handleDownloadPDF = async () => {
         if (orders.length === 0) {
-            alert("Search and load report data before downloading.");
+            toast.error("Search and load report data before downloading.");
             return;
         }
 
@@ -151,7 +121,7 @@ function Report() {
         const currencyPrefix = selectedCurrency || "Converted";
         const doc = new jsPDF({ orientation: "landscape", unit: "mm", format: "a4" });
 
-       const logoRes = await fetch("/inventory_logo.png");
+        const logoRes = await fetch("/inventory_logo.png");
         const blob = await logoRes.blob();
 
         const reader = new FileReader();
@@ -223,9 +193,7 @@ function Report() {
             key: "convertedAmount",
             title: "Selected Currency Amount",
             render: (value) =>
-                `${selectedCurrency || "USD"} ${formatAmount(
-                    value * (exchangeRates[selectedCurrency] ?? 1)
-                )}`
+                `${reportCurrency || "USD"} ${formatAmount(value)}`
         }
     ];
 
@@ -252,18 +220,12 @@ function Report() {
             <div className="mt-6 grid gap-4 bg-white rounded-xl p-4 shadow-md md:grid-cols-5">
                 <div className="flex flex-col space-y-2">
                     <label className="text-sm font-medium">Product</label>
-                    <select
-                        className="rounded-md border border-gray-300 p-2 focus:border-blue-500"
+                    <SearchableProductSelect
                         value={selectedProduct}
-                        onChange={(e) => setSelectedProduct(e.target.value)}
-                    >
-                        <option value="">Select Product</option>
-                        {products.map((product) => (
-                            <option key={product.id} value={product.id}>
-                                {product.name}
-                            </option>
-                        ))}
-                    </select>
+                        onChange={setSelectedProduct}
+                        products={products}
+                        placeholder="Select Product"
+                    />
                 </div>
 
                 <div className="flex flex-col space-y-2">
@@ -297,21 +259,14 @@ function Report() {
                     />
                 </div>
 
-                <div className="flex flex-col justify-end gap-2">
+                <div className="flex flex-col justify-end">
                     <button
-                        className="group flex items-center justify-center gap-x-2 rounded-md bg-blue-500 px-4 py-2 text-white hover:bg-blue-600 disabled:cursor-not-allowed disabled:opacity-60"
+                        className="flex h-10 mb-1 w-full items-center justify-center gap-2 rounded-md bg-blue-600 text-white transition hover:bg-blue-700 disabled:opacity-60"
                         onClick={fetchReport}
                         disabled={isLoading}
                     >
-                        <Search className="h-5 w-5 transition-transform group-hover:scale-105" />
+                        <Search className="h-5 w-5" />
                         {isLoading ? "Searching..." : "Search"}
-                    </button>
-                    <button
-                        className="group flex items-center justify-center gap-x-2 rounded-md border border-gray-300 px-5 py-2 hover:bg-gray-200"
-                        onClick={handleReset}
-                    >
-                        <RotateCcw className="h-5 w-5 transition-transform duration-300 group-hover:-rotate-180" />
-                        Reset
                     </button>
                 </div>
             </div>
@@ -319,10 +274,10 @@ function Report() {
                 <div className="relative h-[calc(100vh-200px)] 2xl:h-[calc(100vh-450px)] flex justify-center px-4">
                     <div className="absolute left-1/2 top-1/2 w-full max-w-2xl -translate-x-1/2 -translate-y-1/2 rounded-xl border-l-4 border-blue-500 bg-white px-8 py-6 shadow-xl">
                         <h1 className="text-xl font-semibold text-gray-800">
-                        Select a product and date range to generate a report.
+                            Select a product and date range to generate a report.
                         </h1>
                         <p className="mt-2 text-gray-500">
-                        Reports will be generated once both fields are selected.
+                            Reports will be generated once both fields are selected.
                         </p>
                     </div>
                 </div>
@@ -341,9 +296,8 @@ function Report() {
                         onPageChange={setCurrentPage}
                         onPageSizeChange={(size) => {
                             setPageSize(size);
-                            setCurrentPage(1);
+                            setCurrentPage(PAGINATION.DEFAULT_PAGE);
                         }}
-                        getRowKey={(row, index) => `${row.orderNumber}-${row.productName}-${index}`}
                     />
                 </div>
             )}
@@ -403,11 +357,10 @@ function Report() {
                                                 className="flex items-center justify-between rounded-md border border-gray-200 bg-gray-50 px-4 py-2"
                                             >
                                                 <span
-                                                    className={`font-medium ${
-                                                        currency === selectedCurrency
-                                                            ? "text-blue-600"
-                                                            : "text-gray-700"
-                                                    }`}
+                                                    className={`font-medium ${currency === selectedCurrency
+                                                        ? "text-blue-600"
+                                                        : "text-gray-700"
+                                                        }`}
                                                 >
                                                     {currency}
                                                 </span>
@@ -425,7 +378,7 @@ function Report() {
                     </div>
                 </div>
             )}
-            
+
         </div>
     );
 }
