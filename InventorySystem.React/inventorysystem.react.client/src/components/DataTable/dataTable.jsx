@@ -4,18 +4,13 @@ import TableBody from "./TableBody";
 import Pagination from "./Pagination";
 import EmptyState from "./EmptyState";
 import LoadingState from "./LoadingState";
-import {
-    DEFAULT_CURRENT_PAGE,
-    DEFAULT_PAGE_SIZE,
-    DEFAULT_PAGE_SIZE_OPTIONS
-} from "./dataTableConfig";
-
-function dataTable({ 
+import { PAGINATION } from "./paginationConfig";
+function dataTable({
     data = [],
     columns = [],
     loading = false,
-    emptyMessage="" ,
-    /* FILTERS*/ 
+    emptyMessage="",
+    /* FILTERS*/
     filters = {},
     filterConfig = [],
     onFilterChange,
@@ -23,17 +18,16 @@ function dataTable({
     onInstantFilterChange,
     /*PAGINATIOn*/
     pagination = true,
-    currentPage = DEFAULT_CURRENT_PAGE,
-    pageSize = DEFAULT_PAGE_SIZE,
-    pageSizeOptions = DEFAULT_PAGE_SIZE_OPTIONS,
-    totalItems,
+    currentPage = PAGINATION.DEFAULT_PAGE,
+    pageSize = PAGINATION.DEFAULT_PAGE_SIZE,
+    totalItems = PAGINATION.DEFAULT_TOTAL,
     onPageChange,
     onPageSizeChange,
     /*ROW EVENTS*/
     onRowClick,
-    rowClassName,
+    rowClassName="",
     className = "",
-    tableClassName = ""
+    tableClassName = "",
 }) {
 
     const total = totalItems ?? data.length;
@@ -48,7 +42,7 @@ function dataTable({
         return data.slice(start, start + pageSize);
 
     }, [
-        data,   
+        data,
         pagination,
         currentPage,
         pageSize
@@ -167,7 +161,6 @@ function dataTable({
 
                 </div>
             }
-
         </div>
     );
 }

@@ -7,7 +7,7 @@ function TableHeader({
     onFilterChange,
     onInstantFilterChange,
     onFilterApply,
-    handleFilterKeyDown
+    handleFilterKeyDown,
 }) {
 
     const getFilter = (key) => {

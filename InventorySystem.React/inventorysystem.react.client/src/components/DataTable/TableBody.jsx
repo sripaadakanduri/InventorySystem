@@ -15,7 +15,7 @@ function TableBody({
 
                     return (
                         <tr
-                            key={row.id ?? rowIndex}
+                            key={row.id}
                             className={`
                                 border-b border-gray-100 transition
                                 ${onRowClick ? "cursor-pointer hover:bg-gray-50" : ""}
@@ -31,7 +31,7 @@ function TableBody({
                                     {column.render
                                         ? column.render(row[column.key], row)
                                         : row[column.key]}
-                                                                </td>
+                                </td>
                             ))}
                         </tr>
                     );

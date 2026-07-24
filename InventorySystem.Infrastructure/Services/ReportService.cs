@@ -1,5 +1,4 @@
-using InventorySystem.Core.DTOs;
-using InventorySystem.Core.Entities;
+using InventorySystem.Core.DTOs.Reports;
 using InventorySystem.Service.Data;
 using InventorySystem.Service.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -15,17 +14,18 @@ namespace InventorySystem.Service.Services
             _context = context;
         }
 
-        public async Task<List<ProductSalesReportDto>> GetOrdersByProductAndDateRangeAsync(
+        public async Task<ProductSalesReportResultDto> GetProductSalesReportAsync(
             int productId,
             DateTime startDate,
-            DateTime endDate)
+            DateTime endDate,
+            string currency)
         {
-            return await _context.OrderItems
+            var orderItems = await _context.OrderItems
                 .Where(i =>
                     i.ProductId == productId &&
                     i.Order.CreatedAt >= startDate &&
                     i.Order.CreatedAt <= endDate)
-                .Select(i => new ProductSalesReportDto
+                .Select(i => new
                 {
                     ProductName = i.Product.Name,
                     OrderNumber = i.Order.OrderNumber,
@@ -33,45 +33,58 @@ namespace InventorySystem.Service.Services
                     Quantity = i.Quantity,
                     OriginalAmount = i.TotalPrice,
                     OriginalCurrency = i.Order.Currency,
-                    ConvertedAmount = i.BaseTotalPrice
+                    BaseAmount = i.BaseTotalPrice
                 })
-                .OrderByDescending(x => x.OrderDate)
+                .OrderByDescending(i => i.OrderDate)
                 .ToListAsync();
-        }
 
-        public async Task<Dictionary<string, int>> GetCurrencyFrequencyByProductAsync(int productId, DateTime startDate, DateTime endDate)
-        {
-            var data = await _context.Orders
-             .Where(o => o.OrderItems.Any(oi => oi.ProductId == productId)
-                      && o.CreatedAt >= startDate
-                      && o.CreatedAt <= endDate)
-             .GroupBy(o => o.Currency)
-             .Select(g => new
-             {
-                 Currency = g.Key,
-                 Count = g.Count()
-             })
-             .OrderByDescending(x => x.Count)
-             .ToListAsync();
+            var exchangeRates = await _context.ExchangeRates
+                .Where(r =>
+                    r.CurrencyCode == currency &&
+                    r.Date >= startDate.Date &&
+                    r.Date <= endDate.Date)
+                .OrderBy(r => r.Date)
+                .ToListAsync();
 
-            return data.ToDictionary(x => x.Currency, x => x.Count);
-        }
+            var reportOrders = new List<ProductSalesReportDto>();
 
-        public async Task<ProductSalesSummaryDto> GetTotalQuantityAndRange(
-            int productId,
-            DateTime startDate,
-            DateTime endDate)
-        {
-            var totalQuantity = await _context.OrderItems
-                .Where(i =>
-                    i.ProductId == productId &&
-                    i.Order.CreatedAt >= startDate &&
-                    i.Order.CreatedAt <= endDate)
-                .SumAsync(i => (int?)i.Quantity) ?? 0;
-
-            return new ProductSalesSummaryDto
+            foreach (var item in orderItems)
             {
-                TotalQuantity = totalQuantity,
+                var rate = exchangeRates
+                    .Where(r => r.Date.Date == item.OrderDate.Date)
+                    .FirstOrDefault();
+
+                if (rate == null)
+                {
+                    rate = exchangeRates.FirstOrDefault();
+                }
+
+                decimal convertedAmount = rate != null
+                    ? item.BaseAmount * rate.Rate
+                    : item.BaseAmount;
+
+                reportOrders.Add(new ProductSalesReportDto
+                {
+                    ProductName = item.ProductName,
+                    OrderNumber = item.OrderNumber,
+                    OrderDate = item.OrderDate,
+                    Quantity = item.Quantity,
+                    OriginalAmount = item.OriginalAmount,
+                    OriginalCurrency = item.OriginalCurrency,
+                    ConvertedAmount = convertedAmount
+                });
+            }
+
+            return new ProductSalesReportResultDto
+            {
+                Orders = reportOrders,
+
+                CurrencyFrequency = orderItems
+                    .GroupBy(x => x.OriginalCurrency)
+                    .ToDictionary(g => g.Key, g => g.Count()),
+
+                TotalQuantity = orderItems.Sum(x => x.Quantity),
+
                 TotalDays = (endDate.Date - startDate.Date).Days + 1
             };
         }
