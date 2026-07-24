@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
-import { Download, RotateCcw, Search } from "lucide-react";
+import { toast } from "react-toastify";
+import { Download, RotateCcw, Search ,FileBarChart} from "lucide-react";
 import CurrencySelector from "../../components/CurrencySelector";
 import DataTable from "../../components/DataTable";
+import { DEFAULT_CURRENT_PAGE, DEFAULT_PAGE_SIZE } from "../../components/DataTable/dataTableConfig";
 import { getProducts } from "../../services/ProductService";
 import * as reportService from "../../services/reportService";
 import { getLatestRates } from "../../services/ExchangeRateService";
@@ -21,8 +23,8 @@ function Report() {
     const [exchangeRates, setExchangeRates] = useState({});
     const [isLoading, setIsLoading] = useState(false);
     const [hasSearched, setHasSearched] = useState(false);
-    const [currentPage, setCurrentPage] = useState(1);
-    const [pageSize, setPageSize] = useState(10);
+    const [currentPage, setCurrentPage] = useState(DEFAULT_CURRENT_PAGE);
+    const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
 
     const formatAmount = (value) => Number(value ?? 0).toLocaleString(undefined, {
         minimumFractionDigits: 2,
@@ -59,12 +61,12 @@ function Report() {
 
     const fetchReport = async () => {
         if (!selectedProduct || !selectedStartDate || !selectedEndDate) {
-            alert("Please select product, from date, and to date.");
+            toast.error("Please select product, from date, and to date.");
             return;
         }
 
         if (new Date(selectedStartDate) > new Date(selectedEndDate)) {
-            alert("From date cannot be after to date.");
+            toast.error("From date cannot be after to date.");
             return;
         }
 
@@ -120,12 +122,12 @@ function Report() {
                     0,
             });
 
-            setCurrentPage(1);
+            setCurrentPage(DEFAULT_CURRENT_PAGE);
         } 
         catch (error) {
             console.error("Error fetching report orders:", error);
             setOrders([]);
-            alert("Unable to load report data.");
+            toast.error("Unable to load report data.");
         } finally {
             setIsLoading(false);
         }
@@ -138,12 +140,12 @@ function Report() {
         setSelectedEndDate("");
         setOrders([]);
         setHasSearched(false);
-        setCurrentPage(1);
+        setCurrentPage(DEFAULT_CURRENT_PAGE);
     };
 
     const handleDownloadPDF =async () => {
         if (orders.length === 0) {
-            alert("Search and load report data before downloading.");
+            toast.error("Search and load report data before downloading.");
             return;
         }
 
@@ -230,13 +232,19 @@ function Report() {
     ];
 
     return (
-        <div className="w-full max-w-7xl mx-auto flex flex-col gap-6 p-4 sm:p-6">
-            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mt-10">
+        <div className="page-container">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                 <div>
-                    <h1 className="text-2xl font-semibold">Product Sales Report</h1>
-                    <p className="text-sm text-gray-600">
-                        View product wise sales details and summary for the selected period and currency
-                    </p>
+                    <div className="flex items-center justify-start gap-2">
+                        <FileBarChart className="h-10 w-10 text-blue-800 " />
+                        <div>
+                            <h1 className="text-2xl font-semibold">Product Sales Report</h1>
+                            <p className="text-sm text-gray-600 ">
+                                View product wise sales details and summary for the selected period and currency
+                            </p>
+                        </div>
+                    </div>
+                    
                 </div>
 
                 <button
@@ -341,9 +349,8 @@ function Report() {
                         onPageChange={setCurrentPage}
                         onPageSizeChange={(size) => {
                             setPageSize(size);
-                            setCurrentPage(1);
+                            setCurrentPage(DEFAULT_CURRENT_PAGE);
                         }}
-                        getRowKey={(row, index) => `${row.orderNumber}-${row.productName}-${index}`}
                     />
                 </div>
             )}

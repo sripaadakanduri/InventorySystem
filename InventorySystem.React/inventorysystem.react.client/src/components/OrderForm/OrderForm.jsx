@@ -255,7 +255,7 @@ function OrderForm({
     };
 
     return (
-        <div className="w-full">
+        <div className="w-full px-10">
             <div className="flex items-center gap-3 mb-8">
                 <PackagePlus className="w-8 h-8 text-blue-500" />
 

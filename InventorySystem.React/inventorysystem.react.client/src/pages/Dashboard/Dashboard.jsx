@@ -129,7 +129,7 @@ export default function Dashboard() {
 
     return (
 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="page-container">
 
             {/* HERO SECTION */}
             <section className="mb-12">
@@ -447,7 +447,7 @@ export default function Dashboard() {
                     duration-700
                     ease-in-out
                     ${open
-                        ? "max-h-[5000px] opacity-100 mt-8"
+                        ? "max-h-[5000px] opacity-100"
                         : "max-h-0 opacity-0"
                     }
                 `}

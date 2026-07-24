@@ -36,15 +36,11 @@ const Navbar = () => {
 
             <div
                 className="
-                    flex w-full max-w-6xl
+                    flex w-full 
                     items-center justify-between
                     rounded-full border border-gray-200
                     bg-white/80 px-4 py-2
-<<<<<<< Updated upstream
-                    shadow-lg backdrop-blur
-=======
                     shadow-lg backdrop-blur mx-2 mb-6 2xl:mx-8
->>>>>>> Stashed changes
                 "
             >
 
@@ -138,7 +134,8 @@ const Navbar = () => {
                     <div
                         className="
                             invisible absolute right-0 top-full
-                            mt-2 w-80 origin-top-right
+                            mt-2 w-80 2xl:w-96
+                            origin-top-right
                             rounded-2xl border border-gray-200
                             bg-white p-6 shadow-2xl
                             opacity-0 scale-95
@@ -181,17 +178,9 @@ const Navbar = () => {
                         <div >
                         <Link
                             to="/dashboard"
-                            className={`
-                                flex w-full items-center gap-3
-                                rounded-2xl px-2 py-1
-                                transition duration-300
-                                hover:bg-blue-50
-                                mb-1
-                                ${location.pathname === "/dashboard"
-                                    ? "bg-blue-50 text-blue-600"
-                                    : ""
-                                }
-                            `}
+                            className={`nav-item ${
+                                location.pathname === "/dashboard" ? "nav-item-active" : ""
+                            }`}
                         >
 
                             <Home size={16} />
@@ -202,17 +191,9 @@ const Navbar = () => {
 
                         <Link
                             to="/orders"
-                            className={`
-                                flex w-full items-center gap-3
-                                rounded-2xl px-2 py-1
-                                transition duration-300
-                                hover:bg-blue-50
-                                mb-1
-                                ${location.pathname === "/orders"
-                                    ? "bg-blue-50 text-blue-600"
-                                    : ""
-                                }
-                            `}
+                            className={`nav-item ${
+                                location.pathname === "/orders" ? "nav-item-active" : ""
+                            }`}
                         >
 
                             <ShoppingCart size={16} />
@@ -223,16 +204,9 @@ const Navbar = () => {
 
                         <Link
                             to="/products"
-                            className={`
-                                flex w-full items-center gap-3
-                                rounded-2xl px-2 py-1
-                                transition duration-300
-                                hover:bg-blue-50 mb-1
-                                ${location.pathname === "/products"
-                                    ? "bg-blue-50 text-blue-600"
-                                    : ""
-                                }
-                            `}
+                            className={`nav-item ${
+                                location.pathname === "/products" ? "nav-item-active" : ""
+                            }`}
                         >
 
                             <Package size={16} />
@@ -257,17 +231,10 @@ const Navbar = () => {
                                 </p>
 
                                 <Link
-                                    to="/admin/users"
-                                    className={`
-                                        flex w-full items-center gap-3
-                                        rounded-2xl px-2 py-1
-                                        transition duration-300
-                                        hover:bg-blue-50 mb-1
-                                        ${location.pathname === "/admin/users"
-                                            ? "bg-blue-50 text-blue-600"
-                                            : ""
-                                        }
-                                    `}
+                                to="/admin/users"
+                                className={`nav-item ${
+                                    location.pathname === "/admin/users" ? "nav-item-active" : ""
+                                }`}
                                 >
 
                                     <Users size={16} />
@@ -277,16 +244,9 @@ const Navbar = () => {
                                 </Link>
                                     <Link
                                         to="/admin/reports"
-                                        className={`
-                                        flex w-full items-center gap-3
-                                        rounded-2xl px-2 py-1
-                                        transition duration-300
-                                        hover:bg-blue-50 mb-1
-                                        ${location.pathname === "/admin/reports"
-                                                ? "bg-blue-50 text-blue-600"
-                                                : ""
-                                            }
-                                    `}
+                                        className={`nav-item ${
+                                            location.pathname === "/admin/reports" ? "nav-item-active" : ""
+                                        }`}
                                     >
 
                                         <FileBarChart size={16} />
@@ -297,16 +257,9 @@ const Navbar = () => {
 
                                 <Link
                                     to="/transactions"
-                                    className={`
-                                        flex w-full items-center gap-3
-                                        rounded-2xl px-2 py-1
-                                        transition duration-300
-                                        hover:bg-blue-50 mb-1
-                                        ${location.pathname === "/transactions"
-                                            ? "bg-blue-50 text-blue-600"
-                                            : ""
-                                        }
-                                    `}
+                                    className={`nav-item ${
+                                        location.pathname === "/transactions" ? "nav-item-active" : ""
+                                    }`}
                                 >
 
                                     <CreditCard size={16} />

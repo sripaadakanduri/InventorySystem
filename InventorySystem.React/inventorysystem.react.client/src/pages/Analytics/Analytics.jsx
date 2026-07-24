@@ -115,7 +115,7 @@ export default function Analytics() {
 
     return (
 
-        <div className="bg-slate-50 max-w-7xl mb-5">
+        <div className="page-container">
 
             <div className="border border-gray-300 mb-5"></div>
 

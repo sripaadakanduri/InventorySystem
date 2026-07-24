@@ -1,7 +1,14 @@
+import {
+    DEFAULT_CURRENT_PAGE,
+    DEFAULT_PAGE_SIZE,
+    DEFAULT_PAGE_SIZE_OPTIONS
+} from "./dataTableConfig";
+
 function Pagination({
-    currentPage = 1,
+    currentPage = DEFAULT_CURRENT_PAGE,
     totalItems = 0,
-    pageSize = 10,
+    pageSize = DEFAULT_PAGE_SIZE,
+    pageSizeOptions = DEFAULT_PAGE_SIZE_OPTIONS,
     onPageChange,
     onPageSizeChange
 }) {
@@ -26,7 +33,7 @@ function Pagination({
                     value={pageSize}
                     onChange={(e) => onPageSizeChange?.(Number(e.target.value))}
                 >
-                    {[10, 25, 50, 100].map((size) => (
+                    {pageSizeOptions.map((size) => (
                         <option key={size} value={size}>
                             {size}
                         </option>
