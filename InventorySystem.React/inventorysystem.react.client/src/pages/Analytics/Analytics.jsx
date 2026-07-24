@@ -85,7 +85,7 @@ export default function Analytics() {
         () => getLowStockProducts(products),
         [products]
     );
-   
+
     const mostOrdered = useMemo(
         () => getTopSellingProducts(orders, products),
         [orders, products]
@@ -176,7 +176,7 @@ export default function Analytics() {
                 <MostOrderdProducts
                     data={mostOrdered}
                 />
-                
+
             </div>
 
         </div>

@@ -9,7 +9,7 @@ function dataTable({
     data = [],
     columns = [],
     loading = false,
-    emptyMessage="",
+    emptyMessage = "",
     /* FILTERS*/
     filters = {},
     filterConfig = [],
@@ -18,14 +18,15 @@ function dataTable({
     onInstantFilterChange,
     /*PAGINATIOn*/
     pagination = true,
+    serverSidePagination = false,
     currentPage = PAGINATION.DEFAULT_PAGE,
     pageSize = PAGINATION.DEFAULT_PAGE_SIZE,
-    totalItems = PAGINATION.DEFAULT_TOTAL,
+    totalItems,
     onPageChange,
     onPageSizeChange,
     /*ROW EVENTS*/
     onRowClick,
-    rowClassName="",
+    rowClassName = "",
     className = "",
     tableClassName = "",
 }) {
@@ -34,7 +35,7 @@ function dataTable({
 
     const paginatedData = useMemo(() => {
 
-        if (!pagination)
+        if (!pagination || serverSidePagination)
             return data;
 
         const start = (currentPage - 1) * pageSize;
@@ -44,6 +45,7 @@ function dataTable({
     }, [
         data,
         pagination,
+        serverSidePagination,
         currentPage,
         pageSize
     ]);
@@ -154,7 +156,6 @@ function dataTable({
                         currentPage={currentPage}
                         totalItems={total}
                         pageSize={pageSize}
-                        pageSizeOptions={pageSizeOptions}
                         onPageChange={onPageChange}
                         onPageSizeChange={onPageSizeChange}
                     />

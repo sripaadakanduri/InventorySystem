@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { toast } from "react-toastify";
-import {useNavigate} from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import ProductForm from "../../components/ProductForm/ProductForm";
 import ProductImportModal from "../../components/ProductImportModal/ProductImportModal";
 import ProductTable from "../../components/ProductTable/ProductTable";
@@ -23,7 +23,7 @@ import {
 import useAuth from "../../hooks/useAuth";
 
 function Products() {
-    const navigate=useNavigate();
+    const navigate = useNavigate();
 
     const [open, setOpen] = useState(false);
     const [products, setProducts] = useState([]);
@@ -36,7 +36,7 @@ function Products() {
         name: "",
         priceSort: "",
         category: "",
-        stock:""
+        stock: ""
     });
     const [showImportModal, setShowImportModal] = useState(false);
     const [exchangeRates, setExchangeRates] = useState({ USD: 1.0 });
@@ -78,11 +78,11 @@ function Products() {
 
     useEffect(() => {
         const queryParams = new URLSearchParams(location.search);
-        
+
         // Security check for email link
         const expectedEmail = queryParams.get("userEmail");
         if (expectedEmail && user?.email) {
-            if (expectedEmail.toLowerCase() !== user.email.toLowerCase()) {                
+            if (expectedEmail.toLowerCase() !== user.email.toLowerCase()) {
                 // Clear the auth token directly
                 // we clear the cookie and reload the page to let ProtectedRoute handle the redirect seamlessly)
                 document.cookie = "AuthToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
@@ -98,7 +98,7 @@ function Products() {
 
         const stockParam = queryParams.get("stock");
 
-       const initialFilters = {
+        const initialFilters = {
             name: "",
             priceSort: "",
             category: "",
@@ -264,8 +264,8 @@ function Products() {
 
                         <div
                             className={`absolute left-0 top-full w-full z-50 transition-all duration-300 ${open
-                                    ? "opacity-100 translate-y-0 visible"
-                                    : "opacity-0 -translate-y-3 invisible pointer-events-none"
+                                ? "opacity-100 translate-y-0 visible"
+                                : "opacity-0 -translate-y-3 invisible pointer-events-none"
                                 }`}
                         >
                             <button

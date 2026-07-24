@@ -1,4 +1,4 @@
-﻿using InventorySystem.Core.DTOs;
+using InventorySystem.Core.DTOs;
 using Microsoft.AspNetCore.Http;
 
 namespace InventorySystem.Service.Interfaces

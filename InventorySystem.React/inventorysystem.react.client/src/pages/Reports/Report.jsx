@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import { toast } from "react-toastify";
-import { Download, RotateCcw, Search ,FileBarChart} from "lucide-react";
+import { Download, RotateCcw, Search, FileBarChart } from "lucide-react";
 import CurrencySelector from "../../components/CurrencySelector";
 import DataTable from "../../components/DataTable";
 import { DEFAULT_CURRENT_PAGE, DEFAULT_PAGE_SIZE } from "../../components/DataTable/dataTableConfig";
@@ -212,7 +212,7 @@ function Report() {
                             </p>
                         </div>
                     </div>
-                    
+
                 </div>
 
                 <button

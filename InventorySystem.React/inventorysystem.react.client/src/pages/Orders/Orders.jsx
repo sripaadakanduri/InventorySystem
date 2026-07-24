@@ -31,7 +31,7 @@ function Orders() {
         status: "",
         startDate: "",
         endDate: "",
-        orderNumber:"",
+        orderNumber: "",
     });
 
     const fetchOrders = async (activeFilters = filters) => {
@@ -121,9 +121,9 @@ function Orders() {
 
     return (
         <div className="page-container">
-            
 
-            
+
+
 
             <div className="bg-white p-6 rounded-3xl border border-gray-200 shadow-lg">
                 <h1 className="flex text-3xl font-bold text-gray-900  justify-center mb-15 hover:scale-105 transition duration-300">
@@ -231,21 +231,21 @@ function Orders() {
                     </div>
                 </div>
             ) : (
-                    <OrderList
-                        orders={orders}
-                        onCancelOrder={handleCancelOrder}
-                        onSelectForEdit={(order) => {
-                            setOrderToEdit(order);
-                            window.scrollTo({ top: 0, behavior: "smooth" });
-                        }}
-                        filters={filters}
-                        onFilterChange={handleFilterChange}
-                        onFilterApply={handleFilterApply}
-                        onInstantFilterChange={handleInstantFilterChange}
-                        exchangeRates={exchangeRates}
-                        selectedCurrency={selectedCurrency}
-                        setSelectedCurrency={setSelectedCurrency}
-                    />
+                <OrderList
+                    orders={orders}
+                    onCancelOrder={handleCancelOrder}
+                    onSelectForEdit={(order) => {
+                        setOrderToEdit(order);
+                        window.scrollTo({ top: 0, behavior: "smooth" });
+                    }}
+                    filters={filters}
+                    onFilterChange={handleFilterChange}
+                    onFilterApply={handleFilterApply}
+                    onInstantFilterChange={handleInstantFilterChange}
+                    exchangeRates={exchangeRates}
+                    selectedCurrency={selectedCurrency}
+                    setSelectedCurrency={setSelectedCurrency}
+                />
             )}
         </div>
     );

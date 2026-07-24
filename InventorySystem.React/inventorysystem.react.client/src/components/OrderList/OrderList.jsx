@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
 import api from "../../services/api";
-import Pagination from "../Pagination/Pagination";
 import { getAllCurrencySymbols } from '../../services/CurrencySymbolService';
 import { formatApiDate } from "../../utils/dateUtils";
 import DataTable from "../DataTable";
+import { PAGINATION } from "../DataTable/paginationConfig";
 const getCurrencySymbolText = (currency) => {
     if (!currency) {
         return "$";
@@ -27,8 +27,8 @@ function OrderList({
 }) {
     const [selectedOrder, setSelectedOrder] = useState(null);
     const [products, setProducts] = useState([]);
-    const [currentPage, setCurrentPage] = useState(1);
-    const [pageSize, setPageSize] = useState(10);
+    const [currentPage, setCurrentPage] = useState(PAGINATION.DEFAULT_PAGE);
+    const [pageSize, setPageSize] = useState(PAGINATION.DEFAULT_PAGE_SIZE);
     const [symbols, setSymbols] = useState({});
 
     useEffect(() => {
@@ -54,19 +54,8 @@ function OrderList({
     }, []);
 
     useEffect(() => {
-        setCurrentPage(1);
+        setCurrentPage(PAGINATION.DEFAULT_PAGE);
     }, [orders]);
-
-
-    const handleFilterKeyDown = (e) => {
-        if (e.key === "Enter") {
-            onFilterApply();
-        }
-    };
-
-    const indexOfLastOrder = currentPage * pageSize;
-    const indexOfFirstOrder = indexOfLastOrder - pageSize;
-    const currentOrders = orders.slice(indexOfFirstOrder, indexOfLastOrder);
 
     const getStatusText = (status) => {
         switch (status) {
@@ -110,21 +99,21 @@ function OrderList({
             key: "username",
             title: "Username",
             render: (value) => value ? value.charAt(0).toUpperCase() + value.slice(1) : `User ${row.userId}`,
-        
+
         },
         {
             key: "orderNumber",
-            title:"Order No",
+            title: "Order No",
         },
         {
             key: "totalAmount",
             title: "Total Amount",
-            render: (value,row) =>(<>{formatMoney(value)}{" "}{getCurrencySymbolText(symbols[row.currency])}</>) 
+            render: (value, row) => (<>{formatMoney(value)}{" "}{getCurrencySymbolText(symbols[row.currency])}</>)
         },
         {
             key: "totalQuantity",
             title: "Quantity",
-        
+
         },
         {
             key: "status",
@@ -142,11 +131,11 @@ function OrderList({
             title: "Date & Time",
             render: (value) => (
                 <span className="text-gray-500 text-sm">{formatApiDate(value)}</span>
-                
+
             ),
         }
 
-        
+
     ]
 
     const filterConfig = [
@@ -193,7 +182,7 @@ function OrderList({
         },
         {
             key: "createdAt",
-            type:"date-range",
+            type: "date-range",
             startKey: "startDate",
             endKey: "endDate",
             instant: true,
@@ -201,23 +190,26 @@ function OrderList({
     ]
     return (
         <div className="w-full overflow-x-auto rounded-3xl border border-gray-200 shadow-lg bg-white">
-            
+
             <DataTable
                 data={orders}
-                columns={columns}   
+                columns={columns}
                 filters={filters}
                 filterConfig={filterConfig}
                 onFilterChange={onFilterChange}
                 onInstantFilterChange={onInstantFilterChange}
                 onFilterApply={onFilterApply}
                 pagination={true}
-                onPageSizeChange={setPageSize}
+                onPageSizeChange={(size) => {
+                    setPageSize(size);
+                    setCurrentPage(PAGINATION.DEFAULT_PAGE)
+                }}
                 onPageChange={setCurrentPage}
                 currentPage={currentPage}
                 pageSize={pageSize}
                 totalItems={orders.length}
                 emptyMessage="No orders found."
-                onRowClick={(order)=>{openViewModal(order)}}
+                onRowClick={(order) => { openViewModal(order) }}
             />
             {selectedOrder && (
                 <div

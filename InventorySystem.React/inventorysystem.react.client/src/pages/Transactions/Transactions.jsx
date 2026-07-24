@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import transactionService from '../../services/transactionService';
-import Pagination from '../../components/Pagination/Pagination';
+import { PAGINATION } from '../../components/DataTable/paginationConfig';
 import { toast } from 'react-toastify';
 import { formatApiDate } from '../../utils/dateUtils';
 import DataTable from '../../components/DataTable';
@@ -8,7 +8,7 @@ import {
     Activity,
     ChevronDown,
     FileSpreadsheet,
-    FileText,   
+    FileText,
     File,
 } from 'lucide-react';
 import {
@@ -29,8 +29,8 @@ const Transactions = () => {
         endDate: ""
     });
 
-    const [currentPage, setCurrentPage] = useState(1);
-    const [pageSize, setPageSize] = useState(10);
+    const [currentPage, setCurrentPage] = useState(PAGINATION.DEFAULT_PAGE);
+    const [pageSize, setPageSize] = useState(PAGINATION.DEFAULT_PAGE_SIZE);
 
     const fetchTransactions = async (activeFilters = filters) => {
         try {
@@ -47,6 +47,7 @@ const Transactions = () => {
 
     useEffect(() => {
         fetchTransactions();
+        setCurrentPage(PAGINATION.DEFAULT_PAGE)
     }, []);
 
     const handleFilterChange = (e) => {
@@ -107,12 +108,7 @@ const Transactions = () => {
         actionType === "OrderUpdatedRevert" ? "OrderUpdated" : actionType
     );
 
-    // if (loading) return (
-    //     <div className="flex justify-center items-center min-h-[50vh]">
-    //         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
-    //     </div>
-    // );
-    const columns =[
+    const columns = [
         {
             key: "username",
             title: "Username",
@@ -251,8 +247,8 @@ const Transactions = () => {
                         <button
                             onClick={() => handleExportTransactions(exportTransactionsToExcel)}
                             className={`flex items-center gap-4 w-full bg-white px-4 py-3 text-left border-x hover:bg-gray-100 border-gray-200 transition-all duration-300  ${open
-                                    ? "opacity-100 translate-y-0"
-                                    : "opacity-0 -translate-y-3 pointer-events-none"
+                                ? "opacity-100 translate-y-0"
+                                : "opacity-0 -translate-y-3 pointer-events-none"
                                 } `}
                         >
                             <FileSpreadsheet className="text-green-600" size={20} />
@@ -267,8 +263,8 @@ const Transactions = () => {
                         <button
                             onClick={() => handleExportTransactions(exportTransactionsToCSV)}
                             className={`flex items-center gap-4 w-full bg-white px-4 py-3 text-left border-x hover:bg-gray-100 border-gray-200 transition-all duration-300 delay-75 ${open
-                                    ? "opacity-100 translate-y-0"
-                                    : "opacity-0 -translate-y-3 pointer-events-none"
+                                ? "opacity-100 translate-y-0"
+                                : "opacity-0 -translate-y-3 pointer-events-none"
                                 }`}
                         >
                             <FileText className="text-blue-600" size={20} />
@@ -283,8 +279,8 @@ const Transactions = () => {
                         <button
                             onClick={() => handleExportTransactions(exportTransactionsToPDF)}
                             className={`flex items-center gap-4 w-full bg-white px-4 py-3 text-left border-x border-gray-200 hover:bg-gray-100 transition-all duration-300 delay-150 ${open
-                                    ? "opacity-100 translate-y-0"
-                                    : "opacity-0 -translate-y-3 pointer-events-none"
+                                ? "opacity-100 translate-y-0"
+                                : "opacity-0 -translate-y-3 pointer-events-none"
                                 }`}
                         >
                             <File className="text-red-600" size={20} />
@@ -305,9 +301,13 @@ const Transactions = () => {
                 filters={filters}
                 filterConfig={filterConfig}
                 onFilterChange={handleFilterChange}
+                pagination={true}
                 onInstantFilterChange={handleInstantFilterChange}
                 onFilterApply={handleFilterApply}
-                onPageSizeChange={setPageSize}
+                onPageSizeChange={(size) => {
+                    setCurrentPage(PAGINATION.DEFAULT_PAGE);
+                    setPageSize(size);
+                }}
                 onPageChange={setCurrentPage}
                 currentPage={currentPage}
                 pageSize={pageSize}

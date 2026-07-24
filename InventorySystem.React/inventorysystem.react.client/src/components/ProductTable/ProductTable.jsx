@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Pencil, Trash2 } from "lucide-react";
-import DataTable from "../DataTable/DataTable";
+import DataTable from "../DataTable";
+import { PAGINATION } from "../DataTable/paginationConfig"
 import CurrencySelector from "../CurrencySelector";
 
 function ProductTable({
@@ -19,13 +20,13 @@ function ProductTable({
     exchangeRates,
     selectedCurrency,
     setSelectedCurrency
-}){
+}) {
     const [selectedCurrencyInfo, setSelectedCurrencyInfo] = useState(null);
-    const [currentPage, setCurrentPage] = useState(1);
-    const [pageSize, setPageSize] = useState(10);
+    const [currentPage, setCurrentPage] = useState(PAGINATION.DEFAULT_PAGE);
+    const [pageSize, setPageSize] = useState(PAGINATION.DEFAULT_PAGE_SIZE);
 
     useEffect(() => {
-        setCurrentPage(1);
+        setCurrentPage(PAGINATION.DEFAULT_PAGE);
     }, [products]);
 
     const columns = [
@@ -36,7 +37,7 @@ function ProductTable({
 
         {
             key: "price",
-            title: "Price",     
+            title: "Price",
             render: (_, row) => (
                 <>
                     {selectedCurrencyInfo?.symbol || selectedCurrency || ""}
@@ -62,8 +63,8 @@ function ProductTable({
                         row.stockQuantity > 20
                             ? "text-green-600 font-bold"
                             : row.stockQuantity > 0
-                            ? "text-yellow-600 font-bold"
-                            : "text-red-600 font-bold"
+                                ? "text-yellow-600 font-bold"
+                                : "text-red-600 font-bold"
                     }
                 >
                     {row.stockQuantity}
@@ -172,34 +173,37 @@ function ProductTable({
 
     return (
 
-    <DataTable
-        data={products}
-        columns={columns}
-        loading={isLoading}
-        emptyMessage="No Products Found"
-        filters={filters}
-        filterConfig={filterConfig}
-        onFilterChange={onFilterChange}
-        onInstantFilterChange={(e)=>{
-            switch(e.target.name){
-                case "category":
-                    onCategoryFilterChange(e);
-                    break;
-                case "priceSort":
-                    onPriceSortChange(e);
-                    break;
-                default:
-                    onFilterChange(e);
-            }
-        }}
-        onFilterApply={onFilterApply}
-        pagination={true}
-        currentPage={currentPage}
-        pageSize={pageSize}
-        totalItems={products.length}
-        onPageChange={setCurrentPage}
-        onPageSizeChange={setPageSize}
-    />
+        <DataTable
+            data={products}
+            columns={columns}
+            loading={isLoading}
+            emptyMessage="No Products Found"
+            filters={filters}
+            filterConfig={filterConfig}
+            onFilterChange={onFilterChange}
+            onInstantFilterChange={(e) => {
+                switch (e.target.name) {
+                    case "category":
+                        onCategoryFilterChange(e);
+                        break;
+                    case "priceSort":
+                        onPriceSortChange(e);
+                        break;
+                    default:
+                        onFilterChange(e);
+                }
+            }}
+            onFilterApply={onFilterApply}
+            pagination={true}
+            currentPage={currentPage}
+            pageSize={pageSize}
+            totalItems={products.length}
+            onPageChange={setCurrentPage}
+            onPageSizeChange={(size) => {
+                setPageSize(size);
+                setCurrentPage(PAGINATION.DEFAULT_PAGE)
+            }}
+        />
 
     );
 }

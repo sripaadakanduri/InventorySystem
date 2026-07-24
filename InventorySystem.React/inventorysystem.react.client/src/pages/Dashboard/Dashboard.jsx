@@ -7,7 +7,7 @@ import {
     ShoppingCart,
     Users,
     ClipboardList,
-    FileBarChart 
+    FileBarChart
 } from "lucide-react";
 
 import { getProducts } from "../../services/ProductService";
@@ -115,7 +115,7 @@ export default function Dashboard() {
         {
             title: "Reports",
             description: "View Product sales",
-            icon: <FileBarChart   size={22} />,
+            icon: <FileBarChart size={22} />,
             path: "/admin/reports", // Corrected path to match routing
             iconBg: "#dbeafe",
             iconColor: "#2563eb"
@@ -159,7 +159,7 @@ export default function Dashboard() {
                                         text-blue-600 justify-center items-center gap-x-2
                                     "
                                 >
-                                <div className="w-2 h-2 rounded-full bg-blue-600"></div>
+                                    <div className="w-2 h-2 rounded-full bg-blue-600"></div>
                                     Inventory Management Platform
                                 </div>
                             </div>
@@ -402,22 +402,22 @@ export default function Dashboard() {
 
             </section>
 
-                <div onClick={() => {
-                    const nextState = !open;
-                    setOpen(nextState);
+            <div onClick={() => {
+                const nextState = !open;
+                setOpen(nextState);
 
-                    if (nextState) {
-                        setTimeout(() => {
-                            analyticsRef.current?.scrollIntoView({
-                                behavior: "smooth",
-                                block: "start",
-                            });
-                        }, 300);
-                    }
-                }}
+                if (nextState) {
+                    setTimeout(() => {
+                        analyticsRef.current?.scrollIntoView({
+                            behavior: "smooth",
+                            block: "start",
+                        });
+                    }, 300);
+                }
+            }}
                 className=" group flex items-center justify-between mb-2">
                 <div ref={analyticsRef}
-                     className="flex flex-col gap-1">
+                    className="flex flex-col gap-1">
                     <h1 className="font-bold text-xl">View Analytics</h1>
                     <p className="font-semibold text-sm">Use the charts to analyze</p>
                 </div>
@@ -451,8 +451,8 @@ export default function Dashboard() {
                         : "max-h-0 opacity-0"
                     }
                 `}
-                        >
-                 <Analytics />
+            >
+                <Analytics />
             </div>
 
             {/* FOOTER */}

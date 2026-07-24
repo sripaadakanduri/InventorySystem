@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { getUsers, updateUserRole, createUser } from "../../services/userService";
-import Pagination from "../../components/Pagination/Pagination";
+import { PAGINATION } from "../../components/DataTable/paginationConfig";
 import { Users, Shield, ShieldOff, Plus, X } from "lucide-react";
 import UserHoverCard from "./UserHoverCard";
 import DataTable from "../../components/DataTable";
@@ -17,8 +17,8 @@ const UsersManagement = () => {
         role: "User"
     });
 
-    const [currentPage, setCurrentPage] = useState(1);
-    const [pageSize, setPageSize] = useState(10);
+    const [currentPage, setCurrentPage] = useState(PAGINATION.DEFAULT_PAGE);
+    const [pageSize, setPageSize] = useState(PAGINATION.DEFAULT_PAGE_SIZE);
     const [filters, setFilters] = useState({
         username: "",
         role: ""
@@ -40,6 +40,7 @@ const UsersManagement = () => {
 
     useEffect(() => {
         fetchUsers();
+        setCurrentPage(PAGINATION.DEFAULT_PAGE);
     }, []);
 
     const handleRoleUpdate = async (id, role) => {
@@ -82,18 +83,12 @@ const UsersManagement = () => {
         };
 
         setFilters(updatedFilters);
-        setCurrentPage(1);
+        setCurrentPage(PAGINATION.DEFAULT_PAGE);
     };
 
     const handleFilterApply = () => {
         fetchUsers(filters);
-        setCurrentPage(1);
-    };
-
-    const handleFilterKeyDown = (e) => {
-        if (e.key === "Enter") {
-            handleFilterApply();
-        }
+        setCurrentPage(PAGINATION.DEFAULT_PAGE);
     };
 
     const handleInstantFilterChange = (e) => {
@@ -103,23 +98,19 @@ const UsersManagement = () => {
         };
 
         setFilters(updatedFilters);
-        setCurrentPage(1);
+        setCurrentPage(PAGINATION.DEFAULT_PAGE);
         fetchUsers(updatedFilters);
     };
-
-    const indexOfLastUser = currentPage * pageSize;
-    const indexOfFirstUser = indexOfLastUser - pageSize;
-    const currentUsers = users.slice(indexOfFirstUser, indexOfLastUser);
 
     const columns = [
         {
             key: "username",
             title: "Username",
             render: (value, row) => (
-                        <UserHoverCard user={row}>
-                            {value.charAt(0).toUpperCase() + value.slice(1)}
-                        </UserHoverCard>
-                    ) 
+                <UserHoverCard user={row}>
+                    {value.charAt(0).toUpperCase() + value.slice(1)}
+                </UserHoverCard>
+            )
         },
         {
             key: "email",
@@ -130,11 +121,10 @@ const UsersManagement = () => {
             title: "Role",
             render: (value) => (
                 <span
-                    className={`px-3 py-1 rounded-full text-sm font-medium border ${
-                        value === "Admin"
-                            ? "bg-purple-50 text-purple-700 border-purple-200"
-                            : "bg-gray-100 text-gray-700 border-gray-200"
-                    }`}
+                    className={`px-3 py-1 rounded-full text-sm font-medium border ${value === "Admin"
+                        ? "bg-purple-50 text-purple-700 border-purple-200"
+                        : "bg-gray-100 text-gray-700 border-gray-200"
+                        }`}
                 >
                     {value}
                 </span>
@@ -158,11 +148,10 @@ const UsersManagement = () => {
                         </button>
                     ) : (
                         <button
-                            className={`flex max-w-[180px] items-center gap-2 px-3 py-2 rounded-lg transition shadow-sm text-sm font-medium ${
-                                row.username.toLowerCase() === "bunny"
-                                    ? "bg-gray-100 text-gray-400 border border-gray-200 cursor-not-allowed"
-                                    : "text-amber-600 hover:text-white bg-amber-50 hover:bg-amber-600 border border-amber-200 hover:border-amber-600"
-                            }`}
+                            className={`flex max-w-[180px] items-center gap-2 px-3 py-2 rounded-lg transition shadow-sm text-sm font-medium ${row.username.toLowerCase() === "bunny"
+                                ? "bg-gray-100 text-gray-400 border border-gray-200 cursor-not-allowed"
+                                : "text-amber-600 hover:text-white bg-amber-50 hover:bg-amber-600 border border-amber-200 hover:border-amber-600"
+                                }`}
                             disabled={row.username.toLowerCase() === "bunny"}
                             title={
                                 row.username.toLowerCase() === "bunny"
@@ -235,7 +224,10 @@ const UsersManagement = () => {
                     onInstantFilterChange={handleInstantFilterChange}
                     onFilterApply={handleFilterApply}
                     pagination={true}
-                    onPageSizeChange={setPageSize}
+                    onPageSizeChange={(size) => {
+                        setCurrentPage(PAGINATION.DEFAULT_PAGE);
+                        setPageSize(size);
+                    }}
                     onPageChange={setCurrentPage}
                     currentPage={currentPage}
                     pageSize={pageSize}

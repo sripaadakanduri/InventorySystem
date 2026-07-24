@@ -1,0 +1,49 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 500px;
+            margin: auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .otp {
+            font-size: 32px;
+            font-weight: bold;
+            color: #2563eb;
+            letter-spacing: 6px;
+            margin: 20px 0;
+        }
+
+        .footer {
+            color: gray;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Password Reset</h2>
+
+        <p>Your verification code is:</p>
+        <p>Hello {{NAME}},</p>
+        <div class="otp">{{OTP}}</div>
+
+        <p>This code expires in <strong>5 minutes</strong>.</p>
+
+        <p class="footer">
+            If you didn't request this, please ignore this email.
+        </p>
+    </div>
+</body>
+</html>
