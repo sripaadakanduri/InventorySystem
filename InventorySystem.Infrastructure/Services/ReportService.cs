@@ -56,7 +56,20 @@ namespace InventorySystem.Service.Services
 
                 if (rate == null)
                 {
-                    rate = exchangeRates.FirstOrDefault();
+                    // Use the most recent rate before the order date
+                    rate = exchangeRates
+                        .Where(r => r.Date.Date < item.OrderDate.Date)
+                        .OrderByDescending(r => r.Date)
+                        .FirstOrDefault();
+
+                    // If there is no previous rate, use the nearest future rate
+                    if (rate == null)
+                    {
+                        rate = exchangeRates
+                            .Where(r => r.Date.Date > item.OrderDate.Date)
+                            .OrderBy(r => r.Date)
+                            .FirstOrDefault();
+                    }
                 }
 
                 decimal convertedAmount = rate != null
@@ -80,8 +93,9 @@ namespace InventorySystem.Service.Services
                 Orders = reportOrders,
 
                 CurrencyFrequency = orderItems
-                    .GroupBy(x => x.OriginalCurrency)
-                    .ToDictionary(g => g.Key, g => g.Count()),
+                .GroupBy(x => x.OriginalCurrency)
+                .OrderByDescending(g => g.Count())
+                .ToDictionary(g => g.Key, g => g.Count()),
 
                 TotalQuantity = orderItems.Sum(x => x.Quantity),
 

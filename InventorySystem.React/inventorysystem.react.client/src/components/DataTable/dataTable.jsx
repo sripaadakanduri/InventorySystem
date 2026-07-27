@@ -21,7 +21,7 @@ function dataTable({
     serverSidePagination = false,
     currentPage = PAGINATION.DEFAULT_PAGE,
     pageSize = PAGINATION.DEFAULT_PAGE_SIZE,
-    totalItems,
+    totalItems =PAGINATION.DEFAULT_TOTAL,
     onPageChange,
     onPageSizeChange,
     /*ROW EVENTS*/
@@ -35,7 +35,7 @@ function dataTable({
 
     const paginatedData = useMemo(() => {
 
-        if (!pagination || serverSidePagination)
+        if (!pagination )
             return data;
 
         const start = (currentPage - 1) * pageSize;
@@ -85,9 +85,7 @@ function dataTable({
             `}
         >
 
-            {/* =====================
-                    TABLE
-            ====================== */}
+            {/*TABLE */}
 
             <div className="overflow-x-auto">
 
@@ -135,9 +133,6 @@ function dataTable({
                 </table>
 
             </div>
-            {/* =====================
-                    PAGINATION
-            ====================== */}
 
             {
                 pagination &&

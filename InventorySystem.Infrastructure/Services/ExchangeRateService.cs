@@ -1,10 +1,6 @@
 using InventorySystem.Service.Interfaces;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using System.Text;
 using System.Text.Json;
 
 namespace InventorySystem.Service.Services

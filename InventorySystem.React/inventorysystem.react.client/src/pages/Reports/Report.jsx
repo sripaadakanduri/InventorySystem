@@ -2,15 +2,14 @@ import { useEffect, useState } from "react";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import { toast } from "react-toastify";
-import { Download, RotateCcw, Search, FileBarChart } from "lucide-react";
+import { Download, Search, FileBarChart } from "lucide-react";
 import CurrencySelector from "../../components/CurrencySelector";
 import DataTable from "../../components/DataTable";
-import { DEFAULT_CURRENT_PAGE, DEFAULT_PAGE_SIZE } from "../../components/DataTable/dataTableConfig";
 import { getProducts } from "../../services/ProductService";
 import * as reportService from "../../services/reportService";
-import { getLatestRates } from "../../services/ExchangeRateService";
 import SearchableProductSelect from "../../components/SearchableProductSelect";
 import { PAGINATION } from "../../components/DataTable/paginationConfig";
+import { exportToPDF,buildDataForReport } from "../../services/Exports/exportIndex";
 
 function Report() {
     const [selectedProduct, setSelectedProduct] = useState("");
@@ -112,88 +111,68 @@ function Report() {
             setIsLoading(false);
         }
     };
-
-    const handleDownloadPDF = async () => {
-        if (orders.length === 0) {
-            toast.error("Search and load report data before downloading.");
-            return;
-        }
-
-        const productName = selectedProductName || selectedProduct || "N/A";
-        const currencyPrefix = selectedCurrency || "Converted";
-        const doc = new jsPDF({ orientation: "landscape", unit: "mm", format: "a4" });
-
-        const logoRes = await fetch("/inventory_logo.png");
-        const blob = await logoRes.blob();
-
-        const reader = new FileReader();
-        await new Promise(resolve => {
-            reader.onloadend = resolve;
-            reader.readAsDataURL(blob);
-        });
-
-        // Logo
-        doc.addImage(reader.result, "PNG", 5, 5, 20, 20);
-
-        // Title beside the logo
-        doc.setFontSize(16);
-        doc.setFont("helvetica", "bold");
-        doc.text("Product Sales Report", 30, 16);
-
-        // Details below the logo
-        doc.setFont("helvetica", "normal");
-        doc.setFontSize(10);
-
-        let y = 35;
-
-        doc.text(`Product: ${productName}`, 10, y);
-        y += 6;
-
-        doc.text(`Period: ${selectedStartDate} to ${selectedEndDate}`, 10, y);
-        y += 6;
-
-        doc.text(
-            `Currency Frequency: ${Object.entries(currencyCounts)
+   const metadata = [
+        {
+            label: "Product Name:",
+            value: selectedProductName
+        },
+        {
+            label: "Total Quantity:",
+            value: stats.totalQuantity
+        },
+        {
+            label: "Total Days:",
+            value: stats.totalDays
+        },
+        {
+            label: "Period:",
+            value: `${selectedStartDate} to ${selectedEndDate}`
+        },
+        {
+            label: "Selected Currency:",
+            value: selectedCurrency
+        },
+        {
+            label: "Currency Frequency:",
+            value: Object.entries(currencyCounts)
                 .map(([currency, count]) => `${currency}: ${count}`)
-                .join(", ")}`,
-            10,
-            y
-        );
-
-        autoTable(doc, {
-            startY: 55,
-            head: [["Product", "Order Number", "Order Date", "Quantity", "Original Amount", "Selected Currency Amount"]],
-            body: orders.map((order) => [
-                order.productName,
-                order.orderNumber,
-                order.orderDate ? new Date(order.orderDate).toLocaleDateString() : "-",
-                order.quantity,
-                `${order.originalCurrency} ${formatAmount(order.originalAmount)}`,
-                `${currencyPrefix} ${formatAmount(order.convertedAmount)}`
-            ]),
-            theme: "grid"
-        });
-
-        doc.save("Product-Sales-Report.pdf");
-    };
-
-    const reportColumns = [
-        { key: "productName", title: "Product Name" },
-        { key: "orderNumber", title: "Order Number" },
+                .join(", ")
+        }
+    ];
+   const reportColumns = [
+        {
+            key: "productName",
+            title: "Product Name",
+            accessor: "productName"
+        },
+        {
+            key: "orderNumber",
+            title: "Order Number",
+            accessor: "orderNumber"
+        },
         {
             key: "orderDate",
             title: "Order Date",
-            render: (value) => value ? new Date(value).toLocaleDateString() : "-"
+            accessor: "orderDate",
+            render: (value) =>
+                value ? new Date(value).toLocaleDateString() : "-"
         },
-        { key: "quantity", title: "Quantity" },
+        {
+            key: "quantity",
+            title: "Quantity",
+            accessor: "quantity"
+        },
         {
             key: "originalAmount",
             title: "Original Amount",
-            render: (value, row) => `${row.originalCurrency} ${formatAmount(value)}`
+            accessor: "originalAmount",
+            render: (value, row) =>
+                `${row.originalCurrency} ${formatAmount(value)}`
         },
         {
             key: "convertedAmount",
             title: "Selected Currency Amount",
+            accessor:"convertedAmount",
             render: (value) =>
                 `${reportCurrency || "USD"} ${formatAmount(value)}`
         }
@@ -217,7 +196,13 @@ function Report() {
 
                 <button
                     className="flex items-center justify-center gap-x-2 rounded-md bg-blue-500 px-5 py-3 text-white hover:bg-blue-600 disabled:cursor-not-allowed disabled:opacity-60"
-                    onClick={handleDownloadPDF}
+                    onClick={()=> exportToPDF({
+                        data:buildDataForReport(orders),
+                        columns:reportColumns,
+                        fileName: "Product-Sales-Report.pdf",
+                        title:"Product Sales Report",
+                        metadata:metadata,
+                    })}
                     disabled={orders.length === 0}
                 >
                     <Download className="h-4 w-4" />
@@ -290,27 +275,9 @@ function Report() {
                     </div>
                 </div>
             )}
-            {hasSearched && (
-                <div className="mt-6">
-                    <DataTable
-                        data={orders}
-                        columns={reportColumns}
-                        loading={isLoading}
-                        emptyMessage="No orders found for the selected filters."
-                        pagination={true}
-                        currentPage={currentPage}
-                        pageSize={pageSize}
-                        totalItems={orders.length}
-                        onPageChange={setCurrentPage}
-                        onPageSizeChange={(size) => {
-                            setPageSize(size);
-                            setCurrentPage(PAGINATION.DEFAULT_PAGE);
-                        }}
-                    />
-                </div>
-            )}
+            
             {hasSearched && !isLoading && (
-                <div className="m-10 flex justify-center ">
+                <div className="flex justify-center ">
                     <div className="w-full  rounded-xl border-l-4 border-blue-500 bg-white p-8 shadow-xl">
                         <div className="grid grid-cols-2 gap-10">
                             {/* Left Section */}
@@ -386,7 +353,25 @@ function Report() {
                     </div>
                 </div>
             )}
-
+            {hasSearched && (
+                <div className="mt-6">
+                    <DataTable
+                        data={orders}
+                        columns={reportColumns}
+                        loading={isLoading}
+                        emptyMessage="No orders found for the selected filters."
+                        pagination={true}
+                        currentPage={currentPage}
+                        pageSize={pageSize}
+                        totalItems={orders.length}
+                        onPageChange={setCurrentPage}
+                        onPageSizeChange={(size) => {
+                            setPageSize(size);
+                            setCurrentPage(PAGINATION.DEFAULT_PAGE);
+                        }}
+                    />
+                </div>
+            )}
         </div>
     );
 }

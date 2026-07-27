@@ -1,7 +1,7 @@
 import { PAGINATION } from "./paginationConfig";
 function Pagination({
     currentPage,
-    totalItems = 0,
+    totalItems,
     pageSize,
     onPageChange,
     onPageSizeChange

@@ -5,10 +5,8 @@ import OrderForm from "../../components/OrderForm/OrderForm";
 import { getAllOrders, cancelOrder } from "../../services/ordersService";
 import api from "../../services/api";
 import { getLatestRates } from "../../services/exchangeRateService";
-
+import {buildDataForOrders,exportToCSV,exportToExcel} from "../../services/Exports/exportIndex";
 import {
-    exportToCSV,
-    exportToExcel,
     exportToPDF,
 } from "../../components/orderExportUtils";
 import {
@@ -118,13 +116,111 @@ function Orders() {
             toast.error("Failed to export filtered orders.");
         }
     };
+    const columns = [
+        {
+            title: "Order NO",
+            accessor: "orderNumber"
+        },
+        {
+            title: "Username",
+            accessor: "username"
+        },
+        {
+            title: "Items",
+            accessor: (row) =>
+                row.items
+                    .map(item => `${item.name} (${item.quantity})`)
+                    .join(", ")
+        },
+        {
+            title: "Total",
+            accessor: (row) => `${row.orderTotal} ${row.currency}`
+        },
+        {
+            title: "Status",
+            accessor: "status"
+        },
+        {
+            title: "Created At",
+            accessor: "createdAt"
+        }
+    ];
+    const formatMoney = (value, currency) => {
+        const formattedNumber = new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(value);
+        return `${formattedNumber} ${currency}`;
+    };
+    const Excelcolumns = [
+        {
+            header: "Order Number",
+            key: "orderNumber",
+            width: 24,
+            parent: row => row.orderNumber,
+            merge: true,
+            align: "center"
+        },
+        {
+            header: "User",
+            key: "username",
+            width: 20,
+            parent: row => row.username,
+            merge: true,
+            align: "center"
+        },
+        {
+            header: "Product",
+            key: "product",
+            width: 35,
+            child: item => item.name
+        },
+        {
+            header: "Price",
+            key: "price",
+            width: 18,
+            child: item => formatMoney(item.unitPrice, item.currency),
+            align: "right"
+        },
+        {
+            header: "Qty",
+            key: "quantity",
+            width: 10,
+            child: item => item.quantity,
+            align: "center"
+        },
+        {
+            header: "Total",
+            key: "total",
+            width: 18,
+            child: item => formatMoney(item.total, item.currency),
+            align: "right"
+        },
+        {
+            header: "Order Total",
+            key: "orderTotal",
+            width: 20,
+            parent: row => formatMoney(row.orderTotal, row.currency),
+            merge: true,
+            align: "right"
+        },
+        {
+            header: "Status",
+            key: "status",
+            width: 18,
+            parent: row => row.status,
+            merge: true,
+            align: "center"
+        },
+        {
+            header: "Created At",
+            key: "createdAt",
+            width: 24,
+            parent: row => row.createdAt,
+            merge: true,
+            align: "center"
+        }
+    ];
 
     return (
         <div className="page-container">
-
-
-
-
             <div className="bg-white p-6 rounded-3xl border border-gray-200 shadow-lg">
                 <h1 className="flex text-3xl font-bold text-gray-900  justify-center mb-15 hover:scale-105 transition duration-300">
                     Order Management
@@ -169,7 +265,15 @@ function Orders() {
                     {/* Dropdown */}
                     <div className="absolute left-0 top-full w-full z-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible">
                         <button
-                            onClick={() => handleExportOrders(exportToExcel)}
+                            onClick={() =>
+                                exportToExcel({
+                                    data: buildDataForOrders(orders,products),
+                                    columns:Excelcolumns,
+                                    fileName: "orders.xlsx",
+                                    sheetName:"orders",
+                                    childrenAccessor: (row) => row.items
+                                }
+                            )}
                             className={`flex items-center gap-4 w-full bg-white px-4 py-3 text-left border-x hover:bg-gray-100 border-gray-200 transition-all duration-300  ${open
                                 ? "opacity-100 translate-y-0"
                                 : "opacity-0 -translate-y-3 pointer-events-none"
@@ -184,8 +288,8 @@ function Orders() {
                             </div>
                         </button>
 
-                        <button
-                            onClick={() => handleExportOrders(exportToCSV)}
+                        <button 
+                            onClick={() => exportToCSV( buildDataForOrders(orders,products), columns, "orders.csv")}
                             className={`flex items-center gap-4 w-full bg-white px-4 py-3 text-left border-x hover:bg-gray-100 border-gray-200 transition-all duration-300 delay-75 ${open
                                 ? "opacity-100 translate-y-0"
                                 : "opacity-0 -translate-y-3 pointer-events-none"

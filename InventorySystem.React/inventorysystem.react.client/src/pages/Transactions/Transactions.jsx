@@ -5,17 +5,18 @@ import { toast } from 'react-toastify';
 import { formatApiDate } from '../../utils/dateUtils';
 import DataTable from '../../components/DataTable';
 import {
+    buildDataForTransactions,
+    exportToCSV,
+    exportToExcel,
+    exportToPDF,
+} from "../../services/Exports/exportIndex";
+import {
     Activity,
     ChevronDown,
     FileSpreadsheet,
     FileText,
     File,
 } from 'lucide-react';
-import {
-    exportTransactionsToCSV,
-    exportTransactionsToExcel,
-    exportTransactionsToPDF,
-} from '../../components/transactionExportUtils';
 
 const Transactions = () => {
     const [transactions, setTransactions] = useState([]);
@@ -56,7 +57,7 @@ const Transactions = () => {
             [e.target.name]: e.target.value
         });
 
-        setCurrentPage(1);
+        setCurrentPage(PAGINATION.DEFAULT_PAGE);
     };
 
     const handleFilterApply = () => {
@@ -71,7 +72,7 @@ const Transactions = () => {
         };
 
         setFilters(updatedFilters);
-        setCurrentPage(1);
+        setCurrentPage(PAGINATION.DEFAULT_PAGE);
         fetchTransactions(updatedFilters);
     };
 
@@ -113,11 +114,13 @@ const Transactions = () => {
             key: "username",
             title: "Username",
             render: (_, row) => (row.user?.username.charAt(0).toUpperCase() + row.user?.username.slice(1)) || `User ${row.userId}`,
+            accessor: "username"
         },
         {
-            key: "product",
+            key: "productName",
             title: "Product",
-            render: (_, row) => row.product?.name || `Product ${row.productId}`,
+            render: (_, row) => row.productName,
+            accessor: "productName"
         },
         {
             key: "quantityChanged",
@@ -126,14 +129,16 @@ const Transactions = () => {
                 <span className={value > 0 ? 'text-green-600' : 'text-red-600'}>
                     {value > 0 ? `+${value}` : value}
                 </span>
-            )
+            ),
+            accessor:"quantityChanged"
         },
         {
             key: "remainingStock",
             title: "Stock",
             render: (value) => (
                 <span className="text-gray-600 font-medium">{value}</span>
-            )
+            ),
+            accessor: "remainingStock"
         },
         {
             key: "actionType",
@@ -142,14 +147,16 @@ const Transactions = () => {
                 <span className={`px-2 py-1 rounded-full text-xs font-medium border ${getBadgeStyle(value)}`}>
                     {getDisplayActionType(value)}
                 </span>
-            )
+            ),
+            accessor:"actionType"
         },
         {
             key: "createdAt",
             title: "Date & Time",
             render: (value) => (
                 <span className="text-gray-500 text-sm">{formatApiDate(value)}</span>
-            )
+            ),
+            accessor: "createdAt"
         }
     ];
 
@@ -245,7 +252,15 @@ const Transactions = () => {
 
                     <div className="absolute left-0 top-full w-full z-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible">
                         <button
-                            onClick={() => handleExportTransactions(exportTransactionsToExcel)}
+                            onClick={() =>
+                                exportToExcel({
+                                    data: buildDataForTransactions(transactions),
+                                    columns,
+                                    headerName:"title",
+                                    fileName: "Transactions.xlsx",
+                                    sheetName:"transactions"
+                                })
+                            }
                             className={`flex items-center gap-4 w-full bg-white px-4 py-3 text-left border-x hover:bg-gray-100 border-gray-200 transition-all duration-300  ${open
                                 ? "opacity-100 translate-y-0"
                                 : "opacity-0 -translate-y-3 pointer-events-none"
@@ -261,7 +276,7 @@ const Transactions = () => {
                         </button>
 
                         <button
-                            onClick={() => handleExportTransactions(exportTransactionsToCSV)}
+                            onClick={() => exportToCSV(buildDataForTransactions(transactions), columns)}
                             className={`flex items-center gap-4 w-full bg-white px-4 py-3 text-left border-x hover:bg-gray-100 border-gray-200 transition-all duration-300 delay-75 ${open
                                 ? "opacity-100 translate-y-0"
                                 : "opacity-0 -translate-y-3 pointer-events-none"
@@ -277,7 +292,13 @@ const Transactions = () => {
                         </button>
 
                         <button
-                            onClick={() => handleExportTransactions(exportTransactionsToPDF)}
+                            onClick={() => exportToPDF({
+                                data: buildDataForTransactions(transactions),
+                                columns: columns,
+                                fileName: "Transactions.pdf",
+                                title: "Transactions",
+
+                            })}
                             className={`flex items-center gap-4 w-full bg-white px-4 py-3 text-left border-x border-gray-200 hover:bg-gray-100 transition-all duration-300 delay-150 ${open
                                 ? "opacity-100 translate-y-0"
                                 : "opacity-0 -translate-y-3 pointer-events-none"
@@ -301,9 +322,9 @@ const Transactions = () => {
                 filters={filters}
                 filterConfig={filterConfig}
                 onFilterChange={handleFilterChange}
-                pagination={true}
                 onInstantFilterChange={handleInstantFilterChange}
                 onFilterApply={handleFilterApply}
+                pagination={true}
                 onPageSizeChange={(size) => {
                     setCurrentPage(PAGINATION.DEFAULT_PAGE);
                     setPageSize(size);
@@ -311,6 +332,7 @@ const Transactions = () => {
                 onPageChange={setCurrentPage}
                 currentPage={currentPage}
                 pageSize={pageSize}
+                totalItems={transactions.length}
                 loading={loading}
                 emptyMessage="No transactions found."
             />

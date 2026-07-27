@@ -3,197 +3,15 @@ import ExcelJS from "exceljs";
 import { saveAs } from "file-saver";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
-
-const getStatusText = (status) => {
-    switch (status) {
-        case 1:
-            return "Pending";
-        case 2:
-            return "Confirmed";
-        case 3:
-            return "Failed";
-        case 4:
-            return "Cancelled";
-        case 5:
-            return "Updated";
-        default:
-            return "Unknown";
-    }
-};
+import { buildDataForOrders } from "../services/Exports/exportIndex";
 
 const formatMoney = (value, currency) => {
     const formattedNumber = new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(value);
     return `${formattedNumber} ${currency}`;
 };
 
-const buildExportData = (orders, products = []) => {
-    return orders.map((order) => {
-        const currency = order.currency || 'USD';
-        const items = (order.items || []).map((item) => {
-            const product = products.find((p) => p.id === item.productId);
-            const totalBase = item.totalPrice ?? (item.unitPrice * item.quantity);
-            const unitPriceBase = item.unitPrice;
-
-            return {
-                name: product?.name || `Product #${item.productId}`,
-                unitPrice: unitPriceBase,
-                quantity: item.quantity,
-                total: totalBase,
-                currency: currency
-            };
-        });
-
-        return {
-            orderNumber: order.orderNumber,
-            username: order.username,
-            items,
-            orderTotal: order.totalAmount,
-            currency: currency,
-            status: getStatusText(order.status),
-            createdAt: new Date(order.createdAt).toLocaleString()
-        };
-    });
-};
-
-const formatProductsForCSV = (items) => {
-    return items
-        .map((item) =>
-            `${item.name} (Price: ${formatMoney(item.unitPrice, item.currency)}, Qty: ${item.quantity}, Total: ${formatMoney(item.total, item.currency)})`
-        )
-        .join(" | ");
-};
-
-export const exportToCSV = (orders, products) => {
-    const data = buildExportData(orders, products);
-
-    const headers = [
-        "Order Number",
-        "User",
-        "Products",
-        "Order Total",
-        "Status",
-        "Created At"
-    ];
-
-    const rows = data.map((row) => [
-        row.orderNumber,
-        row.username,
-        `"${formatProductsForCSV(row.items)}"`,
-        `"${formatMoney(row.orderTotal, row.currency)}"`,
-        row.status,
-        `"${row.createdAt}"`
-    ]);
-
-    const csvContent = [
-        headers.join(","),
-        ...rows.map((r) => r.join(","))
-    ].join("\n");
-
-    const blob = new Blob(
-        [csvContent],
-        {
-            type: "text/csv;charset=utf-8;"
-        }
-    );
-
-    saveAs(blob, "Orders.csv");
-};
-export const exportToExcel = async (orders, products) => {
-    const data = buildExportData(orders, products);
-    const workbook = new ExcelJS.Workbook();
-    const worksheet = workbook.addWorksheet("Orders");
-
-    worksheet.columns = [
-        { header: "Order Number", key: "orderNumber", width: 24 },
-        { header: "User", key: "username", width: 20 },
-        { header: "Product", key: "product", width: 35 },
-        { header: "Price", key: "price", width: 18 },
-        { header: "Qty", key: "quantity", width: 10 },
-        { header: "Total", key: "total", width: 18 },
-        { header: "Order Total", key: "orderTotal", width: 20 },
-        { header: "Status", key: "status", width: 15 },
-        { header: "Created At", key: "createdAt", width: 22 }
-    ];
-
-    const headerRow = worksheet.getRow(1);
-    headerRow.eachCell(cell => {
-        cell.font = { bold: true, color: { argb: "FFFFFFFF" }, size: 12 };
-        cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FF2980B9" } };
-        cell.alignment = { horizontal: "center", vertical: "middle" };
-        cell.border = {
-            top: { style: "thin" }, bottom: { style: "thin" },
-            left: { style: "thin" }, right: { style: "thin" }
-        };
-    });
-    headerRow.height = 30;
-
-    let currentRowNumber = 2;
-
-    data.forEach(order => {
-        const startRow = currentRowNumber;
-
-        if (order.items.length === 0) {
-            const row = worksheet.addRow({
-                orderNumber: order.orderNumber,
-                username: order.username,
-                product: "No Products",
-                orderTotal: formatMoney(order.orderTotal, order.currency),
-                status: order.status,
-                createdAt: order.createdAt
-            });
-            row.height = 24;
-            currentRowNumber++;
-        } else {
-            order.items.forEach((item, index) => {
-                const row = worksheet.addRow({
-                    orderNumber: index === 0 ? order.orderNumber : "",
-                    username: index === 0 ? order.username : "",
-                    product: item.name,
-                    price: formatMoney(item.unitPrice, item.currency),
-                    quantity: item.quantity,
-                    total: formatMoney(item.total, item.currency),
-                    orderTotal: index === 0 ? formatMoney(order.orderTotal, order.currency) : "",
-                    status: index === 0 ? order.status : "",
-                    createdAt: index === 0 ? order.createdAt : ""
-                });
-                row.height = 24;
-                currentRowNumber++;
-            });
-        }
-
-        const endRow = currentRowNumber - 1;
-
-        if (endRow > startRow) {
-            [1, 2, 7, 8, 9].forEach(col => {
-                worksheet.mergeCells(startRow, col, endRow, col);
-            });
-        }
-
-        for (let i = startRow; i <= endRow; i++) {
-            const row = worksheet.getRow(i);
-            row.eachCell({ includeEmpty: true }, (cell, colNumber) => {
-                let horizontal = "left";
-                if (colNumber === 5) horizontal = "center"; 
-                if (colNumber === 4 || colNumber === 6) horizontal = "right"; 
-                if ([1, 2, 7, 8, 9].includes(colNumber)) horizontal = "center";
-
-                cell.alignment = { horizontal, vertical: "middle", wrapText: true };
-                cell.border = {
-                    top: { style: "thin" }, bottom: { style: "thin" },
-                    left: { style: "thin" }, right: { style: "thin" }
-                };
-                cell.font = { size: 11 };
-            });
-        }
-    });
-
-    const buffer = await workbook.xlsx.writeBuffer();
-    const blob = new Blob([buffer], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
-    saveAs(blob, "Orders.xlsx");
-};
-
 export const exportToPDF = async (orders, products) => {
-    const data = buildExportData(orders, products);
+    const data = buildDataForOrders(orders, products);
 
     const doc = new jsPDF({
         orientation: "landscape",
@@ -307,19 +125,14 @@ export const exportToPDF = async (orders, products) => {
             if (hookData.section !== "body")
                 return;
 
-            // Order Total
             if (hookData.column.index === 3) {
                 hookData.cell.styles.fontStyle = "bold";
                 hookData.cell.styles.halign = "right";
             }
-
-            // Created At
             if (hookData.column.index === 5) {
                 hookData.cell.styles.fontSize = 9;
                 hookData.cell.styles.halign = "center";
             }
-
-            // Products column
             if (hookData.column.index !== 2)
                 return;
 

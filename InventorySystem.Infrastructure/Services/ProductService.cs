@@ -5,10 +5,7 @@ using InventorySystem.Service.Interfaces;
 using System.Globalization;
 using CsvHelper;
 using CsvHelper.Configuration;
-using System.Runtime.CompilerServices;
 using Microsoft.AspNetCore.Http;
-using Microsoft.IdentityModel.Protocols.OpenIdConnect;
-using System.Runtime.Intrinsics.Arm;
 
 
 namespace InventorySystem.Service.Services
