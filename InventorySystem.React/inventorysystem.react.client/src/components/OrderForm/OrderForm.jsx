@@ -97,6 +97,11 @@ function OrderForm({
     const handleSubmit = async (e) => {
         e.preventDefault();
 
+        if (items.length === 0 || items.some((item) => !item.productId)) {
+            toast.error("Please select a product to place the order.");
+            return;
+        }
+
         setLoading(true);
 
         try {

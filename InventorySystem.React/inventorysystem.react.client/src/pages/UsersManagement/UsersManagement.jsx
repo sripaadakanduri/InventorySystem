@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { getUsers, updateUserRole, createUser } from "../../services/userService";
 import { PAGINATION } from "../../components/DataTable/paginationConfig";
-import { Users, Shield, ShieldOff, Plus, X } from "lucide-react";
+import { Users, Shield, ShieldOff, Plus, X, Eye, EyeOff, Check, ChevronDown } from "lucide-react";
 import UserHoverCard from "./UserHoverCard";
 import DataTable from "../../components/DataTable";
 
@@ -23,6 +23,17 @@ const UsersManagement = () => {
         username: "",
         role: ""
     });
+    
+    const [showPassword, setShowPassword] = useState(false);
+    const [showReqs, setShowReqs] = useState(false);
+
+    const passwordReqs = [
+        { label: "At least 8 characters", met: newUser.password.length >= 8 },
+        { label: "One uppercase letter", met: /(?=.*[A-Z])/.test(newUser.password) },
+        { label: "One lowercase letter", met: /(?=.*[a-z])/.test(newUser.password) },
+        { label: "One number", met: /(?=.*\d)/.test(newUser.password) },
+        { label: "One special character", met: /(?=.*[!@#$%^&*.,<>?|])/.test(newUser.password) }
+    ];
 
     const fetchUsers = async (filterParams = filters) => {
         try {
@@ -54,8 +65,40 @@ const UsersManagement = () => {
         }
     };
 
+    const validateNewUser = () => {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(newUser.email)) {
+            toast.error("Please enter a valid email address.");
+            return false;
+        }
+
+        if (!passwordReqs.every(req => req.met)) {
+            toast.error("Please ensure all password requirements are met.");
+            return false;
+        }
+
+        const usernameExists = users.some(u => u.username.toLowerCase() === newUser.username.toLowerCase());
+        if (usernameExists) {
+            toast.error("Username already exists in the current list.");
+            return false;
+        }
+
+        const emailExists = users.some(u => u.email.toLowerCase() === newUser.email.toLowerCase());
+        if (emailExists) {
+            toast.error("Email address already exists in the current list.");
+            return false;
+        }
+
+        return true;
+    };
+
     const handleAddUser = async (e) => {
         e.preventDefault();
+        
+        if (!validateNewUser()) {
+            return;
+        }
+
         try {
             await createUser(newUser);
             toast.success("User created successfully.");
@@ -271,14 +314,43 @@ const UsersManagement = () => {
                             </div>
                             <div className="flex flex-col gap-1">
                                 <label className="text-sm font-semibold text-gray-700">Password</label>
-                                <input
-                                    type="password"
-                                    placeholder="Enter password"
-                                    value={newUser.password}
-                                    onChange={(e) => setNewUser({ ...newUser, password: e.target.value })}
-                                    className="border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-indigo-400"
-                                    required
-                                />
+                                <div className="relative">
+                                    <input
+                                        type={showPassword ? "text" : "password"}
+                                        placeholder="Enter password"
+                                        value={newUser.password}
+                                        onChange={(e) => setNewUser({ ...newUser, password: e.target.value })}
+                                        className="w-full border border-gray-300 rounded-lg p-3 pr-12 focus:outline-none focus:ring-2 focus:ring-indigo-400"
+                                        required
+                                    />
+                                    <button
+                                        type="button"
+                                        className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-indigo-600 transition-colors"
+                                        onClick={() => setShowPassword(!showPassword)}
+                                    >
+                                        {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                                    </button>
+                                </div>
+                                <div className="mt-2 ml-1 border border-gray-100 rounded-lg overflow-hidden bg-gray-50/50">
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowReqs(!showReqs)}
+                                        className={`w-full flex items-center justify-between px-3 py-2 text-xs font-semibold transition-colors hover:bg-gray-100 ${passwordReqs.every(req => req.met) ? 'text-green-600' : 'text-red-500 hover:text-red-600'}`}
+                                    >
+                                        <span>Password Requirements</span>
+                                        <ChevronDown className={`w-4 h-4 transform transition-transform duration-200 ${showReqs ? 'rotate-180' : ''}`} />
+                                    </button>
+                                    <div className={`transition-all duration-300 ease-in-out ${showReqs ? 'max-h-48 opacity-100 pb-3' : 'max-h-0 opacity-0'} overflow-hidden`}>
+                                        <div className="space-y-1.5 px-3">
+                                            {passwordReqs.map((req, index) => (
+                                                <div key={index} className={`flex items-center text-xs font-medium transition-colors ${req.met ? 'text-green-600' : 'text-red-500'}`}>
+                                                    {req.met ? <Check className="w-3.5 h-3.5 mr-1.5" /> : <X className="w-3.5 h-3.5 mr-1.5" />}
+                                                    {req.label}
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                             <div className="flex flex-col gap-1">
                                 <label className="text-sm font-semibold text-gray-700">Role</label>

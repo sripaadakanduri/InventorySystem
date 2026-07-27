@@ -121,6 +121,7 @@ function ProductForm({ onSubmit, selectedProduct, categories = [], onClose }) {
                         <input
                             type="number"
                             step="0.01"
+                            min="0.01"
                             name="price"
                             placeholder="0.00"
                             value={formData.price}
@@ -133,8 +134,9 @@ function ProductForm({ onSubmit, selectedProduct, categories = [], onClose }) {
                         <label className="text-sm font-semibold text-gray-700">Stock Quantity</label>
                         <input
                             type="number"
+                            min="1"
                             name="stockQuantity"
-                            placeholder="0"
+                            placeholder="1"
                             value={formData.stockQuantity}
                             onChange={handleChange}
                             className="border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-400"
