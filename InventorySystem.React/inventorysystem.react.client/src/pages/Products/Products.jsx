@@ -85,13 +85,13 @@ function Products() {
             if (expectedEmail.toLowerCase() !== user.email.toLowerCase()) {
                 // Clear the auth token directly
                 // we clear the cookie and reload the page to let ProtectedRoute handle the redirect seamlessly)
-                document.cookie = "AuthToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
                 const params = new URLSearchParams(location.search);
                 const from = {
                     pathname: location.pathname,
                     search: params.toString() ? `?${params.toString()}` : "",
                     hash: location.hash
                 };
+                document.cookie = "AuthToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
                 navigate("/login", {
                             replace: true,
                             state: { from }

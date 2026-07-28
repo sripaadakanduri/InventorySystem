@@ -197,7 +197,7 @@ function Report() {
                 <button
                     className="flex items-center justify-center gap-x-2 rounded-md bg-blue-500 px-5 py-3 text-white hover:bg-blue-600 disabled:cursor-not-allowed disabled:opacity-60"
                     onClick={()=> exportToPDF({
-                        data:buildDataForReport(orders),
+                        data:buildDataForReport(orders,reportCurrency),
                         columns:reportColumns,
                         fileName: "Product-Sales-Report.pdf",
                         title:"Product Sales Report",
@@ -308,10 +308,10 @@ function Report() {
                                     <p>
                                         <span className="font-medium text-gray-700">Selected Currency:</span>{" "}
                                         <span className="font-semibold text-blue-600">
-                                            {selectedCurrency}
+                                            {reportCurrency}
                                         </span>
                                     </p>
-                                </div>
+                                </div>  
                             </div>
 
                             {/* Right Section */}
@@ -332,7 +332,7 @@ function Report() {
                                                 className="flex items-center justify-between rounded-md border border-gray-200 bg-gray-50 px-4 py-2"
                                             >
                                                 <span
-                                                    className={`font-medium ${currency === selectedCurrency
+                                                    className={`font-medium ${currency === reportCurrency
                                                         ? "text-blue-600"
                                                         : "text-gray-700"
                                                         }`}

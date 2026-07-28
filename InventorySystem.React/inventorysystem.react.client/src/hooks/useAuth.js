@@ -19,10 +19,14 @@ const useAuth = () => {
     };
 
     const handleGoogleLogin = async (idToken) => {
+        console.log("Google location.state:", location.state);
+
         const destination = getRedirectDestination(location.state?.from);
 
         await authService.googleLogin(idToken);
         await auth.refreshUser();
+
+        console.log("Redirecting to:", destination);
 
         navigate(destination, { replace: true });
     };

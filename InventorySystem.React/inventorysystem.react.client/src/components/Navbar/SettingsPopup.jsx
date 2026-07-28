@@ -7,7 +7,7 @@ import {
     EnvelopeIcon,
 } from "@heroicons/react/24/outline";
 import ChangePassword from "./ChangePassword";
-
+import {logout} from "../../services/authService";
 const SettingsPopup = ({ isOpen, onClose }) => {
     const emptyForm = {
         username: "",
@@ -268,6 +268,9 @@ const SettingsPopup = ({ isOpen, onClose }) => {
                 }
             }
             await updateProfile(payload);
+            if(form.newPassword){
+                logout();
+            }
             await refreshUser();
 
             toast.success("Profile updated successfully.");
