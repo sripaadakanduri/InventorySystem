@@ -86,7 +86,16 @@ function Products() {
                 // Clear the auth token directly
                 // we clear the cookie and reload the page to let ProtectedRoute handle the redirect seamlessly)
                 document.cookie = "AuthToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-                navigate("/login");
+                const params = new URLSearchParams(location.search);
+                const from = {
+                    pathname: location.pathname,
+                    search: params.toString() ? `?${params.toString()}` : "",
+                    hash: location.hash
+                };
+                navigate("/login", {
+                            replace: true,
+                            state: { from }
+                });
                 return;
             } else {
                 // If they match, just clean the userEmail param from the URL so it doesn't linger
