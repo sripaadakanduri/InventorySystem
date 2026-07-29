@@ -25,7 +25,7 @@ function Orders() {
     const [selectedCurrency, setSelectedCurrency] = useState("USD");
 
     const [filters, setFilters] = useState({
-        user: "",
+        username: "",
         status: "",
         startDate: "",
         endDate: "",
@@ -35,9 +35,15 @@ function Orders() {
     const fetchOrders = async (activeFilters = filters) => {
         try {
             setLoading(true);
-
+            // Map UI filter 'username' to backend expected 'user'
+            const apiFilters = { ...activeFilters };
+            if (apiFilters.username !== undefined) {
+                apiFilters.user = apiFilters.username;
+                delete apiFilters.username;
+            }
+            console.log('Fetching orders with filters', apiFilters);
             const [data, ratesData] = await Promise.all([
-                getAllOrders(activeFilters),
+                getAllOrders(apiFilters),
                 getLatestRates().catch(() => ({ USD: 1.0 }))
             ]);
 
@@ -102,7 +108,13 @@ function Orders() {
     };
 
     const getFilteredOrdersForExport = async () => {
-        const data = await getAllOrders(filters);
+        // Map UI filter 'username' to backend expected 'user'
+        const apiFilters = { ...filters };
+        if (apiFilters.username !== undefined) {
+            apiFilters.user = apiFilters.username;
+            delete apiFilters.username;
+        }
+        const data = await getAllOrders(apiFilters);
         setOrders(data);
         return data;
     };
