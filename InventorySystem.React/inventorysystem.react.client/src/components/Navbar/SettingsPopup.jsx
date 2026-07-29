@@ -383,7 +383,14 @@ const SettingsPopup = ({ isOpen, onClose }) => {
                                                 <button
                                                     type="button"
                                                     key={option}
-                                                    onClick={() => setSelectedOpt(option)}
+                                                    onClick={() => {
+                                                        if(option == "Daily"){
+                                                            setSelectedOpt(option);
+                                                            updateSchedule("daily");
+                                                            return;
+                                                        }   
+                                                        setSelectedOpt(option)
+                                                    }}
                                                     disabled={form.role === "Admin"}
                                                     className={`rounded-full px-4 py-2 text-sm font-medium transition-all duration-200 ${selectedOpt === option
                                                         ? "bg-blue-600 text-white shadow"

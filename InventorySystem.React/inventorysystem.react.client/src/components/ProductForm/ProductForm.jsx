@@ -120,8 +120,8 @@ function ProductForm({ onSubmit, selectedProduct, categories = [], onClose }) {
                         <label className="text-sm font-semibold text-gray-700">Price ($)</label>
                         <input
                             type="number"
-                            step="0.01"
-                            min="0.01"
+                            step="1"
+                            min="1"
                             name="price"
                             placeholder="0.00"
                             value={formData.price}

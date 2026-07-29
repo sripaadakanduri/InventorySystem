@@ -6,6 +6,7 @@ import {
     Tooltip,
 } from "recharts";
 import { useState, useRef, useEffect } from "react";
+
 const COLORS = [
     "#3B82F6", // Blue
     "#10B981", // Emerald
@@ -16,7 +17,7 @@ const COLORS = [
     "#EC4899", // Pink
     "#84CC16", // Lime
     "#F97316", // Orange
-    "#6366F1"  // Indigo
+    "#6366F1", // Indigo
 ];
 
 export default function CategoryPieChart({ data }) {
@@ -25,7 +26,10 @@ export default function CategoryPieChart({ data }) {
 
     useEffect(() => {
         function handleClickOutside(event) {
-            if (cardRef.current && !cardRef.current.contains(event.target)) {
+            if (
+                cardRef.current &&
+                !cardRef.current.contains(event.target)
+            ) {
                 setExpanded(false);
             }
         }
@@ -33,29 +37,34 @@ export default function CategoryPieChart({ data }) {
         document.addEventListener("mousedown", handleClickOutside);
 
         return () => {
-            document.removeEventListener("mousedown", handleClickOutside);
+            document.removeEventListener(
+                "mousedown",
+                handleClickOutside
+            );
         };
     }, []);
-    // Sort categories by value (highest first)
+
+    // Sort categories by value
     const sortedData = [...data].sort((a, b) => b.value - a.value);
 
-    // Keep only top 6 categories
-    const topCategories = sortedData.slice(0,10);
+    // Keep top 10
+    const topCategories = sortedData.slice(0, 10);
 
-    // Combine remaining categories into "Others"
+    // Combine remaining into "Others"
     const othersValue = sortedData
         .slice(10)
         .reduce((sum, item) => sum + item.value, 0);
 
-    const chartData = othersValue > 0
-        ? [
-            ...topCategories,
-            {
-                name: "Others",
-                value: othersValue
-            }
-        ]
-        : topCategories;
+    const chartData =
+        othersValue > 0
+            ? [
+                  ...topCategories,
+                  {
+                      name: "Others",
+                      value: othersValue,
+                  },
+              ]
+            : topCategories;
 
     return (
         <>
@@ -66,48 +75,82 @@ export default function CategoryPieChart({ data }) {
             <div
                 ref={cardRef}
                 onClick={() => setExpanded(true)}
-                className={`bg-white rounded-xl shadow-sm border border-gray-200 p-6 cursor-pointer transition-all duration-300
-                ${
+                className={`bg-white rounded-xl shadow-sm border border-gray-200 p-6 cursor-pointer transition-all duration-300 ${
                     expanded
-                        ? "fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 scale-130 z-50 w-[700px] duration-500"
-                        : "relative scale-100 duration-500"
+                        ? "fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 w-[700px] scale-110"
+                        : "relative"
                 }`}
-            >            <h2 className="text-xl font-semibold mb-6">
-                Product Category Distribution
-            </h2>
+            >
+                <h2 className="text-xl font-semibold mb-4">
+                    Product Category Distribution
+                </h2>
 
-            <ResponsiveContainer width="100%" height={420} className="group-hover:scale-102 transition-transform duration-300">
-                <PieChart>
-                    <Pie
-                        data={chartData}
-                        dataKey="value"
-                        nameKey="name"
-                        innerRadius={100}
-                        outerRadius={200}
-                        paddingAngle={1}
-                        cornerRadius={8}
-                        stroke="#fff"
-                        strokeWidth={2}
-                    >
-                        {chartData.map((entry, index) => (
-                            <Cell
-                                key={index}
-                                fill={COLORS[index % COLORS.length]}
-                            />
-                        ))}
-                    </Pie>
+                <div className="h-[420px] flex flex-col items-center justify-between">
+                    {/* Pie Chart */}
+                    <div className="w-full h-[300px]">
+                        <ResponsiveContainer width="100%" height="100%">
+                            <PieChart>
+                                <Pie
+                                    data={chartData}
+                                    dataKey="value"
+                                    nameKey="name"
+                                    innerRadius={60}
+                                    outerRadius={120}
+                                    paddingAngle={1}
+                                    cornerRadius={8}
+                                    stroke="#fff"
+                                    strokeWidth={2}
+                                >
+                                    {chartData.map((entry, index) => (
+                                        <Cell
+                                            key={index}
+                                            fill={
+                                                COLORS[
+                                                    index % COLORS.length
+                                                ]
+                                            }
+                                        />
+                                    ))}
+                                </Pie>
 
-                    <Tooltip
-                        formatter={(value, name, props) => [
-                            `${value} Products`,
-                            props.payload.name
-                        ]}
-                    />
+                                <Tooltip
+                                    formatter={(value, name, props) => [
+                                        `${value} Products`,
+                                        props.payload.name,
+                                    ]}
+                                />
+                            </PieChart>
+                        </ResponsiveContainer>
+                    </div>
 
-                    
-                </PieChart>
-            </ResponsiveContainer>
-        </div>
+                    {/* Legend */}
+                    <div className="w-full">
+                        <div className="grid grid-cols-3 gap-x-6 gap-y-3">
+                            {chartData.map((item, index) => (
+                                <div
+                                    key={item.name}
+                                    className="flex items-center gap-2"
+                                    title={`${item.name}: ${item.value} Products`}
+                                >
+                                    <span
+                                        className="w-3 h-3 rounded-full flex-shrink-0"
+                                        style={{
+                                            backgroundColor:
+                                                COLORS[
+                                                    index % COLORS.length
+                                                ],
+                                        }}
+                                    />
+
+                                    <span className="text-sm text-gray-700 truncate">
+                                        {item.name}
+                                    </span>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            </div>
         </>
     );
 }

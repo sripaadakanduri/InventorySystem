@@ -329,7 +329,7 @@ export const exportToPDF = async (orders, products) => {
 
     // Footer
     const pageCount = doc.getNumberOfPages();
-
+    var date =new Date().toLocaleString();
     for (let i = 1; i <= pageCount; i++) {
 
         doc.setPage(i);
@@ -338,7 +338,7 @@ export const exportToPDF = async (orders, products) => {
         doc.setTextColor(120);
 
         doc.text(
-            `Generated: ${new Date().toLocaleString()}`,
+            `Generated At: ${date}`,
             5,
             doc.internal.pageSize.height - 5
         );

@@ -30,7 +30,7 @@ export default function AnalyticsCards({ cards }) {
 
                                     </p>
 
-                                    <h2 className="text-3xl font-bold mt-2">
+                                    <h2 className="text-2xl font-bold mt-2">
 
                                         {card.value}
 

@@ -36,7 +36,7 @@ export default function Register() {
         setLoading(true);
         try {
             await handleRegister(form);
-            toast.success("Registration successful! Redirecting to login...");
+            toast.success("Registration successful!");
         } catch (err) {
             const data = err?.response?.data;
             const message = data?.message || (typeof data === 'string' ? data : "Registration failed");
