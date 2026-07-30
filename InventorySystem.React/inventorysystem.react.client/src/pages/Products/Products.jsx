@@ -79,30 +79,17 @@ function Products() {
     useEffect(() => {
         const queryParams = new URLSearchParams(location.search);
 
-        // Security check for email link
-        const expectedEmail = queryParams.get("userEmail");
-        if (expectedEmail && user?.email) {
-            if (expectedEmail.toLowerCase() !== user.email.toLowerCase()) {
-                // Clear the auth token directly
-                // we clear the cookie and reload the page to let ProtectedRoute handle the redirect seamlessly)
-                const params = new URLSearchParams(location.search);
-                const from = {
-                    pathname: location.pathname,
-                    search: params.toString() ? `?${params.toString()}` : "",
-                    hash: location.hash
-                };
-                document.cookie = "AuthToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-                navigate("/login", {
-                            replace: true,
-                            state: { from }
-                });
-                return;
-            } else {
-                // If they match, just clean the userEmail param from the URL so it doesn't linger
-                queryParams.delete("userEmail");
-                const newSearch = queryParams.toString();
-                window.history.replaceState({}, document.title, window.location.pathname + (newSearch ? "?" + newSearch : ""));
-            }
+        if (queryParams.has("userEmail")) {
+            queryParams.delete("userEmail");
+
+            const newSearch = queryParams.toString();
+
+            window.history.replaceState(
+                {},
+                document.title,
+                window.location.pathname +
+                (newSearch ? `?${newSearch}` : "")
+            );
         }
 
         const stockParam = queryParams.get("stock");

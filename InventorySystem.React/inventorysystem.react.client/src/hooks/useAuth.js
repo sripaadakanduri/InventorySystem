@@ -38,11 +38,11 @@ const useAuth = () => {
         navigate("/dashboard", { replace: true });
     };
 
-    const handleLogout = () => {
+    const handleLogout = (state) => {
         authService.logout();
         auth.refreshUser();
 
-        navigate("/login", { replace: true });
+        navigate("/login", { replace: true },state);
     };
 
     return {

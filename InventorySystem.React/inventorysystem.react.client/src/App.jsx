@@ -4,6 +4,7 @@ import "react-toastify/dist/ReactToastify.css";
 import Navbar from "./components/Navbar/Navbar";
 import ProtectedRoute from "./utils/ProtectedRoute";
 import PublicRoute from "./utils/PublicRoute";
+import EmailGuard from "./utils/EmailGaurd";
 
 import Login from "./pages/Login/Login";
 import Register from "./pages/Register/Register";
@@ -18,7 +19,9 @@ import Report from "./pages/Reports/Report"
 function App() {
     return (
         <BrowserRouter>
-            <Navbar />
+            <EmailGuard>
+                <Navbar />
+            </EmailGuard>
             <ToastContainer
                 position="top-right"
                 autoClose={3000}
@@ -59,7 +62,9 @@ function App() {
                     path="/products"
                     element={
                         <ProtectedRoute>
-                            <Products />
+                            <EmailGuard>
+                                <Products />
+                            </EmailGuard>
                         </ProtectedRoute>
                     }
                 />
