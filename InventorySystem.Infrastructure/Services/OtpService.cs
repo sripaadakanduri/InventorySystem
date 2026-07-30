@@ -68,7 +68,8 @@ namespace InventorySystem.Service.Services
         }
 
         public async Task SendOtpByEmailAsync(string email)
-        {
+        {   
+            email = email.Trim().ToLowerInvariant();
             var user = await _context.Users.FirstOrDefaultAsync(x => x.Email == email);
 
             if (user == null)
@@ -91,6 +92,7 @@ namespace InventorySystem.Service.Services
         
         public Task<bool> ValidateOtpByEmailAsync(string email, string otp)
         {
+            email = email.Trim().ToLowerInvariant();
             if (!_cache.TryGetValue($"OTP_{email.ToLower()}", out string? storedOtp))
                 return Task.FromResult(false);
 

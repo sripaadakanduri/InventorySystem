@@ -113,27 +113,27 @@ function Report() {
     };
    const metadata = [
         {
-            label: "Product Name:",
+            label: "Product Name",
             value: selectedProductName
         },
         {
-            label: "Total Quantity:",
+            label: "Total Quantity",
             value: stats.totalQuantity
         },
         {
-            label: "Total Days:",
+            label: "Total Days",
             value: stats.totalDays
         },
         {
-            label: "Period:",
+            label: "Period",
             value: `${selectedStartDate} to ${selectedEndDate}`
         },
         {
-            label: "Selected Currency:",
+            label: "Selected Currency",
             value: selectedCurrency
         },
         {
-            label: "Currency Frequency:",
+            label: "Currency Frequency",
             value: Object.entries(currencyCounts)
                 .map(([currency, count]) => `${currency}: ${count}`)
                 .join(", ")

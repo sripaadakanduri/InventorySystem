@@ -114,7 +114,8 @@ namespace InventorySystem.Service.Services
 
                 user.Username = dto.Username;
             }
-
+            
+            dto.Email = dto.Email.Trim().ToLowerInvariant();
             if (!string.IsNullOrWhiteSpace(dto.Email) &&
                 dto.Email != user.Email)
             {

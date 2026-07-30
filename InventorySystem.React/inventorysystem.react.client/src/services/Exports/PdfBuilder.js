@@ -98,7 +98,7 @@ export const exportToPDF = async({
         doc.setPage(i);
         doc.setFontSize(8);
         doc.setTextColor(120);
-        doc.text(`Generated At: ${date}`, 5, doc.internal.pageSize.height - 5);
+        doc.text(`Generated On: ${date}`, 5, doc.internal.pageSize.height - 5);
         doc.text(`Page ${i} of ${pageCount}`, doc.internal.pageSize.width - 5, doc.internal.pageSize.height - 5, { align: "right" });
     }
 

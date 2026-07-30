@@ -338,7 +338,7 @@ export const exportToPDF = async (orders, products) => {
         doc.setTextColor(120);
 
         doc.text(
-            `Generated At: ${date}`,
+            `Generated On: ${date}`,
             5,
             doc.internal.pageSize.height - 5
         );

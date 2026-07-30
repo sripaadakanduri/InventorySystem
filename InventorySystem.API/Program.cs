@@ -1,4 +1,3 @@
-using Hangfire;
 using InventorySystem.API.Extensions;
 using InventorySystem.Core.Configurations;
 using InventorySystem.Service.Auth;
@@ -31,13 +30,6 @@ builder.Services.AddScoped<IOtpService, OtpService>();
 builder.Services.AddScoped<IEmailService, SmtpEmailService>();
 builder.Services.AddScoped<IReportService, ReportService>();
 
-
-
-builder.Services.AddHangfire(config =>
-    config.UseSqlServerStorage(
-        builder.Configuration.GetConnectionString("DefaultConnection")));
-
-builder.Services.AddHangfireServer();
 
 
 

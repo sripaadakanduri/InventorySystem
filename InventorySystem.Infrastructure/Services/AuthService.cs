@@ -27,31 +27,39 @@ namespace InventorySystem.Service.Services
 
         public async Task<AuthResponseDto> RegisterAsync(RegisterDto dto)
         {
+            // Normalize email
+            dto.Email = dto.Email.Trim().ToLowerInvariant();
+
+            // Check if username already exists
             var existingUsername = await _repo.GetByUsernameAsync(dto.Username);
             if (existingUsername != null)
             {
                 throw new InvalidOperationException("Username is already taken. Please choose another.");
             }
 
+            // Check if email already exists
             var existingEmail = await _repo.GetByEmailAsync(dto.Email);
             if (existingEmail != null)
             {
                 throw new InvalidOperationException("An account with this email address already exists.");
             }
 
-            var role = string.IsNullOrEmpty(dto.Role) ? "User" : dto.Role;
+            var role = string.IsNullOrWhiteSpace(dto.Role) ? "User" : dto.Role;
+
             var user = new User
             {
                 Username = dto.Username,
-                Email = dto.Email,
+                Email = dto.Email, // Already normalized
                 PasswordHash = PasswordHasher.Hash(dto.Password),
-                Role = string.IsNullOrEmpty(dto.Role) ? "User" : dto.Role,
+                Role = role,
                 NotificationSchedule = role == "Admin" ? "D" : "N"
             };
+
             await _repo.AddAsync(user);
             await _unitOfWork.SaveChangesAsync();
 
             var token = _jwt.GenerateToken(user);
+
             return new AuthResponseDto
             {
                 Token = token,

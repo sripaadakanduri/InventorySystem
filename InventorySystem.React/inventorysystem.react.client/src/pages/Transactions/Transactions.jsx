@@ -117,10 +117,10 @@ const Transactions = () => {
             accessor: "username"
         },
         {
-            key: "productName",
+            key: "product",
             title: "Product",
-            render: (_, row) => row.productName,
-            accessor: "productName"
+            render: (_, row) => row.product?.name ?? "",
+            accessor: "product"
         },
         {
             key: "quantityChanged",
