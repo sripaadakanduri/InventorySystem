@@ -254,7 +254,20 @@ function ProductImportModal({ onClose, onImported }) {
 
         try {
             setIsImporting(true);
+            const fileText = await selectedFile.text();
+            const lines = fileText.split(/\r?\n/).filter(line => line.trim());
 
+            if (lines.length === 0) {
+                toast.error("The selected file is empty.");
+                setIsImporting(false);
+                return;
+            }
+
+            if (lines.length === 1) {
+                toast.error("The selected file contains only headers with no products.");
+                setIsImporting(false);
+                return;
+            }
             const formData = new FormData();
             formData.append("file", selectedFile);
 
