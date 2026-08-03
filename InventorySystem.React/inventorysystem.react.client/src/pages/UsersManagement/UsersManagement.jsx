@@ -66,6 +66,16 @@ const UsersManagement = () => {
     };
 
     const validateNewUser = () => {
+        if (!newUser.username || newUser.username.length < 3) {
+            toast.error("Username must be at least 3 characters.");
+            return false;
+        }
+
+        if (!/[a-zA-Z]/.test(newUser.username)) {
+            toast.error("Username must contain at least one alphabet.");
+            return false;
+        }
+
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!emailRegex.test(newUser.email)) {
             toast.error("Please enter a valid email address.");

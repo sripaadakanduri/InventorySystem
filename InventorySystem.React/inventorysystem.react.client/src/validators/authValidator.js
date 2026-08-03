@@ -3,6 +3,8 @@ export const validateRegister = (form) => {
 
     if (!form.username || form.username.length < 3) {
         errors.username = "Username must be at least 3 characters";
+    } else if (!/[a-zA-Z]/.test(form.username)) {
+        errors.username = "Username must contain at least one alphabet";
     }
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
