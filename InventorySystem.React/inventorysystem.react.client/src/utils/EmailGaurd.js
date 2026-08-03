@@ -19,8 +19,8 @@ const EmailGuard = ({ children }) => {
     useEffect(() => {
         if (!emailMismatch) return;
 
-        authService.logout(); // remove cookie
-        setUser(null);        // immediately clear auth state
+        authService.logout(); 
+        setUser(null); 
 
         navigate("/login", {
             replace: true,

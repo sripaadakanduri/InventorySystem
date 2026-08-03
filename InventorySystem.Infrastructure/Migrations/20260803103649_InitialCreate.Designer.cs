@@ -12,18 +12,35 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace InventorySystem.Service.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260701104556_AddPaidCurrencyFields")]
-    partial class AddPaidCurrencyFields
+    [Migration("20260803103649_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "10.0.8")
+                .HasAnnotation("ProductVersion", "10.0.10")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+
+            modelBuilder.Entity("InventorySystem.Core.Entities.ExchangeRate", b =>
+                {
+                    b.Property<DateTime>("Date")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CurrencyCode")
+                        .HasMaxLength(3)
+                        .HasColumnType("nvarchar(3)");
+
+                    b.Property<decimal>("Rate")
+                        .HasColumnType("decimal(18,6)");
+
+                    b.HasKey("Date", "CurrencyCode");
+
+                    b.ToTable("ExchangeRates");
+                });
 
             modelBuilder.Entity("InventorySystem.Core.Entities.InventoryTransaction", b =>
                 {
@@ -72,6 +89,9 @@ namespace InventorySystem.Service.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<decimal>("BaseTotalAmount")
+                        .HasColumnType("decimal(18,2)");
+
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
@@ -89,8 +109,10 @@ namespace InventorySystem.Service.Migrations
                         .HasColumnType("decimal(18,6)")
                         .HasDefaultValue(1.0m);
 
-                    b.Property<decimal>("PaidTotalAmount")
-                        .HasColumnType("decimal(18,2)");
+                    b.Property<string>("OrderNumber")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
 
                     b.Property<int>("Status")
                         .HasColumnType("int");
@@ -99,12 +121,17 @@ namespace InventorySystem.Service.Migrations
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("datetime2");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETUTCDATE()");
 
                     b.Property<int>("UserId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("OrderNumber")
+                        .IsUnique();
 
                     b.HasIndex("UserId");
 
@@ -119,14 +146,14 @@ namespace InventorySystem.Service.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<decimal>("BaseTotalPrice")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("BaseUnitPrice")
+                        .HasColumnType("decimal(18,2)");
+
                     b.Property<int>("OrderId")
                         .HasColumnType("int");
-
-                    b.Property<decimal>("PaidTotalPrice")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<decimal>("PaidUnitPrice")
-                        .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("ProductId")
                         .HasColumnType("int");
@@ -214,6 +241,13 @@ namespace InventorySystem.Service.Migrations
 
                     b.Property<DateTime?>("LastLoginAt")
                         .HasColumnType("datetime2");
+
+                    b.Property<string>("NotificationSchedule")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)")
+                        .HasDefaultValue("N");
 
                     b.Property<string>("PasswordHash")
                         .IsRequired()

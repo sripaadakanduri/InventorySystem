@@ -50,12 +50,35 @@ namespace InventorySystem.Service.Data
             modelBuilder.Entity<Order>(entity =>
             {
                 entity.HasKey(o => o.Id);
+
                 entity.Property(o => o.OrderNumber)
                       .HasMaxLength(20)
                       .IsRequired();
-                entity.Property(o => o.TotalAmount).HasColumnType("decimal(18,2)");
-                entity.Property(o => o.BaseTotalAmount).HasColumnType("decimal(18,2)");
-                entity.Property(o => o.CreatedAt).HasDefaultValueSql("GETUTCDATE()");
+
+                entity.HasIndex(o => o.OrderNumber)
+                      .IsUnique();
+
+                entity.Property(o => o.TotalAmount)
+                      .HasColumnType("decimal(18,2)");
+
+                entity.Property(o => o.BaseTotalAmount)
+                      .HasColumnType("decimal(18,2)");
+
+                entity.Property(o => o.Currency)
+                      .IsRequired()
+                      .HasMaxLength(3)
+                      .HasDefaultValue("USD");
+
+                entity.Property(o => o.ExchangeRate)
+                      .HasColumnType("decimal(18,6)")
+                      .HasDefaultValue(1.0m);
+
+                entity.Property(o => o.CreatedAt)
+                      .HasDefaultValueSql("GETUTCDATE()");
+
+                entity.Property(o => o.UpdatedAt)
+                      .HasDefaultValueSql("GETUTCDATE()");
+
                 entity.HasOne(o => o.User)
                       .WithMany(u => u.Orders)
                       .HasForeignKey(o => o.UserId)
